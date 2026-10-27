@@ -47,16 +47,67 @@ Verified 2026-10-27 in the environment recorded above:
   performance experiment performed. Socket-disconnect detection is still pending;
   the cancellation test explicitly cancels the request task.
 
-## 2 — Genuine local LLM integration (next)
+## 2 — Genuine local LLM integration (complete)
 
-- [ ] Install/run one local inference backend sequentially; use Ollama Gemma 3 1B
+- [x] Install/run one local inference backend sequentially; use Ollama Gemma 3 1B
   if feasible, otherwise document the actual access/resource blocker.
-- [ ] Configure model alias and demonstrate genuine inference through the adapter.
-- [ ] Record model/server versions, hardware, command, sanitized output and latency.
+- [x] Configure model alias and demonstrate genuine inference through the adapter.
+- [x] Record model/server versions, hardware, command, sanitized output and latency.
 
 Exit: real inference demonstrated independently of deterministic mock tests.
 
-## 3 — Exact cache
+Verified 2026-10-27, preserving all source, configurations, dependencies, and tests
+from foundation commit `971202f`; only README/PLAN changed:
+
+- Official Ollama **0.40.11** Linux archive SHA-256 verified as
+  `7bedab90dd122661be78798e9f0edf37fccf0cccf2699d2c58ea1a3afdc04b6d`.
+  Extracted into ignored `artifacts/ollama-runtime`, no system service/install.
+  Bubblewrap **0.12.0** provided a read-only host, sandbox devices, ephemeral home,
+  and repository-backed key/model/temp state without changing `HOME` or proxy/CA
+  variables. Native startup would otherwise create `~/.ollama` outside the project.
+- Genuine `gemma3:1b` pull returned success: 999.89M parameters, GGUF `Q4_K_M`.
+  Manifest digest `97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`;
+  806,058,400-byte weight layer independently hashed as
+  `2f8c3d137f2496dcb4019e17a50f2974b89c1be1a742db3c80cc86f91cafeeef`.
+- CPU only, one loaded model and one inference at a time, 2,048-token runtime
+  context. `/api/ps`: 881,076,469 bytes loaded; VRAM 0. Sampled cgroup peak
+  **5.65 GiB** including file cache; peak anonymous memory **0.964 GiB**.
+  `memory.events` max/oom/oom_kill all zero; no installation/access/OOM blocker.
+  Feasibility applies to this short sequential workload, not full model context
+  or concurrent inference. macOS/Metal remains untested.
+- Direct physical-model request and authenticated gateway alias `gemma` request
+  both returned **200, `Paris`**, stop, reported usage **23/2/25**; request IDs
+  `chatcmpl-325` / `chatcmpl-613`. Elapsed samples **0.962 / 0.555 s** are not
+  a performance benchmark. Model alias/response filtering matched the contract.
+  Sampling parameters **temperature 0.2, top_p 0.8, seed 42, cap 32, stream false**
+  were accepted; runner logs confirmed temperature/top_p; existing tests establish
+  exact parameter forwarding. A cap-1 request reported **1 completion token**, length;
+  system/user role handling returned **`Tokyo`** for the capital of Japan.
+- Real-endpoint checks: missing/invalid auth **401**; model listing only `gemma`;
+  unsupported physical-name alias **404**; streaming **422**. Stopping actual
+  Ollama produced **503 backend_unavailable**, while liveness stayed **200**.
+  Restarting the same backend restored **200 `Paris`** through the same gateway.
+- Temporary, ignored TOML copies tested 50 ms and 1 s deadlines through a separate
+  HTTP gateway. Results **504 in 0.082 s / 1.567 s**. The 50 ms probe did not
+  establish inference start; the 1 s warmed-model probe did: real runner task,
+  upstream cancellation, and successful subsequent direct completion. Observed
+  client wall-time overshoot means this cooperative adapter deadline is not a
+  hard end-to-end wall-clock bound.
+  No retries or fallback; all verification servers cleaned up. A later direct
+  cold/reload request took **52.14 s**; no model-performance guarantee is inferred.
+- Quality failure retained: **17 + 25 → `32`**, HTTP 200 with usage 24/4/28.
+  Real inference and transport correctness do not imply answer correctness.
+- Reproduction/install/request/fault commands and sample outputs are in README.
+  Raw local JSON/logs and verification drivers are ignored under
+  `artifacts/milestone02/`; the original Ollama TOML comment predates verification.
+
+Final regressions: `.venv/bin/pytest` **58 passed in 1.04 s**;
+`.venv/bin/ruff check .` **all checks passed**;
+`.venv/bin/ruff format --check .` **13 files already formatted**;
+`git diff --check` **clean**. Ports 11434/8000/8001 closed after cleanup.
+No caching, quotas, providers, dashboards, or optimizations added.
+
+## 3 — Exact cache (next; not started)
 
 - [ ] Conservative eligibility, client/context/model/settings/policy keys,
   TTL/capacity, and in-flight coalescing.

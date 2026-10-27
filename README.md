@@ -2,9 +2,9 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with planned conservative semantic caching and process-local traffic
-controls. **Current status: milestone 1, authenticated HTTP foundation.** Caching,
-rate limiting, metrics, performance benchmarks, and genuine inference are not
-complete. This is not yet a high-throughput gateway demonstration.
+controls. **Current status: milestone 2, genuine Gemma 3 1B inference verified
+through Ollama and the gateway.** Caching, rate limiting, metrics, and performance
+benchmarks remain pending. This is not yet a high-throughput gateway demonstration.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
 and one pooled HTTPX async client. A separate deterministic HTTP service validates
@@ -101,23 +101,193 @@ backend response size. HTTPX phase timeouts alone are not total deadlines; an
 outer async deadline includes pool wait and response reading. Response token
 counts, when present, are provider-reported and checked for consistent totals.
 
-## Real model: next milestone
+## Real model: verified milestone 2
 
-The ready-to-use routing example is `config/ollama.toml`. On the target machine,
-install [Ollama](https://ollama.com/download), then run sequentially:
+Verified on 2026-10-27 using **Ollama 0.40.11**, `gemma3:1b`, 999.89M parameters,
+GGUF `Q4_K_M`. The unchanged `config/ollama.toml` routes alias `gemma` to that
+physical model; its initial "not yet verified" comment is historical. No gateway,
+configuration, dependency, or test source changed in this milestone.
+
+Model manifest SHA-256:
+`97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`.
+The 806,058,400-byte model-weight layer was independently hashed as
+`2f8c3d137f2496dcb4019e17a50f2974b89c1be1a742db3c80cc86f91cafeeef`.
+Gemma Terms of Use apply. No alternate inference server or mock supplied these
+results; Ollama itself uses its bundled llama.cpp runner for this model.
+
+### Linux setup used
+
+The runner had 8 GiB cgroup memory, two CPU cores' quota, no GPU, and initially
+29.8 GiB free disk. Installation used the official archive rather than modifying
+system services. Requires `curl`, `tar`, `zstd`, and **bubblewrap 0.12.0** with
+working namespaces. From the repository:
 
 ```sh
-ollama serve              # only if the Ollama app/service is not already running
-ollama pull gemma3:1b     # run in another shell once the server is ready
-export GATEWAY_CONFIG=config/ollama.toml
-# Start the gateway as above, retaining GATEWAY_CLIENT_KEYS_JSON.
-# Send the completion example with model="gemma".
+mkdir -p artifacts/ollama-runtime artifacts/ollama-state artifacts/ollama-models \
+  artifacts/ollama-tmp artifacts/milestone02
+curl --fail --location --silent --show-error --max-time 600 \
+  --output artifacts/ollama-linux-amd64-v0.40.11.tar.zst \
+  https://github.com/ollama/ollama/releases/download/v0.40.11/ollama-linux-amd64.tar.zst
+printf '%s  %s\n' \
+  7bedab90dd122661be78798e9f0edf37fccf0cccf2699d2c58ea1a3afdc04b6d \
+  artifacts/ollama-linux-amd64-v0.40.11.tar.zst | sha256sum --check
+tar --zstd --extract --file artifacts/ollama-linux-amd64-v0.40.11.tar.zst \
+  --directory artifacts/ollama-runtime
+export OLLAMA_HOST=127.0.0.1:11434
+export OLLAMA_MODELS="$PWD/artifacts/ollama-models"
+export OLLAMA_NUM_PARALLEL=1 OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_CONTEXT_LENGTH=2048
+export OLLAMA_KEEP_ALIVE=10m OLLAMA_NO_CLOUD=1
+bwrap --die-with-parent --ro-bind / / --dev /dev --tmpfs "$HOME" \
+  --bind "$PWD/artifacts/ollama-state" "$HOME/.ollama" \
+  --bind "$PWD/artifacts/ollama-models" "$PWD/artifacts/ollama-models" \
+  --bind "$PWD/artifacts/ollama-tmp" "$PWD/artifacts/ollama-tmp" \
+  --chdir "$PWD" --setenv TMPDIR "$PWD/artifacts/ollama-tmp" \
+  -- "$PWD/artifacts/ollama-runtime/bin/ollama" serve \
+  > artifacts/milestone02/ollama.log 2>&1 &
+OLLAMA_DEMO_PID=$!
 ```
 
-This configuration targets the same documented non-streaming HTTP subset.
-**Real inference has not been executed or benchmarked in this milestone.**
-Gemma 3 1B is the first target; its download is about 806 MB, not its full runtime
-memory requirement. Gemma Terms of Use apply. No Qwen models are selected.
+Ollama creates a key in `~/.ollama` even with cloud disabled. This namespace keeps
+the host filesystem read-only, provides an ephemeral home filesystem, and binds
+only state/models/temp back to ignored repository directories. The `HOME`
+environment variable and inherited network proxy/CA settings are unchanged.
+`--dev /dev` provides usable sandbox devices, including `/dev/null`.
+
+After `/api/version` responds, pull **one model**, then start the gateway with
+the real-model configuration. Skip the mock-server command:
+
+```sh
+curl --fail --silent --show-error --noproxy 127.0.0.1 \
+  http://127.0.0.1:11434/api/version
+curl --fail --silent --show-error --noproxy 127.0.0.1 --max-time 600 \
+  http://127.0.0.1:11434/api/pull -H 'Content-Type: application/json' \
+  -d '{"model":"gemma3:1b","stream":false}'
+export GATEWAY_CONFIG=config/ollama.toml
+export GATEWAY_DEMO_KEY="$(.venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export GATEWAY_CLIENT_KEYS_JSON="{\"demo-client\":\"$GATEWAY_DEMO_KEY\"}"
+.venv/bin/python -m uvicorn llm_gateway.app:create_app --factory \
+  --host 127.0.0.1 --port 8000 --workers 1 --no-access-log &
+GATEWAY_DEMO_PID=$!
+```
+
+The pull returned `{"status":"success"}`. Never run the mock backend as a
+substitute for this step. The following reproduces the direct request **first**,
+then the authenticated gateway request with the same messages and parameters.
+Keep `GATEWAY_DEMO_KEY` from the gateway startup shell:
+
+```sh
+.venv/bin/python - <<'PY'
+import json, os, httpx
+payload = {
+    "model": "gemma3:1b",
+    "messages": [{"role": "user", "content":
+                  "What is the capital of France? Answer with only the city name."}],
+    "temperature": 0.2, "top_p": 0.8, "max_tokens": 32,
+    "seed": 42, "stream": False,
+}
+with httpx.Client(trust_env=False, timeout=120) as client:
+    direct = client.post("http://127.0.0.1:11434/v1/chat/completions", json=payload)
+    direct.raise_for_status()
+    print("direct", json.dumps(direct.json()))
+    gateway = client.post("http://127.0.0.1:8000/v1/chat/completions",
+        json=payload | {"model": "gemma"},
+        headers={"Authorization": "Bearer " + os.environ["GATEWAY_DEMO_KEY"]})
+    gateway.raise_for_status()
+    print("gateway", json.dumps(gateway.json()))
+PY
+curl --silent --show-error --noproxy 127.0.0.1 http://127.0.0.1:11434/api/tags
+curl --silent --show-error --noproxy 127.0.0.1 http://127.0.0.1:11434/api/ps
+```
+
+Both actual responses contained assistant text **`Paris`**, `finish_reason: stop`,
+and provider-reported usage `{prompt_tokens: 23, completion_tokens: 2, total_tokens: 25}`.
+The direct response used `model: gemma3:1b`; the gateway normalized it to `gemma`
+and removed `system_fingerprint` and nested provider-only token details. Direct
+request ID was `chatcmpl-325`; gateway ID was `chatcmpl-613`. Matching outputs
+support the integration evidence, not a guarantee of deterministic inference.
+Ollama's runner logs confirmed `temp = 0.200` and `top_p = 0.800`; existing tests
+verify forwarding of all supported parameters, including `seed`.
+
+### Real-backend checks and limitations
+
+All requests were sequential. These elapsed samples are functional evidence,
+not a latency/throughput benchmark:
+
+| Check | Observed result |
+| --- | --- |
+| Direct / gateway Paris request | HTTP 200 / 200; 0.962 s / 0.555 s |
+| `max_tokens: 1` through gateway | HTTP 200; completion tokens 1; finish `length` |
+| System message "Answer with only one word."; capital of Japan | HTTP 200; `Tokyo` |
+| Missing / invalid bearer key | HTTP 401 / 401 |
+| Authenticated model listing | Only public alias `gemma` |
+| Physical name `gemma3:1b` as client alias / `stream: true` | HTTP 404 / 422 |
+| 50 ms deadline, live Ollama | HTTP 504 in 0.082 s; inference start not established |
+| 1 s deadline, warmed Ollama, enumerate 1–100, cap 128 | HTTP 504 in 1.567 s; runner started task, then logged cancellation |
+| Stop actual Ollama, request through gateway | HTTP 503 `backend_unavailable`; liveness still 200 |
+| Restart same Ollama/model, request through same gateway | HTTP 200; `Paris` (8.894 s including model reload) |
+
+For the two timeout checks, temporary copies of the existing TOML changed only
+`request_timeout_seconds` to `0.05` and `1.0`, respectively; separate gateway
+processes listened on port 8001. Reproduce the stronger check while Ollama is warm:
+
+```sh
+.venv/bin/python - <<'PY'
+from pathlib import Path
+Path("artifacts/milestone02/timeout-1s.toml").write_text(
+    Path("config/ollama.toml").read_text().replace(
+        "request_timeout_seconds = 60.0", "request_timeout_seconds = 1.0"))
+PY
+GATEWAY_CONFIG=artifacts/milestone02/timeout-1s.toml \
+  .venv/bin/python -m uvicorn llm_gateway.app:create_app --factory \
+  --host 127.0.0.1 --port 8001 --workers 1 --no-access-log &
+GATEWAY_TIMEOUT_PID=$!
+# Wait for /healthz, then send this authenticated request:
+curl --silent --show-error --noproxy 127.0.0.1 --max-time 120 \
+  --write-out '\nHTTP %{http_code}; elapsed %{time_total}s\n' \
+  http://127.0.0.1:8001/v1/chat/completions \
+  -H "Authorization: Bearer $GATEWAY_DEMO_KEY" -H 'Content-Type: application/json' \
+  -d '{"model":"gemma","messages":[{"role":"user","content":"List the integers from 1 through 100 separated by spaces."}],"temperature":0.2,"top_p":0.8,"max_tokens":128,"seed":42,"stream":false}'
+kill "$GATEWAY_TIMEOUT_PID"
+```
+
+On faster hardware this request may finish before the deadline; the 504 result
+above applies to this tested CPU workload.
+
+The deadline is cooperative and covers the adapter, not all gateway work; the
+observed client wall time exceeded it under CPU-limited conditions. Recovery
+requests succeeded after both timeout probes; latency
+varied, including a 52.14 s direct cold/reload request. Closing HTTP does not
+guarantee prompt cancellation on every backend, even though this active probe
+logged `cancel task` and a subsequent direct request succeeded. To reproduce the
+outage check, stop the owned Ollama process (`kill "$OLLAMA_DEMO_PID"`), repeat
+the normal authenticated request, then restart the same server and retry manually.
+There are no inference retries or model fallback in the gateway.
+
+Runtime feasibility was measured: `/api/ps` reported 881,076,469 bytes loaded,
+`size_vram: 0`, and `context_length: 2048`; process RSS was 38,220 KiB for Ollama
+and 891,444 KiB for its runner. Whole-cgroup peak was **6,067,605,504 bytes
+(5.65 GiB)**, including approximately 4.54 GiB of file cache; sampled peak
+anonymous memory was 0.964 GiB. Cgroup `oom`, `oom_kill`,
+and `max` event counts remained zero. This establishes feasibility only for the
+tested short single-model, single-inference workload, not large contexts or
+concurrent inference on this runner. Model allocation, RSS, and cgroup totals
+measure different things and must not be added together.
+
+One quality probe failed: `Compute 17 + 25. Reply with only the integer.` returned
+`32` (HTTP 200, 24 prompt / 4 completion tokens), not 42. Infrastructure success
+does not establish answer correctness. Local raw JSON, logs, and one-off drivers
+remain in ignored `artifacts/milestone02/`; committed evidence is summarized here
+and in `PLAN.md`. All verification servers were stopped afterward.
+
+No installation, registry-access, or OOM blocker remained. macOS/Metal has not
+been tested. On macOS 14+, install the [official Ollama app](https://ollama.com/download),
+set the same context/concurrency controls when launching `ollama serve`, pull
+`gemma3:1b`, and use the same gateway/request commands; native Ollama writes to
+`~/.ollama`, while the filesystem-isolation wrapper above is Linux-specific.
+References: [release](https://github.com/ollama/ollama/releases/tag/v0.40.11),
+[Linux installation](https://docs.ollama.com/linux),
+[memory/concurrency controls](https://docs.ollama.com/faq), and
+[OpenAI subset](https://docs.ollama.com/api/openai-compatibility).
 
 ## Evidence and limitations
 
@@ -125,10 +295,10 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestone 1 evidence is recorded in `PLAN.md`: **58 passing automated tests**,
-passing lint/format checks, and a two-server HTTP smoke demonstration. The tests exercise
-concurrent async forwarding; they are not a throughput benchmark. **No observed
-RPS, p95, cache savings, or model-generation performance is claimed yet.**
+Milestones 1–2 evidence is recorded in `PLAN.md`: **58 passing automated tests**,
+passing lint/format checks, the deterministic HTTP smoke demonstration, and the
+real-model checks above. Concurrent forwarding tests are not a load benchmark.
+**No RPS, p95, cache savings, or model-generation throughput is claimed yet.**
 
 Use loopback and one worker. There is no admission control, quota, cache, metrics
 endpoint, or shared state across workers yet. Pool capacity is not a rate limiter.
