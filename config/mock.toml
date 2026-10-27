@@ -1,0 +1,11 @@
+# Start the deterministic HTTP backend before the gateway. No real inference.
+request_timeout_seconds = 10.0
+max_connections = 16
+max_response_bytes = 262144
+
+[backends.local]
+base_url = "http://127.0.0.1:9001/v1"
+
+[models.demo]
+backend = "local"
+model = "deterministic-mock"
