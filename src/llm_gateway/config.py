@@ -55,17 +55,30 @@ class ModelRoute(StrictModel):
     model: Annotated[str, Field(min_length=1, max_length=128)]
 
 
+class RateLimitConfig(StrictModel):
+    burst: Annotated[int, Field(ge=1, le=10_000)] = 60
+    requests_per_second: Annotated[float, Field(ge=0.000001, le=10_000)] = 1.0
+
+
 class GatewayConfig(StrictModel):
     backends: dict[str, BackendConfig]
     models: dict[str, ModelRoute]
     request_timeout_seconds: Annotated[float, Field(gt=0, le=300)] = 30.0
     max_connections: Annotated[int, Field(ge=1, le=64)] = 16
     max_response_bytes: Annotated[int, Field(ge=1024, le=1_048_576)] = 262_144
+    max_in_flight: Annotated[int, Field(ge=1, le=64)] = 8
+    rate_limit: RateLimitConfig = Field(default_factory=RateLimitConfig)
+    client_rate_limits: dict[str, RateLimitConfig] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def valid_routes(self) -> "GatewayConfig":
         if not self.backends or not self.models:
             raise ValueError("at least one backend and model must be configured")
+        if len(self.client_rate_limits) > 128 or any(
+            not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", client_id)
+            for client_id in self.client_rate_limits
+        ):
+            raise ValueError("invalid client rate-limit overrides")
         for alias, route in self.models.items():
             if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", alias):
                 raise ValueError("invalid public model alias")
@@ -110,6 +123,9 @@ def load_settings() -> Settings:
             "GATEWAY_CLIENT_KEYS_JSON must map client IDs to distinct 32–256 character "
             "URL-safe bearer keys (maximum 128 clients)"
         ) from None
+
+    if config.client_rate_limits.keys() - set(hashes.values()):
+        raise RuntimeError("Rate-limit override refers to an unconfigured client ID")
 
     backend_tokens = {}
     for name, backend in config.backends.items():

@@ -2,8 +2,8 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with planned conservative semantic caching and process-local traffic
-controls. **Current status: milestone 2, genuine Gemma 3 1B inference verified
-through Ollama and the gateway.** Caching, rate limiting, metrics, and performance
+controls. **Current status: milestone 3, client quotas and bounded inference
+admission implemented; genuine Gemma inference verified.** Caching, metrics, and performance
 benchmarks remain pending. This is not yet a high-throughput gateway demonstration.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
@@ -23,6 +23,8 @@ uv sync --locked
 .venv/bin/ruff check .
 .venv/bin/ruff format --check .
 .venv/bin/python -m devtools.smoke
+.venv/bin/python -m devtools.traffic_probe --output artifacts/traffic-probe.json
+.venv/bin/python -m devtools.deadline_probe --output artifacts/deadline-probe.json
 ```
 
 The smoke command starts and cleans up two loopback HTTP servers, generates an
@@ -92,8 +94,8 @@ No streaming, tools, multimodal content, or full OpenAI API compatibility.
 Errors have `error.code` and `error.message`, without submitted inputs. 401 means
 authentication, 400/422 malformed or invalid input, 413 oversized body, 415 media
 type, 404 unknown model, 502 invalid/rejected backend response, 503 unavailable or
-overloaded backend, and 504 upstream deadline. Upstream 429 maps to 503; client
-quota enforcement with 429 is a later milestone. Model identity must match the
+overloaded backend, and 504 upstream deadline. Client request quotas return 429;
+upstream 429 still maps to 503. Model identity must match the
 configured physical name; canonical-name variants require explicit configuration.
 
 TOML controls total upstream deadline, connection-pool capacity, and maximum
@@ -101,12 +103,89 @@ backend response size. HTTPX phase timeouts alone are not total deadlines; an
 outer async deadline includes pool wait and response reading. Response token
 counts, when present, are provider-reported and checked for consistent totals.
 
+## Request quotas and inference admission
+
+One worker owns all in-memory state. Token buckets are keyed by configured
+authenticated client IDs, not IP addresses or arbitrary request fields. Each
+authenticated completion attempt costs one token, including invalid requests,
+backend failures and admission rejections. No refund; quota-denied attempts do
+not spend another token. Failed authentication, model listing and liveness are
+exempt. These are request counts, not generated-token limits.
+
+```toml
+max_in_flight = 8             # root TOML setting; no admission waiting queue
+
+[rate_limit]
+burst = 60                   # initial tokens and maximum stored tokens
+requests_per_second = 1.0     # continuous refill using a monotonic clock
+
+[client_rate_limits.demo-client]  # optional override for a configured client ID
+burst = 5
+requests_per_second = 0.5
+```
+
+Unknown override IDs fail startup. Exhaustion returns **429**
+`rate_limit_exceeded` with `Retry-After` rounded up to whole seconds until one
+token refills. That guidance describes the current deficit; other callers using
+the same client identity may consume the next token first. The critical
+check/update contains no await, so concurrent tasks on this event loop cannot
+overspend the bucket.
+
+Full inference capacity returns **503** `gateway_overloaded` immediately;
+no task waits for an admission slot. There is no `Retry-After` because completion
+time is unknown. Slots are released after HTTP cleanup on success, failure,
+timeout or cancellation. An ASGI disconnect cancels the upstream operation;
+an empty internal 499 is used only after the peer has departed. The Ollama example
+uses **capacity 1, burst 10, refill 0.2/second** to suit the CPU runner.
+
+Admission bounds gateway adapter operations, including HTTPX pool wait. Setting
+`max_connections` below `max_in_flight` permits bounded waiting inside that
+admitted set. It does not bound uploads, all incoming sockets or server backlog.
+There is no per-client concurrency reservation/fairness: a client within quota
+can occupy all global slots. Restart resets buckets; multiple workers/replicas
+multiply quotas and capacity. This implementation has **no distributed consistency**
+and must run with `--workers 1`; traffic state is not thread-safe.
+
+Reproducible loopback HTTP evidence (`traffic_probe`, deterministic fixture):
+12 simultaneous requests per client produced **3 accepted / 9 quota-rejected**
+for client A and **2 / 10** for client B; exactly **5 upstream calls**. With two
+held inference slots, **20 excess requests returned 503**, upstream calls and
+peak active count stayed at **2**, and a request succeeded after release.
+These are enforcement checks, not model or cached-response throughput numbers.
+
+## Timeout scope and investigation
+
+`request_timeout_seconds` bounds the upstream operation: connection/pool wait,
+I/O, reading and normalization. Cleanup completes before a slot is released,
+even beyond the budget; a monotonic post-check changes late success to 504.
+The timer is disarmed before cleanup to avoid a second deadline cancellation
+interrupting cleanup already triggered by a disconnect. Identity-only raw
+response iteration avoids HTTPX auto-close under the expiring read timer.
+
+`Server-Timing` reports **gateway** time from request-boundary middleware entry to response-start and
+**adapter** time around the complete adapter call, including cleanup. The latter
+also includes request preparation; neither is isolated model inference or CPU
+overhead. Response delivery, client scheduling and network time occur outside
+the gateway measurement. Async deadlines are cooperative, not hard client
+wall-clock bounds; a hung transport cleanup can retain capacity beyond the budget.
+
+The old **1 s → 1.567 s** sample recorded only external time; the available data
+cannot attribute the extra 567 ms to a specific cause. New `deadline_probe`
+measurements separate client, gateway and adapter scopes over actual HTTP with
+50 ms trickled chunks: the final run measured **1003.323 ms client**, **1001.801 ms
+gateway**, and **1001.043 ms adapter**, returning 504. Tests separately demonstrate delayed cleanup and event-loop
+blocking. A real defect was reproduced using a deliberately blocking test
+transport: with a 5 ms budget, the previous code returned **200 after 31.4 ms**;
+the monotonic check now returns **504** after cleanup. This fixes classification,
+not the inability to preempt synchronous work. Overlapping cancellation/deadline
+tests also verify cleanup finishes while its inference slot remains occupied.
+
 ## Real model: verified milestone 2
 
 Verified on 2026-10-27 using **Ollama 0.40.11**, `gemma3:1b`, 999.89M parameters,
 GGUF `Q4_K_M`. The unchanged `config/ollama.toml` routes alias `gemma` to that
-physical model; its initial "not yet verified" comment is historical. No gateway,
-configuration, dependency, or test source changed in this milestone.
+physical model. This section records milestone 2; milestone 3 added traffic
+settings while preserving this model mapping and adapter contract.
 
 Model manifest SHA-256:
 `97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`.
@@ -295,21 +374,22 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestones 1–2 evidence is recorded in `PLAN.md`: **58 passing automated tests**,
-passing lint/format checks, the deterministic HTTP smoke demonstration, and the
-real-model checks above. Concurrent forwarding tests are not a load benchmark.
+Milestones 1–3 evidence is recorded in `PLAN.md`, including **85 passing tests**,
+lint/format checks, deterministic HTTP enforcement/deadline probes, and real-model
+verification. Concurrent forwarding tests are not a load benchmark.
 **No RPS, p95, cache savings, or model-generation throughput is claimed yet.**
 
-Use loopback and one worker. There is no admission control, quota, cache, metrics
-endpoint, or shared state across workers yet. Pool capacity is not a rate limiter.
-Task cancellation closes active HTTPX responses; socket-disconnect detection
-after upload and slow-client ingress deadlines remain later work. HTTP cleanup
+Use loopback and one worker. There is no cache, metrics endpoint, ingress
+slow-client deadline, or shared state across workers. Pool capacity and inference
+admission are distinct from request quotas. Task/ASGI-disconnect cancellation
+closes active HTTPX responses; the automated disconnect tests inject ASGI events.
+HTTP cleanup
 cannot guarantee the model server stops inference. Do not expose this foundation
 directly to the Internet. Prompts, credentials, and upstream error bodies are not
 logged by application code; access logging is disabled in examples.
 
-Benchmark commands are intentionally pending until caching and traffic controls
-exist. Milestone 6 will add a reproducible harness for uncached/exact/semantic,
+Throughput benchmark commands remain pending until caching and metrics exist.
+Milestone 6 will add a reproducible harness for uncached/exact/semantic,
 concurrency, quota and failure scenarios, with raw results and separate mock,
 gateway-overhead and real-model measurements. See [SPEC.md](SPEC.md) for cache
 safety/security boundaries and [PLAN.md](PLAN.md) for the remaining gates.

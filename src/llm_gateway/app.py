@@ -1,23 +1,30 @@
+import asyncio
 import hashlib
 import hmac
+import time
 from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from llm_gateway.backend import GatewayError, HTTPBackend
 from llm_gateway.config import Settings, load_settings
 from llm_gateway.schemas import ChatRequest, ChatResponse
+from llm_gateway.traffic import CapacityFull, InferenceAdmission, RequestLimiter
 
 MAX_BODY_BYTES = 65_536
 
 
-def error_response(status: int, code: str, message: str) -> JSONResponse:
-    headers = {"WWW-Authenticate": "Bearer"} if status == 401 else None
+def error_response(
+    status: int, code: str, message: str, *, retry_after: int | None = None
+) -> JSONResponse:
+    headers = {"WWW-Authenticate": "Bearer"} if status == 401 else {}
+    if retry_after is not None:
+        headers["Retry-After"] = str(retry_after)
     return JSONResponse({"error": {"code": code, "message": message}}, status, headers=headers)
 
 
@@ -28,6 +35,26 @@ class RequestBoundary:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        started = time.perf_counter()
+
+        async def timed_send(message):
+            if message["type"] == "http.response.start":
+                timings = [f"gateway;dur={(time.perf_counter() - started) * 1000:.3f}"]
+                adapter_ms = scope.get("state", {}).get("adapter_ms")
+                if adapter_ms is not None:
+                    timings.append(f"adapter;dur={adapter_ms:.3f}")
+                message = dict(message)
+                message["headers"] = list(message.get("headers", [])) + [
+                    (b"server-timing", ", ".join(timings).encode("ascii"))
+                ]
+            await send(message)
+
+        await self.handle(scope, receive, timed_send)
+
+    async def handle(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http" or not scope["path"].startswith("/v1/"):
             await self.app(scope, receive, send)
             return
@@ -50,6 +77,15 @@ class RequestBoundary:
         scope.setdefault("state", {})["client_id"] = client_id
 
         if scope["method"] == "POST" and scope["path"] == "/v1/chat/completions":
+            retry_after = scope["app"].state.request_limiter.consume(client_id)
+            if retry_after is not None:
+                await error_response(
+                    429,
+                    "rate_limit_exceeded",
+                    "Client request quota is exhausted",
+                    retry_after=retry_after,
+                )(scope, receive, send)
+                return
             headers = {name.lower(): value for name, value in scope["headers"]}
             media_type = headers.get(b"content-type", b"").split(b";", 1)[0].strip().lower()
             if (
@@ -97,6 +133,12 @@ def create_app(
     async def lifespan(app: FastAPI):
         resolved = settings if settings is not None else load_settings()
         app.state.settings = resolved
+        app.state.request_limiter = RequestLimiter(
+            set(resolved.client_key_hashes.values()),
+            resolved.config.rate_limit,
+            resolved.config.client_rate_limits,
+        )
+        app.state.admission = InferenceAdmission(resolved.config.max_in_flight)
         # No environment proxies/netrc, redirects, or automatic inference retries.
         async with httpx.AsyncClient(
             transport=transport,
@@ -126,6 +168,11 @@ def create_app(
     async def gateway_error(_request: Request, exc: GatewayError):
         return error_response(exc.status, exc.code, exc.message)
 
+    @app.exception_handler(CapacityFull)
+    async def capacity_error(_request: Request, _exc: CapacityFull):
+        # Capacity release time is unknown; do not invent a Retry-After value.
+        return error_response(503, "gateway_overloaded", "Gateway inference capacity is full")
+
     @app.exception_handler(RequestValidationError)
     async def validation_error(_request: Request, _exc: RequestValidationError):
         # Default validation details can include prompt content and other input.
@@ -151,7 +198,38 @@ def create_app(
         }
 
     @app.post("/v1/chat/completions", response_model=ChatResponse, response_model_exclude_none=True)
-    async def complete(payload: ChatRequest):
-        return await app.state.backend.complete(payload)
+    async def complete(payload: ChatRequest, request: Request):
+        if payload.model not in app.state.settings.config.models:
+            raise GatewayError(404, "unknown_model", "The requested model is not configured")
+
+        async def infer():
+            started = time.perf_counter()
+            try:
+                return await app.state.backend.complete(payload)
+            finally:
+                request.state.adapter_ms = (time.perf_counter() - started) * 1000
+
+        async def disconnected():
+            while True:
+                if (await request.receive())["type"] == "http.disconnect":
+                    return
+
+        # No await in slot entry/exit: check-and-increment is atomic on this loop.
+        with app.state.admission.slot():
+            operation = asyncio.create_task(infer())
+            watcher = asyncio.create_task(disconnected())
+            try:
+                done, _ = await asyncio.wait(
+                    (operation, watcher), return_when=asyncio.FIRST_COMPLETED
+                )
+                if operation in done:
+                    return await operation
+                # Internal bookkeeping only: the peer has already disconnected.
+                return Response(status_code=499)
+            finally:
+                for task in (operation, watcher):
+                    if not task.done():
+                        task.cancel()
+                await asyncio.gather(operation, watcher, return_exceptions=True)
 
     return app

@@ -2,18 +2,20 @@
 
 ## Status and architecture
 
-Milestone 1 is an async HTTP gateway foundation. Later milestones must add and
-measure caching, quotas, and concurrency controls before this is a complete
-high-throughput gateway. Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
+Milestones 1–3 provide an async gateway, verified local Gemma inference, client
+request quotas, and bounded inference admission. Caching, operational metrics,
+and performance benchmarks are still required for the complete project.
+Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
-Flow: bearer authentication → body-size boundary → strict request validation →
-fixed public-model lookup → HTTP backend adapter → validated normalized response.
+Flow: bearer authentication → client request quota → body-size boundary → strict
+request validation → fixed public-model lookup → immediate inference admission →
+HTTP backend adapter → validated normalized response → release inference slot.
 The deterministic mock is a separate local HTTP service, so demonstrations cross
 a real network boundary. The adapter targets the documented OpenAI-compatible
 non-streaming subset used by Ollama. There is no automatic model fallback.
 
-## Supported contract (milestone 1)
+## Supported contract
 
 - `GET /healthz`: public liveness only, not model readiness.
 - `GET /v1/models`: authenticated public aliases, no backend addresses.
@@ -29,7 +31,7 @@ non-streaming subset used by Ollama. There is no automatic model fallback.
   counts. Private upstream fields and errors are not forwarded.
 - Errors use `{"error":{"code":...,"message":...}}`; 401 unauthorized,
   400 malformed body encoding/nesting, 413 body too large, 415 media type,
-  422 invalid schema/JSON syntax, 404 unknown model,
+  422 invalid schema/JSON syntax, 404 unknown model, 429 client quota exhausted,
   502 invalid backend response, 503 unavailable/overloaded backend, 504 timeout.
   Upstream 429 becomes 503 because it is backend capacity, not a client quota.
 
@@ -51,22 +53,45 @@ TLS termination, untrusted configuration, and multi-host identity are out of sco
 
 ## Networking and reliability
 
-Reuse a bounded HTTP connection pool. Configurable total upstream deadline,
-including pool wait; short connect/pool timeouts; bounded response size. Disable
+Reuse a bounded HTTP connection pool. Configurable upstream deadline,
+including pool wait, network I/O, response reading and validation; short
+connect/pool timeouts; bounded response size. Disable
 automatic retries: a timed-out generation might already have run. Propagate task
-cancellation and close responses/connections at shutdown. HTTP pooling is not
-admission control; explicit bounded queues and request quotas arrive in milestone 5.
-Task cancellation closes the HTTP response; detecting a caller socket disconnect
-after request upload is deferred to milestone 5. Closing an HTTP call does not
-guarantee the inference server stops generation. Ingress slow-client deadlines
-are also deferred; loopback-only operation is the supported initial deployment.
+cancellation and close responses/connections at shutdown. Admission has zero
+waiting slots: reject with 503 before starting a backend task when full. HTTPX
+pool waiting remains possible within the bounded admitted set if the operator
+sets `max_connections` lower than `max_in_flight`.
 
-## Selected next integrations
+On task cancellation or ASGI `http.disconnect` after upload, cancel the backend
+operation and await cleanup before releasing its slot. The disconnected path
+returns an empty internal 499; the departed peer cannot receive it. Response
+cleanup is allowed to finish beyond the upstream budget: disarm any outstanding
+deadline cancellation before closing, and check monotonic time afterward so
+late success becomes 504. A cancelled read's already-expired timer cannot cancel
+cleanup again. Identity-only response streams are read directly to keep HTTPX
+iterator auto-close inside the explicitly managed cleanup boundary.
 
-Ollama with `gemma3:1b` is the first real backend target, appropriate for a 24 GB
-MacBook and smaller CPU-only demonstrations. No Qwen models. Configure the same
-adapter against `http://127.0.0.1:11434/v1`; verify a genuine inference round trip
-before calling integration complete. Do not load multiple models simultaneously.
+The deadline is cooperative, not a hard client wall-clock bound. It excludes
+authentication, request upload/parsing, route lookup, response serialization and
+delivery. Cleanup and event-loop scheduling can extend elapsed time. Closing an
+HTTP call cannot guarantee a remote server stops generation; admission bounds
+gateway operations, not abandoned compute on an uncooperative backend. A hung
+transport cleanup can hold its slot beyond the budget; no forced resource kill.
+Ingress slow-client deadlines are deferred; loopback-only deployment is supported.
+
+`Server-Timing` provides request-local durations in milliseconds: `gateway` from
+ASGI middleware entry until response-start, and `adapter` around `complete()`
+including payload preparation, pool/I/O, validation and cleanup. Adapter timing
+is absent for local rejections. Gateway timing excludes subsequent ASGI sends,
+response-body transmission and client-side work. Neither duration is pure gateway
+CPU time or isolated model inference; differences include scheduling/boundaries.
+
+## Backends and future embeddings
+
+Ollama 0.40.11 with `gemma3:1b` was verified on the 8 GiB CPU-only runner in
+milestone 2. The adapter targets `http://127.0.0.1:11434/v1`; the public alias is
+`gemma`. macOS remains untested. No Qwen models or implicit fallback. Do not load
+multiple models simultaneously.
 
 For semantic embeddings, evaluate `sentence-transformers/all-MiniLM-L6-v2`
 (384 dimensions, CPU) using normalized vectors and bounded NumPy cosine search.
@@ -75,7 +100,7 @@ overlength prompts instead of silently losing constraints. No vector database
 is justified for the initial small cache. Run embedding work
 off the event loop with bounded work; measure its latency before enabling it.
 
-## Planned cache policy (not implemented in milestone 1)
+## Planned cache policy (not implemented)
 
 - Exact: opt-in deterministic requests (`temperature=0`), normalized full
   messages and all supported settings; partition by client, backend/model
@@ -94,14 +119,43 @@ off the event loop with bounded work; measure its latency before enabling it.
 - Record exact/semantic/miss/bypass separately. TTL, expiry, client/context/settings
   isolation, false-hit rate, and coalescing under concurrency must be tested.
 
-## Planned traffic controls and observability
+## Traffic controls (implemented in milestone 3)
 
-Atomic per-client token bucket for request counts using monotonic time;
-independent per-client in-flight and global upstream limits with bounded queue
-wait. Cache hits still consume request quota. Return 429 and useful `Retry-After`
-for client limits, 503 for global capacity, and release permits on every exit.
-All state is process-local; run exactly one worker. Token estimates, if used, are
-labeled separately from reported usage. Do not claim distributed enforcement.
+Each configured authenticated client ID gets a token bucket, initially full:
+`tokens = min(burst, tokens + elapsed_monotonic_seconds * requests_per_second)`.
+Consume one token per authenticated `POST /v1/chat/completions` attempt before
+body parsing. Failures, malformed input, unknown models and global overload spend
+quota; denied attempts do not further debit it. Health/model listing and failed
+authentication do not spend completion quota. This is a request quota, not a
+token-usage or billing quota. State is bounded to at most 128 configured clients.
+
+`[rate_limit]` sets a default burst/refill; `[client_rate_limits.CLIENT_ID]`
+overrides it. Reject unknown override IDs at startup. Exhaustion returns 429
+`rate_limit_exceeded` with integer delta-seconds
+`Retry-After = ceil((1 - tokens) / requests_per_second)`, at least 1. This estimates
+when the next token is available at that decision; competing requests can consume
+it. No reservation or promise of success after that delay.
+
+`max_in_flight` limits all admitted adapter operations across clients/models.
+Capacity entry, exit, quota refill and debit have no awaits and are atomic on the
+single owning event loop. No asyncio waiting queue or slot reservation. Full
+capacity returns 503 `gateway_overloaded` without `Retry-After`: completion time
+is unknown. Unknown models return 404 without acquiring slots. Slots remain held
+through cleanup on success, backend failure, timeout and cancellation.
+
+Defaults: burst 60, refill 1 request/second, global capacity 8. Ollama example:
+burst 10, refill 0.2/second, global capacity 1. Overrides require positive bounded
+values; minimum refill 0.000001/second, maximum burst/refill 10,000, capacity 1–64.
+There is no per-client concurrency reservation or fairness policy: a client may
+occupy all global slots while within quota. Limits apply after authentication and,
+for inference slots, after full body/schema validation; they do not bound all
+incoming sockets, uploads, server backlog or pre-admission parsing tasks.
+
+All state is in-memory and process-local, reset on restart, neither thread-safe
+nor shared between event loops/instances. Run **one Uvicorn worker**, no replicas
+or rolling multi-instance enforcement. Do not claim distributed consistency.
+
+## Planned operational metrics
 
 Add protected metrics for requests/outcomes, cache disposition, quota rejection,
 in-flight counts, upstream errors, latency histograms, and reported token usage.
@@ -141,3 +195,5 @@ Checked 2026-10-27; selected design choices are not performance guarantees.
   [Gemma 3 1B](https://ollama.com/library/gemma3:1b) (806 MB artifact; runtime
   memory is larger; Gemma Terms of Use apply).
 - [MiniLM model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2).
+- [Python asyncio timeout semantics](https://docs.python.org/3.12/library/asyncio-task.html#asyncio.timeout)
+  and [HTTP Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after).

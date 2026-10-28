@@ -107,7 +107,79 @@ Final regressions: `.venv/bin/pytest` **58 passed in 1.04 s**;
 `git diff --check` **clean**. Ports 11434/8000/8001 closed after cleanup.
 No caching, quotas, providers, dashboards, or optimizations added.
 
-## 3 — Exact cache (next; not started)
+## 3 — Bounded admission and client quotas (complete)
+
+- [x] Configurable per-client monotonic token buckets, fixed authenticated IDs,
+  default policy and client overrides; accurate integer Retry-After for 429.
+- [x] Configurable global active-operation limit, immediate 503 on saturation,
+  zero admission waiters; no guessed capacity Retry-After.
+- [x] Release slots after success, errors, timeouts, caller cancellation and ASGI
+  disconnect, including cancellation/deadline overlap during cleanup.
+- [x] Reproducible actual HTTP enforcement and timeout-scope probes; investigate
+  prior external-latency discrepancy and retain scope limitations.
+- [x] Preserve the API/model-routing contract and genuine Gemma integration.
+
+Verified 2026-10-28 on the same Linux/8 GiB/two-CPU-quota runner, no new packages:
+
+- `devtools.traffic_probe` over real loopback HTTP, deterministic held fixture:
+  **24 simultaneous client requests**; A burst 3 → **3 HTTP 200 / 9 HTTP 429**,
+  B override burst 2 → **2 HTTP 200 / 10 HTTP 429**. Exactly **5 backend calls**;
+  positive integer Retry-After, isolated client quotas. With capacity 2, **20
+  excess requests all returned 503**, calls/peak stayed **2** until release,
+  and recovery returned **200** (3 total backend calls). No admission queue,
+  generated credentials stay in child environment, subprocess/config cleanup.
+- Automated concurrent HTTP-boundary tests additionally reject **64** simultaneous
+  excess requests without new upstream calls, verify invalid attempts spend quota,
+  exclude auth failures/model listing/health, and test refill with an injected
+  clock. No request can allocate arbitrary new bucket state.
+- Cancellation tests inject ASGI `http.disconnect` and cancel request tasks;
+  slow response cleanup remains occupied beyond a 40 ms deadline, a competing
+  request receives 503, cleanup completes, permit reaches zero, and recovery
+  succeeds. These are ASGI-message/task tests, not a claim of raw TCP-close testing.
+- Historical 1 s → **1.5665 s** recorded only external duration. The extra 567 ms
+  cannot be causally partitioned from those artifacts. New request-local
+  `Server-Timing` separates middleware entry→response-start and complete adapter elapsed
+  (including preparation/validation/cleanup); neither is pure CPU/model time.
+- A concrete deadline defect was separately reproduced against commit `331cf1f`:
+  deliberately blocking mock transport, **5 ms budget**, old **200 in 31.4 ms**,
+  fixed **504 in 30.7 ms**. Async timers cannot preempt synchronous work; the fix
+  rejects late success after cleanup. A second fix disarms outstanding deadline
+  cancellation before response close, preventing cleanup interruption on a
+  disconnect; raw identity-only stream iteration avoids HTTPX iterator auto-close
+  under the expiring timer. No hard client-latency promise.
+- `devtools.deadline_probe` uses real HTTP chunks every 50 ms against a 1 s total
+  budget. Client, gateway and adapter milliseconds are reported separately in
+  ignored `artifacts/deadline-probe.json`: final client **1003.323 ms**, gateway
+  **1001.801 ms**, adapter **1001.043 ms**, HTTP **504**, **20 chunks sent**.
+  Slow-cleanup/trickle/blocking unit tests
+  verify scope and resource release. This is not a model/throughput benchmark.
+- Genuine **Ollama 0.40.11 / gemma3:1b** regression after the changes: authenticated
+  alias `gemma` returned **200 `Paris`**, usage **23/2/25**, request ID
+  `chatcmpl-679`, elapsed **2.790 s**; gateway/adapter headers **2788.944 / 2787.865 ms**.
+  Used the unchanged model digest from milestone 2, one CPU model at context 2048,
+  new Ollama capacity 1/burst 10/refill 0.2 settings; servers stopped afterward.
+
+Reproduction:
+
+```sh
+.venv/bin/pytest
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+.venv/bin/python -m devtools.smoke
+.venv/bin/python -m devtools.traffic_probe --output artifacts/traffic-probe.json
+.venv/bin/python -m devtools.deadline_probe --output artifacts/deadline-probe.json
+```
+
+Final aggregate run: **85 tests passed in 1.46 s**; Ruff lint passed; **20 files
+already formatted**; `git diff --check` clean. Foundation HTTP smoke returned
+401/422/404/200/200 as expected; both committed loopback probes passed. No dependency
+changes. Verification subprocesses were stopped and temporary configs removed.
+Limits are in-memory, single-process/single-loop, reset on restart; no fairness,
+distributed correctness, ingress connection/upload bound, or control of remote
+compute continuing after HTTP cancellation. Cleanup may extend the budget.
+No cache, extra provider, dashboard, infrastructure, or performance optimization.
+
+## 4 — Exact cache (next; not started)
 
 - [ ] Conservative eligibility, client/context/model/settings/policy keys,
   TTL/capacity, and in-flight coalescing.
@@ -115,7 +187,7 @@ No caching, quotas, providers, dashboards, or optimizations added.
 
 Exit: upstream call reduction measured with no cross-boundary reuse.
 
-## 4 — Conservative semantic cache
+## 5 — Conservative semantic cache
 
 - [ ] Small CPU embedding model, bounded embedding execution and vector lookup.
 - [ ] Explicit opt-in/domain constraints and equivalence safeguards.
@@ -124,17 +196,9 @@ Exit: upstream call reduction measured with no cross-boundary reuse.
 
 Exit: explainable eligible hits and zero held-out false hits with limitations.
 
-## 5 — Traffic control, failure handling, metrics
+## 6 — Operational metrics and reproducible performance evidence
 
-- [ ] Atomic request token buckets, client in-flight limits, global upstream
-  capacity and bounded queueing; correct 429/503 and retry guidance.
-- [ ] Test saturation, races, timeouts, cancellation and permit cleanup.
 - [ ] Protected metrics, sanitized structured logs and usage provenance.
-
-Exit: concurrent tests demonstrate quotas and capacity bounds, with metrics.
-
-## 6 — Reproducible performance evidence
-
 - [ ] Lightweight HTTP benchmark harness; fixed seeds, warmup, hardware/version
   capture and raw JSON results for scenarios A–F.
 - [ ] Separate mock overhead/cache measurements from real-model inference results.

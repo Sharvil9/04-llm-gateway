@@ -37,38 +37,64 @@ class HTTPBackend:
 
         try:
             # HTTPX phase timeouts alone do not enforce a whole-request deadline.
-            async with asyncio.timeout(config.request_timeout_seconds):
+            loop = asyncio.get_running_loop()
+            deadline = loop.time() + config.request_timeout_seconds
+            async with asyncio.timeout_at(deadline) as budget:
                 async with self.client.stream(
                     "POST", f"{backend.base_url}/chat/completions", json=payload, headers=headers
                 ) as upstream:
-                    if upstream.status_code == 429 or upstream.status_code >= 500:
-                        raise GatewayError(503, "backend_unavailable", "The backend is unavailable")
-                    if upstream.status_code != 200:
-                        raise GatewayError(502, "backend_error", "The backend rejected the request")
-                    if (
-                        upstream.headers.get("content-type", "").split(";", 1)[0].strip().lower()
-                        != "application/json"
-                        or upstream.headers.get("content-encoding", "identity").lower()
-                        != "identity"
-                    ):
-                        raise GatewayError(
-                            502, "invalid_backend_response", "Invalid backend response"
-                        )
-                    data = bytearray()
-                    async for chunk in upstream.aiter_bytes():
-                        if len(data) + len(chunk) > config.max_response_bytes:
+                    try:
+                        if upstream.status_code == 429 or upstream.status_code >= 500:
+                            raise GatewayError(
+                                503, "backend_unavailable", "The backend is unavailable"
+                            )
+                        if upstream.status_code != 200:
+                            raise GatewayError(
+                                502, "backend_error", "The backend rejected the request"
+                            )
+                        if (
+                            upstream.headers.get("content-type", "")
+                            .split(";", 1)[0]
+                            .strip()
+                            .lower()
+                            != "application/json"
+                            or upstream.headers.get("content-encoding", "identity").lower()
+                            != "identity"
+                        ):
+                            raise GatewayError(
+                                502, "invalid_backend_response", "Invalid backend response"
+                            )
+                        data = bytearray()
+                        # Identity encoding only: own the response close in the
+                        # context below, rather than aiter_bytes() auto-closing
+                        # under an expiring deadline at the end of iteration.
+                        async for chunk in upstream.stream:
+                            if len(data) + len(chunk) > config.max_response_bytes:
+                                raise GatewayError(
+                                    502,
+                                    "invalid_backend_response",
+                                    "Backend response exceeds size limit",
+                                )
+                            data.extend(chunk)
+                        result = ChatResponse.model_validate(json.loads(data))
+                        if result.model != route.model:
                             raise GatewayError(
                                 502,
                                 "invalid_backend_response",
-                                "Backend response exceeds size limit",
+                                "Backend returned an unexpected model",
                             )
-                        data.extend(chunk)
-                    result = ChatResponse.model_validate(json.loads(data))
-                    if result.model != route.model:
-                        raise GatewayError(
-                            502, "invalid_backend_response", "Backend returned an unexpected model"
-                        )
-                    return result.model_copy(update={"model": request.model})
+                        result = result.model_copy(update={"model": request.model})
+                    finally:
+                        # A second deadline cancellation must not interrupt cleanup
+                        # already triggered by disconnect/caller cancellation. Close
+                        # first, then reject late success with the monotonic check.
+                        if not budget.expired():
+                            budget.reschedule(None)
+            # Synchronous validation or a delayed event loop can finish after the
+            # budget before the cancellation callback runs. Never return late success.
+            if loop.time() >= deadline:
+                raise TimeoutError
+            return result
         except (TimeoutError, httpx.TimeoutException):
             raise GatewayError(504, "backend_timeout", "The backend request timed out") from None
         except httpx.RequestError:
