@@ -2,15 +2,16 @@
 
 ## Status and architecture
 
-Milestones 1–3 provide an async gateway, verified local Gemma inference, client
-request quotas, and bounded inference admission. Caching, operational metrics,
-and performance benchmarks are still required for the complete project.
+Milestones 1–4 provide an async gateway, verified local Gemma inference, client
+request quotas, bounded inference admission and conservative exact caching.
+Semantic caching, operational metrics and benchmarks remain future work.
 Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
 Flow: bearer authentication → client request quota → body-size boundary → strict
-request validation → fixed public-model lookup → immediate inference admission →
-HTTP backend adapter → validated normalized response → release inference slot.
+request validation → fixed public-model lookup → eligible exact-cache lookup →
+hit response, or immediate inference admission → HTTP backend adapter → validated
+normalized response → release inference slot → successful ASGI send → cache commit.
 The deterministic mock is a separate local HTTP service, so demonstrations cross
 a real network boundary. The adapter targets the documented OpenAI-compatible
 non-streaming subset used by Ollama. There is no automatic model fallback.
@@ -24,6 +25,11 @@ non-streaming subset used by Ollama. There is no automatic model fallback.
   String content only; roles `system`, `user`, `assistant`; final message must
   be `user`. No tools, images, streaming, response formats, or full OpenAI API
   compatibility. Unknown fields and coercions are rejected.
+- `X-Gateway-Cache: exact` explicitly requests exact reuse, subject to the
+  operator's policy. Responses expose `X-Gateway-Cache: HIT|MISS|BYPASS` after
+  reaching the cache decision; earlier auth/quota/schema errors omit it. MISS
+  identifies a lookup, not a guarantee of inference or insertion. All HTTP
+  responses carry `Cache-Control: no-store` for downstream HTTP caches.
 - Up to 32 messages, 16,000 characters per message, 32,000 total content
   characters, and 64 KiB body. Generation cap: 2,048 tokens; default 128.
 - Normalize to one assistant choice, public model alias, completion ID/time,
@@ -100,14 +106,80 @@ overlength prompts instead of silently losing constraints. No vector database
 is justified for the initial small cache. Run embedding work
 off the event loop with bounded work; measure its latency before enabling it.
 
-## Planned cache policy (not implemented)
+## Exact cache (implemented in milestone 4)
 
-- Exact: opt-in deterministic requests (`temperature=0`), normalized full
-  messages and all supported settings; partition by client, backend/model
-  identity, system context, and cache-policy version. TTL and capacity bound;
-  no persistence initially. Coalesce identical eligible in-flight requests and
-  test leader/follower cancellation without leaking shared state.
-- Semantic: disabled by default; explicitly opt-in public factual single-turn
+Process-local `OrderedDict` stores immutable normalized JSON response bytes.
+Default disabled, empty approval list unless explicitly configured. Eligibility
+requires **all** of: enabled operator policy, one literal `X-Gateway-Cache: exact`
+header, exactly one user message equal to an operator-approved public/static
+prompt, `temperature=0`, `top_p=1`, explicit seed, and configured model **and**
+backend revision pins. System instructions, conversation history, unapproved
+text, sampling, missing pins/seed, duplicate opt-in headers and cookies bypass.
+Streaming remains unsupported/422. Private, sensitive, stateful and freshness-
+sensitive prompts must never be approved. This is an operator allowlist, not an
+automatic content/privacy classifier. No whitespace or semantic equivalence.
+
+Temperature zero and a seed do not guarantee provider determinism. Opt-in
+explicitly accepts replay of the first complete successful answer for the TTL;
+sampling requests bypass even with a seed. Never cache errors, `length`-truncated
+or blank answers. Backend `Cache-Control` (any directive), `Expires`, `Vary`,
+`Set-Cookie` or outgoing Cookie disallow insertion rather than attempting to model
+provider freshness/session semantics. Client no-store/no-cache and Pragma:no-cache
+bypass lookup and storage. HTTPX rejects cookie persistence, preventing hidden
+shared backend session state across clients.
+Session-cookie-dependent backends are outside this stateless adapter contract.
+
+Keys are per-process-secret HMAC-SHA256 digests over canonical sorted compact JSON:
+full validated request with all defaults/ordered messages, stable authenticated
+client ID, all gateway configuration (including resolved backend URL, physical
+model, revisions, settings, cache namespace/policy), code policy version and hash
+of the actual forwarded backend credential. Canonical plaintext exists transiently
+for hashing; it is neither retained as a key nor logged. Cache values remain
+plaintext responses in RAM. Credentials/prompts are never diagnostics fields.
+
+Model `revision` identifies the approved immutable artifact; backend `revision`
+identifies server/template/context/default changes. These are **operator-managed
+assertions**, not live attestation or automatic model-change discovery. Before
+replacing a model/server/template/context, disable caching, change revisions and
+restart to clear state. Configuration is a startup contract with no hot reload;
+a final fingerprint recheck also rejects writes if configuration changed during
+the request. The real Ollama probe checks live version, digest and context for
+that controlled run only. Silent replacement behind unchanged pins is unsafe.
+
+`[exact_cache]`: enabled false, TTL 60 seconds (0.01–3600), max_entries 128
+(1–4096), max_bytes 8,388,608 (1024–67,108,864), namespace `public-static-v1`,
+approved_prompts (at most 32 strings, 1–4000 characters each). TTL starts at
+successful insertion and does not slide on hits. LRU evicts least-recently-read
+entries until both limits fit; oversized values are skipped without evicting
+existing entries. Byte accounting is **digest bytes + serialized response bytes**,
+not RSS or exact Python allocator overhead; entry count separately bounds metadata.
+Expiration is lazy on get/put/snapshot. Expired data is never returned but can
+remain in RAM while idle until another cache operation or restart.
+
+Cache lookup follows auth, request quota, validation and routing, **before**
+inference admission. Hits still spend quota but hold no inference slot and perform
+no adapter call. On misses, existing admission/cancellation/timeout protection
+is unchanged. No coalescing or waiter registry: simultaneous cold misses may
+duplicate inference up to global capacity, with excess rejected 503. The first
+fresh cache writer wins; later completions do not replace it or extend its TTL.
+All cache mutations have no await on the single owning event loop.
+
+Candidate responses are committed only after the final successful ASGI body send,
+HTTP 200, no observed disconnect/cancellation/send failure, and an unchanged
+fingerprint. ASGI acceptance is not proof of client receipt/ACK; unobserved network
+disconnects remain possible. HIT replays the original id/created/usage bytes;
+those usage counts describe the original generation, not new provider work.
+
+Internal counters: hits, misses, bypasses, stores, evictions, expirations and
+upstream_calls, plus occupancy. `upstream_calls` counts admitted **adapter
+attempts**, including connection/pool failures, not confirmed inference. Verification
+also counts fixture requests or dedicated Ollama access-log POSTs independently.
+No public stats endpoint or comprehensive telemetry yet. Restart clears responses,
+HMAC secret and counters. No persistence, cross-instance sharing or cache fairness.
+
+## Planned semantic cache (not implemented)
+
+- Disabled by default; explicitly opt-in public factual single-turn
   questions under an allowlisted context. Always isolated per client. Exclude
   personal/private data, conversational state, tools, time-dependent information,
   sensitive domains, and sampling. Preserve entities, numbers, negation, and
@@ -116,8 +188,8 @@ off the event loop with bounded work; measure its latency before enabling it.
   a curated positive/negative set and calibrate a threshold; no arbitrary
   universal threshold. Use a conservative domain/intent guard and abstain unless
   equivalence is supported. Hold semantic serving disabled if false hits remain.
-- Record exact/semantic/miss/bypass separately. TTL, expiry, client/context/settings
-  isolation, false-hit rate, and coalescing under concurrency must be tested.
+- Record semantic/miss/bypass separately from exact counters. TTL, expiry,
+  client/context/settings isolation and false-hit rate must be tested.
 
 ## Traffic controls (implemented in milestone 3)
 
@@ -168,8 +240,9 @@ Structured logs contain operational identifiers/timing, never content.
    timeout/connection/malformed-response tests, cancellation and lifecycle cleanup.
 2. Actual inference: documented local Gemma request with recorded model/backend
    versions and hardware, distinct from mock evidence.
-3. Exact cache: TTL/capacity/isolation/settings/coalescing tests and counted
-   reduction of upstream calls on repeated requests.
+3. Exact cache: TTL/capacity/isolation/settings/cancellation tests and counted
+   reduction of upstream calls. Coalescing is deliberately deferred; concurrent
+   misses must still respect admission and first-writer/TTL invariants.
 4. Semantic: curated equivalent and adversarial non-equivalent requests; report
    threshold, precision, recall, false-hit count/rate and sample size. Require zero
    false hits on the held-out curated set before opt-in serving. This is finite

@@ -1,11 +1,17 @@
 import asyncio
 import json
+from dataclasses import dataclass
 
 import httpx
 from pydantic import ValidationError
 
 from llm_gateway.config import Settings
 from llm_gateway.schemas import ChatRequest, ChatResponse
+
+
+@dataclass
+class ResponseCachePolicy:
+    allowed: bool = False
 
 
 class GatewayError(Exception):
@@ -23,7 +29,9 @@ class HTTPBackend:
         self.settings = settings
         self.client = client
 
-    async def complete(self, request: ChatRequest) -> ChatResponse:
+    async def complete(
+        self, request: ChatRequest, *, cache_policy: ResponseCachePolicy | None = None
+    ) -> ChatResponse:
         config = self.settings.config
         route = config.models.get(request.model)
         if route is None:
@@ -84,6 +92,14 @@ class HTTPBackend:
                                 "Backend returned an unexpected model",
                             )
                         result = result.model_copy(update={"model": request.model})
+                        if cache_policy is not None:
+                            cache_policy.allowed = not (
+                                "cache-control" in upstream.headers
+                                or "expires" in upstream.headers
+                                or "set-cookie" in upstream.headers
+                                or "vary" in upstream.headers
+                                or "cookie" in upstream.request.headers
+                            )
                     finally:
                         # A second deadline cancellation must not interrupt cleanup
                         # already triggered by disconnect/caller cancellation. Close

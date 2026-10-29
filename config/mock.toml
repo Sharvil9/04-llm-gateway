@@ -8,9 +8,19 @@ max_in_flight = 8
 burst = 60
 requests_per_second = 1.0
 
+[exact_cache]
+enabled = false
+ttl_seconds = 60.0
+max_entries = 128
+max_bytes = 8388608
+namespace = "public-static-v1"
+approved_prompts = ["What is the capital of France? Answer with only the city name."]
+
 [backends.local]
 base_url = "http://127.0.0.1:9001/v1"
+revision = "deterministic-http-fixture-v1"
 
 [models.demo]
 backend = "local"
 model = "deterministic-mock"
+revision = "deterministic-mock-v1"

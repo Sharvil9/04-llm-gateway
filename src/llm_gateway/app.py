@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import time
 from contextlib import asynccontextmanager
+from http.cookiejar import CookieJar, DefaultCookiePolicy
 
 import httpx
 from fastapi import FastAPI, Request
@@ -11,7 +12,8 @@ from fastapi.responses import JSONResponse, Response
 from starlette.exceptions import HTTPException
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from llm_gateway.backend import GatewayError, HTTPBackend
+from llm_gateway.backend import GatewayError, HTTPBackend, ResponseCachePolicy
+from llm_gateway.cache import ExactResponseCache
 from llm_gateway.config import Settings, load_settings
 from llm_gateway.schemas import ChatRequest, ChatResponse
 from llm_gateway.traffic import CapacityFull, InferenceAdmission, RequestLimiter
@@ -39,18 +41,51 @@ class RequestBoundary:
             await self.app(scope, receive, send)
             return
         started = time.perf_counter()
+        response_status = 0
+        cache_chunks = []
+        cache_bytes = 0
+        cache_overflow = False
 
         async def timed_send(message):
+            nonlocal response_status, cache_bytes, cache_overflow
+            state = scope.get("state", {})
             if message["type"] == "http.response.start":
+                response_status = message["status"]
                 timings = [f"gateway;dur={(time.perf_counter() - started) * 1000:.3f}"]
                 adapter_ms = scope.get("state", {}).get("adapter_ms")
                 if adapter_ms is not None:
                     timings.append(f"adapter;dur={adapter_ms:.3f}")
                 message = dict(message)
                 message["headers"] = list(message.get("headers", [])) + [
-                    (b"server-timing", ", ".join(timings).encode("ascii"))
+                    (b"server-timing", ", ".join(timings).encode("ascii")),
+                    (b"cache-control", b"no-store"),
                 ]
+                if cache_status := state.get("cache_status"):
+                    message["headers"].append((b"x-gateway-cache", cache_status.encode("ascii")))
+            pending = state.get("cache_pending")
+            if message["type"] == "http.response.body" and pending and not cache_overflow:
+                body = message.get("body", b"")
+                cache_bytes += len(body)
+                limit = scope["app"].state.settings.config.exact_cache.max_bytes
+                if cache_bytes + len(pending) > limit:
+                    cache_overflow = True
+                    cache_chunks.clear()
+                else:
+                    cache_chunks.append(body)
             await send(message)
+            if (
+                message["type"] == "http.response.body"
+                and not message.get("more_body", False)
+                and response_status == 200
+                and pending
+                and not cache_overflow
+                and not state.get("client_disconnected", False)
+                and state["cache_recheck"]()
+            ):
+                # Commit only after the complete ASGI send succeeds. This is not
+                # a guarantee of receipt/ACK by the remote client.
+                scope["app"].state.response_cache.put(pending, b"".join(cache_chunks))
+                state.pop("cache_pending", None)
 
         await self.handle(scope, receive, timed_send)
 
@@ -139,11 +174,15 @@ def create_app(
             resolved.config.client_rate_limits,
         )
         app.state.admission = InferenceAdmission(resolved.config.max_in_flight)
+        app.state.response_cache = ExactResponseCache(resolved)
         # No environment proxies/netrc, redirects, or automatic inference retries.
         async with httpx.AsyncClient(
             transport=transport,
             trust_env=False,
             follow_redirects=False,
+            # A stateless backend adapter must not share HTTP sessions between
+            # clients or let a later cookie change an earlier cache partition.
+            cookies=CookieJar(DefaultCookiePolicy(allowed_domains=[])),
             timeout=httpx.Timeout(resolved.config.request_timeout_seconds, connect=2.0, pool=1.0),
             limits=httpx.Limits(
                 max_connections=resolved.config.max_connections,
@@ -202,16 +241,45 @@ def create_app(
         if payload.model not in app.state.settings.config.models:
             raise GatewayError(404, "unknown_model", "The requested model is not configured")
 
+        cache = app.state.response_cache
+        controls = {
+            directive.split("=", 1)[0].strip().lower()
+            for value in request.headers.getlist("cache-control")
+            for directive in value.split(",")
+        }
+        pragma = {
+            part.strip().lower()
+            for value in request.headers.getlist("pragma")
+            for part in value.split(",")
+        }
+        opt_in = (
+            request.headers.getlist("x-gateway-cache") == ["exact"]
+            and not controls.intersection({"no-store", "no-cache"})
+            and "no-cache" not in pragma
+            and "cookie" not in request.headers
+            and not app.state.http_client.cookies
+        )
+        client_id = request.state.client_id
+        key = cache.key_for(payload, client_id, opt_in)
+        request.state.cache_status = "BYPASS" if key is None else "MISS"
+        if key is not None and (cached := cache.get(key)) is not None:
+            request.state.cache_status = "HIT"
+            return Response(content=cached, media_type="application/json")
+
+        cache_policy = ResponseCachePolicy()
+
         async def infer():
             started = time.perf_counter()
             try:
-                return await app.state.backend.complete(payload)
+                cache.stats.upstream_calls += 1
+                return await app.state.backend.complete(payload, cache_policy=cache_policy)
             finally:
                 request.state.adapter_ms = (time.perf_counter() - started) * 1000
 
         async def disconnected():
             while True:
                 if (await request.receive())["type"] == "http.disconnect":
+                    request.state.client_disconnected = True
                     return
 
         # No await in slot entry/exit: check-and-increment is atomic on this loop.
@@ -223,7 +291,21 @@ def create_app(
                     (operation, watcher), return_when=asyncio.FIRST_COMPLETED
                 )
                 if operation in done:
-                    return await operation
+                    result = await operation
+                    if (
+                        key is not None
+                        and cache_policy.allowed
+                        and result.choices[0].finish_reason == "stop"
+                        and result.choices[0].message.content.strip()
+                        and not request.scope["state"].get("client_disconnected", False)
+                        and not app.state.http_client.cookies
+                    ):
+                        request.state.cache_pending = key
+                        request.state.cache_recheck = lambda: (
+                            not app.state.http_client.cookies
+                            and cache.key_for(payload, client_id, opt_in) == key
+                        )
+                    return result
                 # Internal bookkeeping only: the peer has already disconnected.
                 return Response(status_code=499)
             finally:

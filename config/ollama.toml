@@ -8,10 +8,20 @@ max_in_flight = 1
 burst = 10
 requests_per_second = 0.2
 
+[exact_cache]
+enabled = false
+ttl_seconds = 60.0
+max_entries = 128
+max_bytes = 8388608
+namespace = "public-static-v1"
+approved_prompts = ["What is the capital of France? Answer with only the city name."]
+
 [backends.local]
 base_url = "http://127.0.0.1:11434/v1"
+revision = "ollama-0.40.11-ctx2048-template-default-v1"
 # For other compatible servers: api_key_env = "LOCAL_BACKEND_KEY"
 
 [models.gemma]
 backend = "local"
 model = "gemma3:1b"
+revision = "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c"

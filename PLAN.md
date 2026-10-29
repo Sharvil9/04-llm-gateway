@@ -179,15 +179,86 @@ distributed correctness, ingress connection/upload bound, or control of remote
 compute continuing after HTTP cancellation. Cleanup may extend the budget.
 No cache, extra provider, dashboard, infrastructure, or performance optimization.
 
-## 4 — Exact cache (next; not started)
+## 4 — Safe exact response caching (complete)
 
-- [ ] Conservative eligibility, client/context/model/settings/policy keys,
-  TTL/capacity, and in-flight coalescing.
-- [ ] Test hits, bypasses, isolation, expiry, eviction and concurrent cancellation.
+- [x] Conservative operator approval plus client opt-in; HMAC client/model/
+  configuration/credential/policy fingerprints without plaintext prompt keys.
+- [x] Process-local fixed TTL, LRU eviction, entry and serialized-byte budgets;
+  immutable response bytes; counters and no persistence/background service.
+- [x] Lookup after auth/quota before admission; complete-response commit after
+  successful final ASGI send, observed-abort checks and fingerprint recheck.
+- [x] Deterministic TTL/eviction/isolation/model/configuration/race/failure tests;
+  verify hits still spend quota and work while inference capacity is occupied.
+- [x] Reproducible HTTP fixture and genuine Gemma upstream-call reduction.
 
 Exit: upstream call reduction measured with no cross-boundary reuse.
 
-## 5 — Conservative semantic cache
+Verified 2026-10-29, preserving single-loop traffic controls and the API subset:
+
+- Standard-library HMAC/OrderedDict, no dependency changes. Default disabled;
+  approved literal single-user public/static prompts only, explicit `exact`
+  request header, temperature 0/top_p 1/seed, pinned model and deployment revisions.
+  Other contexts, sampling, private/unapproved prompts bypass by default; no
+  semantic classifier or automatic privacy guarantee for misapproved input.
+- Full canonical validated request/defaults, stable client ID, all gateway
+  configuration and actual backend credential hash partition keys. Tests cover
+  parameter, system/history, model/backend revision, namespace and policy changes.
+  A final recheck prevents writes if configuration changes during the request.
+  Revisions require operator-managed immutable deployments; no live update detector.
+- TTL is insertion-based, non-sliding; LRU/expiry reclaim payloads within entry
+  and digest+JSON byte budgets. Oversized responses skip without evicting existing
+  entries. Expiry is lazy; idle expired bytes may persist in RAM, never returned.
+  No exact RSS/secure-memory-erasure promise; values are plaintext responses.
+- Only successful nonblank `stop` responses are candidates. No error/truncation/
+  cancellation/disconnect/send-failure inserts; successful ASGI send is not proof
+  of client receipt. Backend session/freshness/cache-control headers disallow
+  insertion. Cookie persistence is rejected so sessions cannot leak across clients
+  or change cache lookup context. Client cache bypass directives are honored.
+- Deliberately **no coalescing**: duplicate cold misses remain subject to global
+  admission and may duplicate inference; first fresh writer wins without TTL reset.
+  Tests hold two misses in flight, reject an excess request, and verify warm hits
+  create no upstream work or admission slots. Hit requests still consume quota.
+- Internal hits/misses/bypasses/stores/expiration/eviction/upstream-attempt counters;
+  no metrics dashboard/API. Independent fixture/access-log request counts verify
+  actual call reduction. Cached id/created/usage remain the original generation.
+- `devtools.cache_probe` over loopback HTTP: client A **MISS/HIT/HIT**, client B
+  **MISS/HIT**, one sampled A **BYPASS** → **6 successful requests, 3 cache hits,
+  2 misses, 1 bypass, 3 independently counted backend calls**, versus 6 uncached
+  reference calls. Warm unauthorized request stays **401**, no extra backend call.
+  Generated credentials stay in environment, temporary servers/configs cleaned up.
+- Genuine Ollama **0.40.11 / gemma3:1b Q4_K_M**: live digest checked against
+  configured pin `97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`.
+  Three eligible requests returned **200 `Paris`**, **MISS/HIT/HIT**, byte-identical
+  id/created/usage (original **23/2/25**), and exactly **one** Ollama chat POST in
+  its dedicated access log: **two inference calls avoided**. Initial request ID
+  `chatcmpl-718`; elapsed samples **5.289 s / 1.624 ms / 1.703 ms** are functional
+  observations, not throughput or model-generation performance measurements.
+  Local evidence: ignored `artifacts/milestone04/real-gemma-cache.json` and log.
+
+Reproduce on a dedicated Ollama server using the README setup:
+
+```sh
+.venv/bin/pytest
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+.venv/bin/python -m devtools.cache_probe --output artifacts/cache-probe.json
+.venv/bin/python -m devtools.cache_probe --ollama-log artifacts/milestone02/ollama.log \
+  --output artifacts/real-cache-probe.json
+```
+
+Final regressions: **141 passed in 6.73 s**; Ruff lint passed; **24 files already
+formatted**; `git diff --check` clean. All prior HTTP smoke, quota/capacity and
+deadline probes passed; the new fixture cache probe passed. No dependency changes.
+The committed `--ollama-log` mode also passed against a fresh dedicated server:
+version **0.40.11**, live digest and loaded context **2048** matched the example,
+**MISS/HIT/HIT**, exactly **1** upstream POST, original usage **23/2/25**, response
+ID `chatcmpl-688`, identical replay bytes. JSON report under
+`artifacts/milestone04/real-cache-probe.json`; all verification servers stopped,
+temporary configs removed, and cgroup OOM events remained zero.
+No semantic caching, embeddings, Redis, dashboard or distributed consistency
+added. Counters/cache reset on restart; one event loop/worker only.
+
+## 5 — Conservative semantic cache (next; not started)
 
 - [ ] Small CPU embedding model, bounded embedding execution and vector lookup.
 - [ ] Explicit opt-in/domain constraints and equivalence safeguards.

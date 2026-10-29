@@ -2,8 +2,8 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with planned conservative semantic caching and process-local traffic
-controls. **Current status: milestone 3, client quotas and bounded inference
-admission implemented; genuine Gemma inference verified.** Caching, metrics, and performance
+controls. **Current status: milestone 4, safe exact caching, client quotas and
+bounded inference admission; genuine Gemma inference verified.** Semantic caching, metrics and performance
 benchmarks remain pending. This is not yet a high-throughput gateway demonstration.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
@@ -25,6 +25,7 @@ uv sync --locked
 .venv/bin/python -m devtools.smoke
 .venv/bin/python -m devtools.traffic_probe --output artifacts/traffic-probe.json
 .venv/bin/python -m devtools.deadline_probe --output artifacts/deadline-probe.json
+.venv/bin/python -m devtools.cache_probe --output artifacts/cache-probe.json
 ```
 
 The smoke command starts and cleans up two loopback HTTP servers, generates an
@@ -152,6 +153,84 @@ for client A and **2 / 10** for client B; exactly **5 upstream calls**. With two
 held inference slots, **20 excess requests returned 503**, upstream calls and
 peak active count stayed at **2**, and a request succeeded after release.
 These are enforcement checks, not model or cached-response throughput numbers.
+
+## Safe exact response caching
+
+Disabled by default. Enable the existing `[exact_cache]` table only for reviewed
+**public, static** prompts. Both backend and model `revision` pins are required
+(examples are provided); restart and change pins before changing model weights,
+server/template/context/defaults. Pins are operator assertions, not live change
+detection. Never approve sensitive, personal, stateful or freshness-sensitive text.
+
+```toml
+[exact_cache]
+enabled = true
+ttl_seconds = 60.0
+max_entries = 128
+max_bytes = 8388608
+namespace = "public-static-v1"
+approved_prompts = ["What is the capital of France? Answer with only the city name."]
+```
+
+The request must also have one literal `X-Gateway-Cache: exact` header, one user
+message equal to an approved prompt, `temperature: 0`, `top_p: 1`, and an explicit
+seed. Missing pins, system/conversation messages, unapproved text, sampling,
+cookies and client no-store/no-cache bypass; streaming remains 422. Approval is
+human policy, not a content classifier. A seed/zero temperature does not promise
+provider determinism: opt-in accepts replay of the first complete answer for TTL.
+
+Repeat the following against an enabled manual mock gateway (use `gemma` instead
+of `demo` for the configured Ollama gateway):
+
+```sh
+curl -sS http://127.0.0.1:8000/v1/chat/completions \
+  -H "Authorization: Bearer $GATEWAY_DEMO_KEY" -H 'X-Gateway-Cache: exact' \
+  -H 'Content-Type: application/json' -D - \
+  -d '{"model":"demo","messages":[{"role":"user","content":"What is the capital of France? Answer with only the city name."}],"temperature":0,"top_p":1,"seed":42,"max_tokens":32}'
+```
+
+Responses report `X-Gateway-Cache: MISS`, then `HIT`, or `BYPASS` when ineligible.
+Only complete, nonblank, stop-finished responses can fill the cache; errors,
+truncation, cancellation and failed ASGI sends do not. Provider cache/freshness
+or session headers conservatively prohibit insertion. Cookie persistence is
+disabled. Outgoing `Cache-Control: no-store` governs downstream HTTP caches;
+explicit application reuse is separate. HIT preserves original response bytes,
+including id, creation time and provider usage; it represents **no new inference**.
+
+HMAC fingerprints include client identity, full validated input/defaults, resolved
+model/backend revisions, generation settings, full gateway config, credential
+scope and policy version. Raw prompts are not stored in keys or logs. Response
+values remain plaintext in RAM. Fixed insertion TTL and LRU eviction bound the
+combined digest/serialized-response bytes and entry count, not exact process RSS. Expiration is
+lazy on cache operations; idle expired bytes may remain in memory until then or
+restart. See [SPEC.md](SPEC.md) for the precise policy and limits.
+
+Hits follow auth/rate enforcement and bypass inference admission; they still spend
+request quota. Concurrent cold misses are deliberately not coalesced: they may
+generate duplicate calls within the existing admission cap, or receive 503. First
+fresh writer wins without extending TTL. Candidates commit after a successful
+final ASGI send and revision recheck, not proof that the client received the bytes.
+Observed disconnects and aborted sends never insert. No shared/distributed cache.
+
+The committed cache probe independently counted **3 upstream calls for 6
+successful HTTP requests** (3 hits, 2 misses, 1 sampling bypass), with tenant
+isolation and byte-identical replay. For genuine inference, start a dedicated
+Ollama server using the earlier Linux recipe, then run:
+
+```sh
+.venv/bin/python -m devtools.cache_probe \
+  --ollama-log artifacts/milestone02/ollama.log \
+  --output artifacts/real-cache-probe.json
+```
+
+This mode checks the example's live server version, model digest and context,
+starts a temporary cache-enabled gateway, and counts dedicated Ollama access-log
+POSTs. Other traffic invalidates the call-count experiment. The initial real run
+returned **`Paris`**, `MISS/HIT/HIT`, identical bytes and **one actual inference
+POST for three gateway requests**—two calls avoided. These are call-reduction
+checks, not a model-generation speed or broad performance benchmark. Internal
+`app.state.response_cache.snapshot()` exposes counters to tests; `upstream_calls`
+means adapter attempts, not confirmed provider completion. No public stats API.
 
 ## Timeout scope and investigation
 
@@ -374,12 +453,12 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestones 1–3 evidence is recorded in `PLAN.md`, including **85 passing tests**,
+Milestones 1–4 evidence is recorded in `PLAN.md`, including **141 passing tests**,
 lint/format checks, deterministic HTTP enforcement/deadline probes, and real-model
 verification. Concurrent forwarding tests are not a load benchmark.
-**No RPS, p95, cache savings, or model-generation throughput is claimed yet.**
+**No RPS, p95, general cost savings or model-generation throughput is claimed.**
 
-Use loopback and one worker. There is no cache, metrics endpoint, ingress
+Use loopback and one worker. There is no semantic cache, metrics endpoint, ingress
 slow-client deadline, or shared state across workers. Pool capacity and inference
 admission are distinct from request quotas. Task/ASGI-disconnect cancellation
 closes active HTTPX responses; the automated disconnect tests inject ASGI events.
@@ -388,7 +467,7 @@ cannot guarantee the model server stops inference. Do not expose this foundation
 directly to the Internet. Prompts, credentials, and upstream error bodies are not
 logged by application code; access logging is disabled in examples.
 
-Throughput benchmark commands remain pending until caching and metrics exist.
+Throughput benchmark commands remain pending until semantic caching and metrics exist.
 Milestone 6 will add a reproducible harness for uncached/exact/semantic,
 concurrency, quota and failure scenarios, with raw results and separate mock,
 gateway-overhead and real-model measurements. See [SPEC.md](SPEC.md) for cache

@@ -17,6 +17,8 @@ from llm_gateway.schemas import StrictModel
 class BackendConfig(StrictModel):
     base_url: str
     api_key_env: str | None = None
+    # Operator-pinned revision of server/template/defaults affecting responses.
+    revision: Annotated[str, Field(min_length=1, max_length=256)] | None = None
 
     @field_validator("base_url")
     @classmethod
@@ -53,11 +55,23 @@ class BackendConfig(StrictModel):
 class ModelRoute(StrictModel):
     backend: Annotated[str, Field(min_length=1, max_length=128)]
     model: Annotated[str, Field(min_length=1, max_length=128)]
+    revision: Annotated[str, Field(min_length=1, max_length=256)] | None = None
 
 
 class RateLimitConfig(StrictModel):
     burst: Annotated[int, Field(ge=1, le=10_000)] = 60
     requests_per_second: Annotated[float, Field(ge=0.000001, le=10_000)] = 1.0
+
+
+class ExactCacheConfig(StrictModel):
+    enabled: bool = False
+    ttl_seconds: Annotated[float, Field(ge=0.01, le=3600)] = 60.0
+    max_entries: Annotated[int, Field(ge=1, le=4096)] = 128
+    max_bytes: Annotated[int, Field(ge=1024, le=67_108_864)] = 8_388_608
+    approved_prompts: Annotated[
+        list[Annotated[str, Field(min_length=1, max_length=4000)]], Field(max_length=32)
+    ] = Field(default_factory=list)
+    namespace: Annotated[str, Field(min_length=1, max_length=128)] = "public-static-v1"
 
 
 class GatewayConfig(StrictModel):
@@ -69,6 +83,7 @@ class GatewayConfig(StrictModel):
     max_in_flight: Annotated[int, Field(ge=1, le=64)] = 8
     rate_limit: RateLimitConfig = Field(default_factory=RateLimitConfig)
     client_rate_limits: dict[str, RateLimitConfig] = Field(default_factory=dict)
+    exact_cache: ExactCacheConfig = Field(default_factory=ExactCacheConfig)
 
     @model_validator(mode="after")
     def valid_routes(self) -> "GatewayConfig":
