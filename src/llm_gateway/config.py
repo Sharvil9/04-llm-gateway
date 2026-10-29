@@ -74,6 +74,37 @@ class ExactCacheConfig(StrictModel):
     namespace: Annotated[str, Field(min_length=1, max_length=128)] = "public-static-v1"
 
 
+class SemanticFamily(StrictModel):
+    """Operator assertion that every literal phrase permits the same answer."""
+
+    id: Annotated[str, Field(pattern=r"^[a-z0-9_-]{1,64}$")]
+    domain: Annotated[str, Field(min_length=1, max_length=128)]
+    answer_contract: Annotated[str, Field(min_length=1, max_length=512)]
+    prompts: Annotated[
+        list[Annotated[str, Field(min_length=1, max_length=1000)]],
+        Field(min_length=2, max_length=32),
+    ]
+
+
+class SemanticCacheConfig(StrictModel):
+    enabled: bool = False
+    model_dir: Annotated[str, Field(min_length=1, max_length=1024)] = "artifacts/embeddings/l3"
+    threshold: Annotated[float, Field(ge=0.65, le=1.0)] = 0.75
+    timeout_seconds: Annotated[float, Field(ge=0.01, le=5.0)] = 0.25
+    max_entries: Annotated[int, Field(ge=1, le=128)] = 128
+    families: Annotated[list[SemanticFamily], Field(max_length=16)] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def unambiguous_approval(self) -> "SemanticCacheConfig":
+        ids = [family.id for family in self.families]
+        prompts = [prompt for family in self.families for prompt in family.prompts]
+        if len(set(ids)) != len(ids) or len(set(prompts)) != len(prompts):
+            raise ValueError("semantic families and prompt membership must be unique")
+        if self.enabled and not self.families:
+            raise ValueError("semantic reuse requires reviewed equivalence families")
+        return self
+
+
 class GatewayConfig(StrictModel):
     backends: dict[str, BackendConfig]
     models: dict[str, ModelRoute]
@@ -84,9 +115,12 @@ class GatewayConfig(StrictModel):
     rate_limit: RateLimitConfig = Field(default_factory=RateLimitConfig)
     client_rate_limits: dict[str, RateLimitConfig] = Field(default_factory=dict)
     exact_cache: ExactCacheConfig = Field(default_factory=ExactCacheConfig)
+    semantic_cache: SemanticCacheConfig = Field(default_factory=SemanticCacheConfig)
 
     @model_validator(mode="after")
     def valid_routes(self) -> "GatewayConfig":
+        if self.semantic_cache.enabled and not self.exact_cache.enabled:
+            raise ValueError("semantic reuse requires the bounded exact response store")
         if not self.backends or not self.models:
             raise ValueError("at least one backend and model must be configured")
         if len(self.client_rate_limits) > 128 or any(

@@ -4,6 +4,7 @@ import hmac
 import time
 from contextlib import asynccontextmanager
 from http.cookiejar import CookieJar, DefaultCookiePolicy
+from pathlib import Path
 
 import httpx
 from fastapi import FastAPI, Request
@@ -16,6 +17,7 @@ from llm_gateway.backend import GatewayError, HTTPBackend, ResponseCachePolicy
 from llm_gateway.cache import ExactResponseCache
 from llm_gateway.config import Settings, load_settings
 from llm_gateway.schemas import ChatRequest, ChatResponse
+from llm_gateway.semantic import SemanticCache
 from llm_gateway.traffic import CapacityFull, InferenceAdmission, RequestLimiter
 
 MAX_BODY_BYTES = 65_536
@@ -55,6 +57,8 @@ class RequestBoundary:
                 adapter_ms = scope.get("state", {}).get("adapter_ms")
                 if adapter_ms is not None:
                     timings.append(f"adapter;dur={adapter_ms:.3f}")
+                if (semantic_ms := state.get("semantic_ms")) is not None:
+                    timings.append(f"semantic;dur={semantic_ms:.3f}")
                 message = dict(message)
                 message["headers"] = list(message.get("headers", [])) + [
                     (b"server-timing", ", ".join(timings).encode("ascii")),
@@ -67,7 +71,8 @@ class RequestBoundary:
                 body = message.get("body", b"")
                 cache_bytes += len(body)
                 limit = scope["app"].state.settings.config.exact_cache.max_bytes
-                if cache_bytes + len(pending) > limit:
+                tag = state.get("cache_semantic")
+                if cache_bytes + len(pending) + (tag.size if tag else 0) > limit:
                     cache_overflow = True
                     cache_chunks.clear()
                 else:
@@ -84,7 +89,9 @@ class RequestBoundary:
             ):
                 # Commit only after the complete ASGI send succeeds. This is not
                 # a guarantee of receipt/ACK by the remote client.
-                scope["app"].state.response_cache.put(pending, b"".join(cache_chunks))
+                scope["app"].state.response_cache.put(
+                    pending, b"".join(cache_chunks), semantic=state.get("cache_semantic")
+                )
                 state.pop("cache_pending", None)
 
         await self.handle(scope, receive, timed_send)
@@ -162,7 +169,10 @@ class RequestBoundary:
 
 
 def create_app(
-    settings: Settings | None = None, *, transport: httpx.AsyncBaseTransport | None = None
+    settings: Settings | None = None,
+    *,
+    transport: httpx.AsyncBaseTransport | None = None,
+    embedding_encoder=None,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -175,6 +185,22 @@ def create_app(
         )
         app.state.admission = InferenceAdmission(resolved.config.max_in_flight)
         app.state.response_cache = ExactResponseCache(resolved)
+        app.state.semantic_cache = None
+        embedder = None
+        if resolved.config.semantic_cache.enabled:
+            # Optional imports/model loading never occur on the default path.
+            from llm_gateway.embeddings import BoundedEmbedder, LocalEmbedder
+
+            try:
+                encoder = embedding_encoder or await asyncio.to_thread(
+                    LocalEmbedder, Path(resolved.config.semantic_cache.model_dir)
+                )
+                embedder = BoundedEmbedder(encoder)
+            except Exception:
+                raise RuntimeError("Cannot load verified local semantic embedding model") from None
+            app.state.semantic_cache = SemanticCache(
+                app.state.response_cache, embedder, resolved.config.semantic_cache
+            )
         # No environment proxies/netrc, redirects, or automatic inference retries.
         async with httpx.AsyncClient(
             transport=transport,
@@ -191,7 +217,11 @@ def create_app(
         ) as client:
             app.state.http_client = client
             app.state.backend = HTTPBackend(resolved, client)
-            yield
+            try:
+                yield
+            finally:
+                if embedder is not None:
+                    await embedder.close()
 
     app = FastAPI(
         title="Local LLM Gateway",
@@ -252,29 +282,20 @@ def create_app(
             for value in request.headers.getlist("pragma")
             for part in value.split(",")
         }
+        semantic_opt_in = request.headers.getlist("x-gateway-cache") == ["semantic"]
         opt_in = (
-            request.headers.getlist("x-gateway-cache") == ["exact"]
+            (request.headers.getlist("x-gateway-cache") == ["exact"] or semantic_opt_in)
             and not controls.intersection({"no-store", "no-cache"})
             and "no-cache" not in pragma
             and "cookie" not in request.headers
             and not app.state.http_client.cookies
         )
         client_id = request.state.client_id
-        key = cache.key_for(payload, client_id, opt_in)
+        key = cache.key_for(payload, client_id, opt_in, semantic=semantic_opt_in)
         request.state.cache_status = "BYPASS" if key is None else "MISS"
         if key is not None and (cached := cache.get(key)) is not None:
             request.state.cache_status = "HIT"
             return Response(content=cached, media_type="application/json")
-
-        cache_policy = ResponseCachePolicy()
-
-        async def infer():
-            started = time.perf_counter()
-            try:
-                cache.stats.upstream_calls += 1
-                return await app.state.backend.complete(payload, cache_policy=cache_policy)
-            finally:
-                request.state.adapter_ms = (time.perf_counter() - started) * 1000
 
         async def disconnected():
             while True:
@@ -282,36 +303,72 @@ def create_app(
                     request.state.client_disconnected = True
                     return
 
-        # No await in slot entry/exit: check-and-increment is atomic on this loop.
-        with app.state.admission.slot():
-            operation = asyncio.create_task(infer())
-            watcher = asyncio.create_task(disconnected())
-            try:
-                done, _ = await asyncio.wait(
-                    (operation, watcher), return_when=asyncio.FIRST_COMPLETED
-                )
-                if operation in done:
-                    result = await operation
-                    if (
-                        key is not None
-                        and cache_policy.allowed
-                        and result.choices[0].finish_reason == "stop"
-                        and result.choices[0].message.content.strip()
-                        and not request.scope["state"].get("client_disconnected", False)
-                        and not app.state.http_client.cookies
-                    ):
-                        request.state.cache_pending = key
-                        request.state.cache_recheck = lambda: (
+        async def serve():
+            tag = None
+            semantic = app.state.semantic_cache
+            if key is not None and semantic_opt_in and semantic and cache.family_for(payload):
+                started = time.perf_counter()
+                try:
+                    cached, tag = await semantic.lookup(payload, client_id)
+                finally:
+                    request.state.semantic_ms = (time.perf_counter() - started) * 1000
+                if (
+                    cached is not None
+                    and cache.key_for(payload, client_id, opt_in, semantic=True) == key
+                ):
+                    request.state.cache_status = "SEMANTIC_HIT"
+                    return Response(content=cached, media_type="application/json")
+
+            cache_policy = ResponseCachePolicy()
+            # No await in slot entry/exit: atomic on this event loop.
+            with app.state.admission.slot():
+                started = time.perf_counter()
+                try:
+                    cache.stats.upstream_calls += 1
+                    result = await app.state.backend.complete(payload, cache_policy=cache_policy)
+                finally:
+                    request.state.adapter_ms = (time.perf_counter() - started) * 1000
+                if (
+                    key is not None
+                    and cache_policy.allowed
+                    and result.choices[0].finish_reason == "stop"
+                    and result.choices[0].message.content.strip()
+                    and not request.scope["state"].get("client_disconnected", False)
+                    and not app.state.http_client.cookies
+                ):
+                    request.state.cache_pending = key
+                    request.state.cache_semantic = tag
+
+                    def recheck():
+                        return (
                             not app.state.http_client.cookies
-                            and cache.key_for(payload, client_id, opt_in) == key
+                            and cache.key_for(payload, client_id, opt_in, semantic=semantic_opt_in)
+                            == key
+                            and (
+                                tag is None
+                                or cache.semantic_partition(
+                                    payload, client_id, semantic.embedder.fingerprint
+                                )
+                                == tag.partition
+                            )
                         )
-                    return result
-                # Internal bookkeeping only: the peer has already disconnected.
-                return Response(status_code=499)
-            finally:
-                for task in (operation, watcher):
-                    if not task.done():
-                        task.cancel()
-                await asyncio.gather(operation, watcher, return_exceptions=True)
+
+                    request.state.cache_recheck = recheck
+                return result
+
+        # Watch disconnects during embedding as well as upstream I/O. Worker
+        # cancellation retains its own capacity until the native call finishes.
+        operation = asyncio.create_task(serve())
+        watcher = asyncio.create_task(disconnected())
+        try:
+            done, _ = await asyncio.wait((operation, watcher), return_when=asyncio.FIRST_COMPLETED)
+            if operation in done:
+                return await operation
+            return Response(status_code=499)
+        finally:
+            for task in (operation, watcher):
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(operation, watcher, return_exceptions=True)
 
     return app

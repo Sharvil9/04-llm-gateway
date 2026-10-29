@@ -14,7 +14,7 @@ from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 
-from llm_gateway.config import Settings
+from llm_gateway.config import SemanticFamily, Settings
 from llm_gateway.schemas import ChatRequest
 
 _POLICY_VERSION = "exact-v1"
@@ -32,9 +32,24 @@ class CacheStats:
 
 
 @dataclass(frozen=True)
+class SemanticTag:
+    partition: bytes
+    vector: bytes
+
+    @property
+    def size(self) -> int:
+        return len(self.partition) + len(self.vector)
+
+
+@dataclass(frozen=True)
 class _Entry:
     payload: bytes
     expires_at: float
+    semantic: SemanticTag | None = None
+
+    @property
+    def size(self) -> int:
+        return len(self.payload) + (self.semantic.size if self.semantic else 0)
 
 
 class ExactResponseCache:
@@ -54,7 +69,21 @@ class ExactResponseCache:
         self._bytes_used = 0
         self.stats = CacheStats()
 
-    def key_for(self, request: ChatRequest, client_id: str, opt_in: bool) -> bytes | None:
+    def family_for(self, request: ChatRequest) -> SemanticFamily | None:
+        if len(request.messages) != 1 or request.messages[0].role != "user":
+            return None
+        return next(
+            (
+                family
+                for family in self._settings.config.semantic_cache.families
+                if request.messages[0].content in family.prompts
+            ),
+            None,
+        )
+
+    def key_for(
+        self, request: ChatRequest, client_id: str, opt_in: bool, *, semantic: bool = False
+    ) -> bytes | None:
         """Return an isolated exact key, or count a bypass and refuse caching."""
         config = self._settings.config
         policy = config.exact_cache
@@ -69,7 +98,10 @@ class ExactResponseCache:
             or not backend.revision
             or len(request.messages) != 1
             or request.messages[0].role != "user"
-            or request.messages[0].content not in policy.approved_prompts
+            or (
+                request.messages[0].content not in policy.approved_prompts
+                and not (semantic and config.semantic_cache.enabled and self.family_for(request))
+            )
             or request.temperature != 0.0
             or request.top_p != 1.0
             or request.seed is None
@@ -78,12 +110,30 @@ class ExactResponseCache:
             self.stats.bypasses += 1
             return None
 
-        token = self._settings.backend_tokens.get(route.backend) or ""
+        return self._fingerprint(request.model_dump(mode="json"), client_id, route.backend)
+
+    def semantic_partition(
+        self, request: ChatRequest, client_id: str, embedding_fingerprint: str
+    ) -> bytes:
+        """Replace only reviewed wording; every other request/config field remains."""
+        family = self.family_for(request)
+        if family is None:
+            raise ValueError("semantic partition requires reviewed membership")
+        values = request.model_dump(mode="json")
+        values["messages"] = [{"role": "user", "reviewed_family": family.model_dump()}]
+        values["embedding_fingerprint"] = embedding_fingerprint
+        values["semantic_policy"] = "reviewed-equivalence-v1"
+        route = self._settings.config.models[request.model]
+        return self._fingerprint(values, client_id, route.backend)
+
+    def _fingerprint(self, values: dict, client_id: str, backend_name: str) -> bytes:
+        config = self._settings.config
+        token = self._settings.backend_tokens.get(backend_name) or ""
         canonical = json.dumps(
             {
                 "policy_version": _POLICY_VERSION,
                 "client_id": client_id,
-                "request": request.model_dump(mode="json"),
+                "request": values,
                 "config": config.model_dump(mode="json"),
                 "backend_credential_sha256": hashlib.sha256(token.encode()).hexdigest(),
             },
@@ -100,7 +150,7 @@ class ExactResponseCache:
         for key, entry in list(self._entries.items()):
             if entry.expires_at <= now:
                 del self._entries[key]
-                self._bytes_used -= len(key) + len(entry.payload)
+                self._bytes_used -= len(key) + entry.size
                 self.stats.expirations += 1
 
     def get(self, key: bytes) -> bytes | None:
@@ -114,26 +164,59 @@ class ExactResponseCache:
         self.stats.hits += 1
         return entry.payload
 
-    def put(self, key: bytes, payload: bytes) -> bool:
+    def semantic_candidates(self, partition: bytes) -> list[tuple[bytes, bytes]]:
+        self._expire(self._clock())
+        return [
+            (key, entry.semantic.vector)
+            for key, entry in self._entries.items()
+            if entry.semantic is not None and entry.semantic.partition == partition
+        ]
+
+    def semantic_get(self, key: bytes, partition: bytes) -> bytes | None:
+        # Recheck freshness and compatibility after off-loop embedding/search.
+        self._expire(self._clock())
+        entry = self._entries.get(key)
+        if entry is None or entry.semantic is None or entry.semantic.partition != partition:
+            return None
+        self._entries.move_to_end(key)
+        return entry.payload
+
+    def put(self, key: bytes, payload: bytes, *, semantic: SemanticTag | None = None) -> bool:
         """Store a fresh entry; duplicates and oversized responses are skipped."""
         if not isinstance(key, bytes) or not isinstance(payload, bytes):
             raise TypeError("cache keys and response payloads must be immutable bytes")
+        if semantic is not None and (
+            not isinstance(semantic.partition, bytes)
+            or not isinstance(semantic.vector, bytes)
+            or len(semantic.partition) != 32
+            or len(semantic.vector) != 384 * 4
+        ):
+            raise ValueError("semantic metadata must be an opaque partition and float32 vector")
         now = self._clock()
         self._expire(now)
         if key in self._entries:
             return False
 
         policy = self._settings.config.exact_cache
-        size = len(key) + len(payload)
+        size = len(key) + len(payload) + (semantic.size if semantic else 0)
         if size > policy.max_bytes:
             return False
+        if semantic is not None:
+            tagged = [key for key, entry in self._entries.items() if entry.semantic is not None]
+            if len(tagged) >= self._settings.config.semantic_cache.max_entries:
+                previous_key = tagged[0]
+                previous = self._entries.pop(previous_key)
+                self._bytes_used -= len(previous_key) + previous.size
+                self.stats.evictions += 1
         while (
             len(self._entries) >= policy.max_entries or self._bytes_used + size > policy.max_bytes
         ):
             previous_key, previous = self._entries.popitem(last=False)
-            self._bytes_used -= len(previous_key) + len(previous.payload)
+            self._bytes_used -= len(previous_key) + previous.size
             self.stats.evictions += 1
-        self._entries[key] = _Entry(payload=payload, expires_at=now + policy.ttl_seconds)
+        self._entries[key] = _Entry(
+            payload=payload, expires_at=now + policy.ttl_seconds, semantic=semantic
+        )
         self._bytes_used += size
         self.stats.stores += 1
         return True

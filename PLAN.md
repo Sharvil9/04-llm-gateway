@@ -258,14 +258,119 @@ temporary configs removed, and cgroup OOM events remained zero.
 No semantic caching, embeddings, Redis, dashboard or distributed consistency
 added. Counters/cache reset on restart; one event loop/worker only.
 
-## 5 — Conservative semantic cache (next; not started)
+## 5 — Evaluation-driven semantic cache (complete)
 
-- [ ] Small CPU embedding model, bounded embedding execution and vector lookup.
-- [ ] Explicit opt-in/domain constraints and equivalence safeguards.
-- [ ] Curated calibration/held-out positives and adversarial negatives; measured
-  threshold/precision/recall/false hits; keep disabled if safety gate fails.
+- [x] Freeze public/static equivalence and hard-negative cases before scoring;
+  evaluate two pinned small CPU embedding models sequentially.
+- [x] Explicit semantic opt-in, reviewed phrase families/answer requirements,
+  tenant/model/credential/configuration/generation compatibility, exact lookup first.
+- [x] Shared bounded TTL/LRU response/vector storage, no alias TTL extension;
+  one off-loop embedding job, no queue, cancellation-safe capacity and cleanup.
+- [x] Calibration-only threshold selection, held-out positive/negative results,
+  separately report unsafe similarity-only retrieval and guarded reuse.
+- [x] Regression/failure tests, loopback HTTP call counts, real Gemma examples,
+  separate semantic lookup timing, reproducible commands and limitations.
 
-Exit: explainable eligible hits and zero held-out false hits with limitations.
+Verified 2026-10-29 on Linux x86_64 / Python 3.12.14 / 8 GiB / two CPU cores' quota:
+
+- Frozen dataset commit **`ac41d4a`**, SHA256
+  `80e0ba7b0acaf85afaca2e9bd8fa468c426fe67d50acdfa07541bb98d1a04885`:
+  **3 families, 54 queries**, calibration 27 / held-out 27, each 9 positives and 18
+  negatives. Covers negation, entities, numbers, versions, instructions, context,
+  output contracts and freshness. No label/wording/membership changes after scores.
+- Optional extra only: **NumPy 2.5.4, ONNX Runtime 1.31.1, Tokenizers 0.23.3**; no
+  Torch/Transformers, services or vector database. Fixed HF revisions/tokenizer
+  blobs and graph hashes independently verify downloaded local artifacts; no
+  runtime downloads. Source models Apache-2.0, pinned Xenova quantized conversions.
+- Sequential candidate evaluation, 384-dimensional normalized vectors, masked
+  mean pooling, CPU/one ORT thread, no truncation. **L6** revision
+  `751bff37182d3f1213fa05d7196b954e230abad9`: graph 22,972,370 bytes, max 256 tokens;
+  load 397.257 ms, process peak 117.94 MiB, 54-query encode median/p95 **2.732/5.153 ms**.
+  **Selected L3** revision `4b544e74dfc3256b2b56849ea5d7064fee1ac846`:
+  graph 17,452,106 bytes, max 128 tokens including special tokens; load 293.654 ms,
+  process peak 111.29 MiB, encode **1.425/2.253 ms**. Memory includes Python/libs/runtime,
+  not isolated model allocations; timings include tokenization/pooling. NumPy
+  uses the platform BLAS build; one ORT thread is not a total-process thread cap.
+  L3 matches guarded calibration recall with lower observed memory/latency.
+- Fixed threshold grid 0.65/0.70/0.75/0.80/0.85/0.90/0.95/0.98/1.0. Choose highest
+  threshold tied for maximum guarded calibration recall at zero false hits:
+  **0.75** for both models. Selected L3 calibration **9/9 positives, 0/18 negatives**;
+  unchanged held-out **9/9 positives, 0 misses, 0/18 negatives**, precision 9/9.
+  Across both splits guarded false hits **0/36**. **Similarity alone is unsafe**:
+  L3 at 0.75 accepts 11/18 held-out negatives (precision 9/20 = 45%). L6's raw
+  calibration-selected 0.85 also fails (7/9 positive hits, 7 false held-out hits).
+  Full per-case scores/calibration curves/memory/versions are tracked in
+  `evaluation/l3_results.json` and `evaluation/l6_results.json`.
+- Safety is finite reviewed-policy enforcement, not open-domain equivalence or
+  answer-quality proof. Unknown wording bypasses. Five negatives (three held-out)
+  distinguish identical reviewed text through external scope/answer metadata.
+  Component evaluator checks that metadata. A separate synthetic-vector ASGI
+  boundary test maps those five into explicit supported system context and
+  verifies all 54 cases: **18 byte-identical correct-answer reuses, 36 bypasses**;
+  3 warmed sources + 36 uncached negatives = 39 upstream attempts. Bare approved
+  single-user text remains eligible; invisible context cannot be inferred.
+- Existing exact protections remain: auth/quota first, single-user approved
+  public/static input, temperature 0/top_p 1/seed, immutable deployment pins,
+  per-client HMAC fingerprints, no cookies/cache directives, complete stop-only
+  answers, final ASGI send and configuration recheck. Vectors attach to entries
+  and share TTL/LRU/total bytes; another 32-byte partition + 1,536-byte vector/tag,
+  maximum 128 tagged entries. No standalone index, alias promotion, TTL chaining
+  or coalescing. Exact-only entries are not retroactively embedded on exact hits.
+- One dedicated worker, zero queued jobs; busy/error/overlength paths fall through
+  to ordinary admitted inference. Cooperative 250 ms lookup budget, monotonic late
+  check, native capacity retained after caller cancellation/timeout; shutdown waits
+  actual job completion. Token/graph output validation and artifact tamper tests.
+  Default disabled; no distributed consistency, hard native preemption or live
+  backend/model pin attestation. Configuration changes require new approval/eval.
+- Actual ONNX + deterministic backend loopback probe: **8 HTTP 200**, **1 exact hit,
+  2 semantic hits, 3 misses, 2 bypasses**, independently counted **5 upstream calls**.
+  Client B and sampling reach upstream, wrong entity bypasses; replay bytes match.
+  Baseline is one call/request; 3 calls avoided (37.5%), not generation throughput.
+- Genuine **Ollama 0.40.11 / gemma3:1b**, verified manifest
+  `97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`, context 2048,
+  with actual L3 embeddings: **Paris/Tokyo/Berlin**, same 8-request classifications
+  and exactly **5 chat POSTs** in a dedicated quiet Ollama log. Byte-identical
+  Paris/Tokyo semantic replays and Paris exact replay; original Paris usage 23/2/25,
+  ID **`chatcmpl-562`**. Final semantic-hit lookup samples **4.271/13.504 ms**, no
+  adapter invocation; their source adapter samples **4585.997/1380.282 ms** include
+  inference HTTP preparation/read/cleanup and possible loading. These are separate
+  functional observations, not comparative model-generation benchmarks.
+  Tracked `evaluation/gemma_results.json` records actual sample responses/timing;
+  raw dedicated log is ignored under `artifacts/milestone05/ollama.log`.
+- **195 tests passed in 3.36 s**, Ruff lint passed, **33 files formatted**. Core-only
+  `uv sync --locked` verification also passed: **168 passed, 6 skipped** (the NumPy
+  integration module is skipped as a unit); extra restored afterward. All previous
+  smoke, traffic/admission, deadline and exact-cache HTTP probes passed. Final
+  deadline probe 504: client 1016.877 ms / adapter 1013.225 ms / 18 trickle chunks;
+  cooperative cleanup/scheduling scope remains documented. No OOM/max events.
+
+Reproduce from the repository (models sequential; dedicated Ollama setup in README):
+
+```sh
+uv sync --locked --extra semantic --cache-dir .cache/uv
+.venv/bin/python -m devtools.semantic_eval --validate-only
+.venv/bin/python -m devtools.embedding_models --model l6
+.venv/bin/python -m devtools.embedding_models --model l3
+.venv/bin/python -m devtools.semantic_eval --model-dir artifacts/embeddings/l6 \
+  --output artifacts/l6-evaluation.json
+.venv/bin/python -m devtools.semantic_eval --model-dir artifacts/embeddings/l3 \
+  --output artifacts/l3-evaluation.json
+.venv/bin/pytest
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+.venv/bin/python -m devtools.semantic_probe --output artifacts/semantic-probe.json
+.venv/bin/python -m devtools.semantic_probe --ollama-log artifacts/milestone05/ollama.log \
+  --output artifacts/real-semantic-probe.json
+```
+
+Remaining: human-curated finite vocabulary, no generalization/privacy classifier;
+finite tests cannot guarantee universal correctness. A direct reviewed-family
+alias map would be cheaper for this catalog; embeddings supply an evaluated extra
+retrieval filter, not proof of unseen equivalence. Approval/configuration/model
+changes need evaluation. Process-local state, lazy expiry, byte budget excludes
+Python/RSS overhead; native jobs cannot be killed. Comprehensive metrics and
+scenario A–F throughput benchmarks remain milestone 6. No Redis, embeddings service,
+new LLM provider, training, dashboard, distributed state or unrelated optimization.
 
 ## 6 — Operational metrics and reproducible performance evidence
 

@@ -2,15 +2,16 @@
 
 ## Status and architecture
 
-Milestones 1–4 provide an async gateway, verified local Gemma inference, client
-request quotas, bounded inference admission and conservative exact caching.
-Semantic caching, operational metrics and benchmarks remain future work.
+Milestones 1–5 provide an async gateway, verified local Gemma inference, client
+request quotas, bounded inference admission, exact caching and optional reviewed-
+domain semantic reuse. Operational metrics and comprehensive benchmarks remain.
 Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
 Flow: bearer authentication → client request quota → body-size boundary → strict
 request validation → fixed public-model lookup → eligible exact-cache lookup →
-hit response, or immediate inference admission → HTTP backend adapter → validated
+optional reviewed-family semantic lookup → hit response, or immediate inference
+admission → HTTP backend adapter → validated
 normalized response → release inference slot → successful ASGI send → cache commit.
 The deterministic mock is a separate local HTTP service, so demonstrations cross
 a real network boundary. The adapter targets the documented OpenAI-compatible
@@ -26,7 +27,8 @@ non-streaming subset used by Ollama. There is no automatic model fallback.
   be `user`. No tools, images, streaming, response formats, or full OpenAI API
   compatibility. Unknown fields and coercions are rejected.
 - `X-Gateway-Cache: exact` explicitly requests exact reuse, subject to the
-  operator's policy. Responses expose `X-Gateway-Cache: HIT|MISS|BYPASS` after
+  operator's policy. `semantic` opts into exact-first and guarded semantic reuse.
+  Responses expose `X-Gateway-Cache: HIT|SEMANTIC_HIT|MISS|BYPASS` after
   reaching the cache decision; earlier auth/quota/schema errors omit it. MISS
   identifies a lookup, not a guarantee of inference or insertion. All HTTP
   responses carry `Cache-Control: no-store` for downstream HTTP caches.
@@ -92,19 +94,20 @@ is absent for local rejections. Gateway timing excludes subsequent ASGI sends,
 response-body transmission and client-side work. Neither duration is pure gateway
 CPU time or isolated model inference; differences include scheduling/boundaries.
 
-## Backends and future embeddings
+## Backends and embeddings
 
-Ollama 0.40.11 with `gemma3:1b` was verified on the 8 GiB CPU-only runner in
-milestone 2. The adapter targets `http://127.0.0.1:11434/v1`; the public alias is
-`gemma`. macOS remains untested. No Qwen models or implicit fallback. Do not load
-multiple models simultaneously.
+Ollama 0.40.11 / `gemma3:1b` remains the verified model backend, alias `gemma`,
+endpoint `http://127.0.0.1:11434/v1`; CPU, one model, context 2048. macOS is untested.
+No Qwen models or implicit fallback.
 
-For semantic embeddings, evaluate `sentence-transformers/all-MiniLM-L6-v2`
-(384 dimensions, CPU) using normalized vectors and bounded NumPy cosine search.
-The model truncates beyond 256 word pieces: semantic eligibility must reject
-overlength prompts instead of silently losing constraints. No vector database
-is justified for the initial small cache. Run embedding work
-off the event loop with bounded work; measure its latency before enabling it.
+Compared quantized ONNX conversions of all-MiniLM-L6-v2 and paraphrase-MiniLM-L3-v2
+(Apache-2.0, 384 dimensions). Selected L3 using calibration recall and measured
+CPU latency/process memory. Source and tokenizer pins, mean pooling, normalization,
+package versions and pipeline policy identify vectors. L3 rejects more than 128
+tokens including special tokens; L6 rejects more than 256. No truncation, implicit
+download, GPU provider or vector database. Optional dependencies are NumPy,
+ONNX Runtime and Tokenizers. See README and tracked evaluation JSON for commands,
+hardware, revisions, raw scores and results.
 
 ## Exact cache (implemented in milestone 4)
 
@@ -151,7 +154,7 @@ that controlled run only. Silent replacement behind unchanged pins is unsafe.
 approved_prompts (at most 32 strings, 1–4000 characters each). TTL starts at
 successful insertion and does not slide on hits. LRU evicts least-recently-read
 entries until both limits fit; oversized values are skipped without evicting
-existing entries. Byte accounting is **digest bytes + serialized response bytes**,
+existing entries. Byte accounting is **digest bytes + serialized response bytes + attached semantic metadata**,
 not RSS or exact Python allocator overhead; entry count separately bounds metadata.
 Expiration is lazy on get/put/snapshot. Expired data is never returned but can
 remain in RAM while idle until another cache operation or restart.
@@ -177,19 +180,80 @@ also counts fixture requests or dedicated Ollama access-log POSTs independently.
 No public stats endpoint or comprehensive telemetry yet. Restart clears responses,
 HMAC secret and counters. No persistence, cross-instance sharing or cache fairness.
 
-## Planned semantic cache (not implemented)
+## Reviewed-domain semantic cache (milestone 5)
 
-- Disabled by default; explicitly opt-in public factual single-turn
-  questions under an allowlisted context. Always isolated per client. Exclude
-  personal/private data, conversational state, tools, time-dependent information,
-  sensitive domains, and sampling. Preserve entities, numbers, negation, and
-  requested constraints; unsupported ambiguity results in a miss.
-- Similarity is candidate retrieval, not proof of equivalent answers. Evaluate
-  a curated positive/negative set and calibrate a threshold; no arbitrary
-  universal threshold. Use a conservative domain/intent guard and abstain unless
-  equivalence is supported. Hold semantic serving disabled if false hits remain.
-- Record semantic/miss/bypass separately from exact counters. TTL, expiry,
-  client/context/settings isolation and false-hit rate must be tested.
+Disabled by default and requires the exact store to be enabled. One literal
+`X-Gateway-Cache: semantic` requests exact lookup first and semantic lookup second,
+only after authentication, request quota, validation and fixed routing. Both hit
+types bypass inference admission; misses retain existing zero-queue admission,
+cleanup, deadlines and no-retry behavior. Exact-only opt-in never searches vectors.
+
+Additional eligibility: exact literal membership in an operator-reviewed family
+of public/static questions with identical answer requirements. Each family has a
+unique ID, domain, answer contract and 2–32 distinct approved phrases; at most 16
+families; no duplicate/ambiguous phrase membership. Current evaluated domains:
+France/Japan capital city-only answers and Python 3 list/tuple comparison with
+exactly two short bullets about mutability/literal syntax. Unknown wording,
+private/personal/sensitive/contextual/dynamic/freshness/tool workloads bypass.
+All original single-user-message, temperature=0/top_p=1/seed, pin, cookie, request/
+provider cache directive, successful complete stop, abort and send protections apply.
+
+Cosine similarity retrieves candidates; it never authorizes answer equivalence.
+The operator-reviewed family is that assertion. `answer_contract` is metadata,
+not an answer validator. The semantic HMAC partition replaces only reviewed
+wording with family/domain/contract identity while retaining all other request
+fields, full configuration, tenant, model/deployment/credential revisions and
+embedding pipeline fingerprint. Only that partition is searched, and freshness/
+compatibility are rechecked after embedding and before commit. No general
+unseen-paraphrase classifier or automatic privacy assurance is claimed.
+
+Vectors attach directly to response entries, with shared non-sliding insertion
+TTL, LRU eviction and byte budget; no independent stale index. Each tag costs a
+32-byte partition plus 1,536-byte float32 vector. `semantic_cache.max_entries`
+(1–128, default 128) separately bounds tagged entries: remove the oldest tagged
+response when full. Response TTL/eviction removes its vector atomically. Exact
+entries remain subject to existing total budgets. Oversized combined entries skip
+storage without evicting. Hits never create aliases, overwrite content or extend
+TTL; simultaneous cold misses are not coalesced.
+
+A dedicated one-job ThreadPoolExecutor runs tokenization, encoding and NumPy
+cosine search off the event loop. ORT explicitly uses CPUExecutionProvider,
+sequential execution, one intra/inter-op thread and no spinning. Zero embedding
+waiters; busy requests fall through to admitted inference. A configurable separate
+lookup budget defaults to 0.25 s (0.01–5), threshold defaults to 0.75 (0.65–1). Invalid/
+overlength/native errors also fall through without a semantic tag; eligible exact
+responses can still be stored. Exact-only entries are not retroactively embedded
+on exact hits. Caller cancellation/lookup timeout stops waiting,
+not a running native call: worker capacity stays occupied until actual completion.
+A monotonic post-check rejects late results if the loop was starved. The budget
+is cooperative, not a hard client wall-clock bound. Shutdown waits for native
+cleanup; there is no native hard-kill or CPU preemption.
+Disconnect watching covers both embedding and backend I/O.
+
+Evaluation: the SHA-pinned 54-case dataset was frozen/committed before scoring.
+Only calibration selects a threshold from the fixed grid; held-out cases are not
+retuned. At 0.75, selected L3 yields 9/9 held-out positive retrievals, 0 misses,
+0/18 negative acceptances; across both splits 0/36 negatives. Similarity alone
+at 0.75 accepts 11/18 held-out negatives, so open-domain reuse is unsafe and disabled.
+Zero guarded false hits measures finite reviewed-policy enforcement, not general
+semantic correctness. Approval/labels are a curated engineering fixture, not an
+external study. Five negatives (three held-out) use external scope/response metadata;
+these are component-policy cases. Separate synthetic-vector ASGI boundary tests map
+them into explicit system context and verify 18 valid reuses / 36 bypasses. The
+bare approved user wording alone remains eligible. Keep serving disabled if
+approval/evaluation fails; changing the
+model, tokenizer, domain, generation or policy requires new approval/evaluation.
+See `evaluation/semantic_cases.json`, `evaluation/l3_results.json`,
+`evaluation/l6_results.json`, `evaluation/gemma_results.json` and README.
+
+`HIT` is exact; `SEMANTIC_HIT` is reviewed semantic; `MISS` and `BYPASS` retain
+prior meanings. Replay returns original id/created/usage bytes. Stage counters
+separate exact hits/misses, semantic hits/misses/busy/failures and admitted adapter
+attempts. An exact miss followed by a semantic hit is one request with two stages;
+response dispositions are mutually exclusive. `Server-Timing: semantic` measures
+worker submission/encoding/retrieval, separate from adapter elapsed. No public
+metrics endpoint, persistence, thread safety, cross-worker/distributed consistency
+or model-generation throughput claim.
 
 ## Traffic controls (implemented in milestone 3)
 
@@ -270,3 +334,12 @@ Checked 2026-10-27; selected design choices are not performance guarantees.
 - [MiniLM model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2).
 - [Python asyncio timeout semantics](https://docs.python.org/3.12/library/asyncio-task.html#asyncio.timeout)
   and [HTTP Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#name-retry-after).
+
+Semantic dependency/model checks (2026-10-29):
+
+- [L3 model card](https://huggingface.co/sentence-transformers/paraphrase-MiniLM-L3-v2)
+  and [L6 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2).
+- [ONNX mean pooling requirements](https://sbert.net/docs/sentence_transformer/usage/efficiency.html#onnx).
+- [ORT thread control](https://onnxruntime.ai/docs/performance/tune-performance/threading.html)
+  and [Tokenizers stable API](https://huggingface.co/docs/tokenizers/v0.23.1/en/api/tokenizer).
+- [Python running-future cancellation](https://docs.python.org/3.12/library/concurrent.futures.html).

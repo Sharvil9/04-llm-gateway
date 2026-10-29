@@ -1,10 +1,10 @@
 # LLM gateway
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
-LLM HTTP API with planned conservative semantic caching and process-local traffic
-controls. **Current status: milestone 4, safe exact caching, client quotas and
-bounded inference admission; genuine Gemma inference verified.** Semantic caching, metrics and performance
-benchmarks remain pending. This is not yet a high-throughput gateway demonstration.
+LLM HTTP API with conservative caching and process-local traffic controls.
+**Current status: milestone 5, optional reviewed-domain semantic caching, exact
+caching, quotas and bounded inference admission; genuine Gemma inference verified.**
+Operational metrics and comprehensive throughput benchmarks remain pending.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
 and one pooled HTTPX async client. A separate deterministic HTTP service validates
@@ -232,6 +232,154 @@ checks, not a model-generation speed or broad performance benchmark. Internal
 `app.state.response_cache.snapshot()` exposes counters to tests; `upstream_calls`
 means adapter attempts, not confirmed provider completion. No public stats API.
 
+## Evaluation-driven semantic reuse
+
+Optional and **disabled by default**. This implementation accepts only literal
+phrases in operator-reviewed equivalence families. Unknown paraphrases bypass;
+it does not infer that arbitrary similar questions have interchangeable answers.
+The approved domains are city-only France/Japan capital questions and a narrow
+Python 3 list/tuple comparison with identical two-bullet requirements. Never
+approve personal, sensitive, conversational, changing or tool-dependent content.
+
+The frozen [dataset](evaluation/semantic_cases.json) contains **18 paraphrases and
+36 hard negatives**, split equally into calibration and held-out sets. It was
+committed before scoring (`ac41d4a`, SHA256
+`80e0ba7b0acaf85afaca2e9bd8fa468c426fe67d50acdfa07541bb98d1a04885`).
+Negatives cover negation, countries/entities, quantities, Python versions, output
+format/case, additional instructions, system context, private and time-dependent
+information. Metadata-only boundary cases represent incompatible request context;
+they are not extra supported request fields. **Five of the 36 negatives (three
+held-out) use this metadata**: the component evaluator rejects its mismatches.
+A separate 54-case ASGI/HTTP-boundary test with synthetic vectors maps those five
+cases into explicit system messages and verifies 18 positive reuses / 36 bypasses.
+Sending the bare approved user wording alone remains eligible. Labels/membership are a curated
+engineering fixture, not an independent human study.
+
+Measured sequentially on the Linux/8 GiB/two-CPU-quota environment below, with
+one ORT intra-op thread, batch size one, quantized ONNX and 384-dimensional vectors:
+
+| Candidate | Graph size | Peak process RSS | Encode median / p95 (54 queries) | Guarded calibration recall |
+| --- | --- | --- | --- | --- |
+| all-MiniLM-L6-v2 | 21.91 MiB | 117.94 MiB | 2.732 / 5.153 ms | 9/9 |
+| paraphrase-MiniLM-L3-v2 (selected) | 16.64 MiB | 111.29 MiB | 1.425 / 2.253 ms | 9/9 |
+
+RSS includes Python/libraries/runtime, not just weights; these are small sequential
+component measurements, not gateway throughput. L3 provides equal guarded
+calibration retrieval at lower observed memory/latency. Both are Apache-2.0
+Sentence Transformers models, using pinned Xenova ONNX conversions. Graphs,
+tokenizers and manifests are verified against source pins; no implicit downloads.
+Full scores, candidate revisions, package versions, memory and calibration curves:
+[L3 results](evaluation/l3_results.json), [L6 results](evaluation/l6_results.json).
+
+The threshold grid was fixed at 0.65/0.70/0.75/0.80/0.85/0.90/0.95/0.98/1.0.
+Calibration alone selects the highest threshold tied for maximum recall with zero
+guarded false hits: **0.75**, unchanged for held-out evaluation. L3 then retrieves
+**9/9 held-out positives, 0 misses, 0/18 accepted negatives, precision 9/9**.
+Across both splits, guarded false hits are **0/36 negatives**. Similarity alone
+at 0.75 accepts **11/18 held-out negatives** (9 correct + 11 false reuses,
+45% precision); it is unsafe. The finite membership/family/answer-contract guard
+provides the safety boundary. Zero on this finite fixture is no universal
+correctness guarantee and does not establish the model's answer quality. Keep
+reuse disabled when approval or evaluation is unsatisfactory; never tune on
+held-out failures to improve this reported result.
+
+Reproduce without paid services (run model evaluations sequentially):
+
+```sh
+uv sync --locked --extra semantic --cache-dir .cache/uv
+.venv/bin/python -m devtools.semantic_eval --validate-only
+.venv/bin/python -m devtools.embedding_models --model l6
+.venv/bin/python -m devtools.embedding_models --model l3
+.venv/bin/python -m devtools.semantic_eval --model-dir artifacts/embeddings/l6 \
+  --output artifacts/l6-evaluation.json
+.venv/bin/python -m devtools.semantic_eval --model-dir artifacts/embeddings/l3 \
+  --output artifacts/l3-evaluation.json
+.venv/bin/pytest
+.venv/bin/python -m devtools.semantic_probe --output artifacts/semantic-probe.json
+# Start the dedicated Ollama server using the Linux/macOS recipe below first:
+.venv/bin/python -m devtools.semantic_probe \
+  --ollama-log artifacts/milestone02/ollama.log --output artifacts/real-semantic-probe.json
+```
+
+The extra installs NumPy, ONNX Runtime and Tokenizers; the ordinary gateway needs
+none of them. Core-only tests skip the optional NumPy integration cases. No
+model weights are committed. macOS/Metal is not verified here.
+The probe uses the frozen families and checks the evaluation/model fingerprint;
+its temporary configuration enables reuse, then cleans up its gateway. Dedicated
+Ollama logs independently count actual chat POSTs, so unrelated traffic invalidates
+that experiment. It validates actual reused city answers and byte compatibility.
+The [recorded Gemma run](evaluation/gemma_results.json) returned **Paris/Tokyo/Berlin**:
+8 successful requests, **1 exact hit, 2 semantic hits, 3 misses, 2 bypasses**,
+**5 actual Ollama chat POSTs** (3 calls avoided). Tenant changes and sampling
+reached inference; semantic replays retained the source response bytes. These
+functional samples do not establish model-generation throughput. Semantic-hit
+lookup samples were **4.271 / 13.504 ms**, separately from their source adapter
+operations **4585.997 / 1380.282 ms**; loading, scheduling and scope differ.
+
+For manual use, enable the existing exact-cache store and retain model/backend
+pins. Append a reviewed semantic policy such as:
+
+```toml
+[semantic_cache]
+enabled = true
+model_dir = "artifacts/embeddings/l3"
+threshold = 0.75
+timeout_seconds = 0.25
+max_entries = 128
+
+[[semantic_cache.families]]
+id = "france-capital"
+domain = "public-static-v1"
+answer_contract = "city-name-only-v1"
+prompts = [
+  "What is the capital of France? Answer with only the city name.",
+  "Identify the capital city of France; reply with the city name alone."
+]
+```
+
+Send one literal `X-Gateway-Cache: semantic` header and the same generation fields
+as the exact example (`temperature=0`, `top_p=1`, explicit seed). This opts into
+exact lookup **first**, then guarded semantic lookup. Exact-only opt-in never
+performs semantic search. `HIT` means exact; `SEMANTIC_HIT` means reviewed semantic
+reuse; `MISS` means eligible lookup found no reusable response; `BYPASS` means
+ineligible. Both hit types spend quota and bypass inference admission. A miss
+still uses bounded inference admission; no model fallback or retry is added.
+
+All exact safeguards apply: one public/static user message, revision/credential/
+tenant/generation partitioning, no cookies/cache-bypass directives, complete stop
+response, no errors/truncation/aborted sends, final configuration recheck. The
+semantic partition replaces only reviewed wording with family/answer identity
+and includes the embedding pipeline fingerprint. Wrong entities, numbers,
+negation or response requirements are separate families or unapproved text.
+`answer_contract` is an operator assertion, not an automatic answer validator.
+
+Vectors are attached to response entries: shared insertion TTL, LRU and total
+byte budget (another 32-byte partition + 1,536-byte float32 vector per tagged
+entry), plus at most 128 tagged entries. Expiry/eviction removes both; no stale
+index or paraphrase aliases extend TTL. The first fresh writer still wins. Cache
+values/vectors remain plaintext RAM; metadata and Python overhead are not RSS
+accounted. Approval configuration contains only public text.
+
+A dedicated one-job worker runs tokenization/encoding/cosine off the event loop;
+ORT uses one CPU thread with spinning disabled. No embedding queue. Busy,
+failed or >128-token L3 inputs fall through to ordinary admitted inference
+without semantic metadata. Exact-only entries are not retroactively embedded on
+an exact hit, which can reduce semantic opportunities. The cooperative 250 ms
+lookup budget also falls through and rejects late results; it is not a hard
+client wall-clock deadline;
+cancel/timeout stops waiting, while the native job retains its capacity until
+finished. Shutdown waits for native cleanup. Exact storage can still accept an
+approved full-text response; no truncation is used to authorize semantic reuse.
+
+`Server-Timing: semantic` measures embedding-worker submission, encoding and
+retrieval, separate from `adapter` (inference HTTP operation). Exact hits have
+neither. `app.state.response_cache.snapshot()` counts exact hits/lookup misses
+and admitted upstream attempts; `app.state.semantic_cache.snapshot()` separately
+counts semantic hits/misses, busy skips and failures. These are stage counters:
+an exact miss followed by a semantic hit is one request with two lookup stages.
+Use the response disposition for mutually exclusive request outcomes. No public
+metrics endpoint. State resets on restart; one worker only, no distributed claims.
+
 ## Timeout scope and investigation
 
 `request_timeout_seconds` bounds the upstream operation: connection/pool wait,
@@ -453,12 +601,13 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestones 1–4 evidence is recorded in `PLAN.md`, including **141 passing tests**,
+Milestones 1–5 evidence is recorded in `PLAN.md`, including **195 passing tests**,
 lint/format checks, deterministic HTTP enforcement/deadline probes, and real-model
 verification. Concurrent forwarding tests are not a load benchmark.
-**No RPS, p95, general cost savings or model-generation throughput is claimed.**
+**No model-generation RPS, general cost savings or broad throughput is claimed.**
+Semantic component median/p95 timings are reported with their sample size above.
 
-Use loopback and one worker. There is no semantic cache, metrics endpoint, ingress
+Use loopback and one worker. There is no public metrics endpoint, ingress
 slow-client deadline, or shared state across workers. Pool capacity and inference
 admission are distinct from request quotas. Task/ASGI-disconnect cancellation
 closes active HTTPX responses; the automated disconnect tests inject ASGI events.
@@ -467,7 +616,7 @@ cannot guarantee the model server stops inference. Do not expose this foundation
 directly to the Internet. Prompts, credentials, and upstream error bodies are not
 logged by application code; access logging is disabled in examples.
 
-Throughput benchmark commands remain pending until semantic caching and metrics exist.
+Comprehensive throughput benchmarks remain deferred to milestone 6.
 Milestone 6 will add a reproducible harness for uncached/exact/semantic,
 concurrency, quota and failure scenarios, with raw results and separate mock,
 gateway-overhead and real-model measurements. See [SPEC.md](SPEC.md) for cache
