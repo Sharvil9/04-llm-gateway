@@ -1,0 +1,649 @@
+{
+  "schema_version": 1,
+  "dataset_version": "semantic-cases-v1",
+  "protocol": {
+    "frozen_before_model_scoring": true,
+    "cache_sources": "One canonical question per family represents an already-cached response. Positive cases are genuine, non-identical paraphrases.",
+    "selection": "Only calibration cases select thresholds. Heldout labels, wording, and membership are frozen before any similarity scoring.",
+    "guard": "Exact text membership in a listed canonical or reviewed paraphrase is necessary. The retrieved candidate must also match family ID, scope, and response_requirement. Unknown text and metadata mismatch bypass.",
+    "negative_labels": "answer_mismatch marks an incompatible answer/output requirement; policy_exclusion marks a conservative scope/context/version exclusion even if some answer facts might coincide.",
+    "limitations": "This finite curated engineering fixture is not an external human review, a random sample, an answer-quality evaluation, or evidence of general equivalence detection. Guarded zero false hits follow finite admission; similarity remains retrieval only."
+  },
+  "families": [
+    {
+      "id": "france-capital",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "canonical": "What is the capital of France? Answer with only the city name.",
+      "reference_requirement": "The answer must be only Paris.",
+      "paraphrases": {
+        "calibration": [
+          "Name France's capital city. Return only its name.",
+          "Which city is the capital of France? Give just the city name.",
+          "Tell me the name of France's capital, with nothing else."
+        ],
+        "heldout": [
+          "Identify the capital city of France; reply with the city name alone.",
+          "France has which capital? Respond solely with the city's name.",
+          "Give only the name of the city that serves as France's capital."
+        ]
+      }
+    },
+    {
+      "id": "japan-capital",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "canonical": "What is the capital of Japan? Answer with only the city name.",
+      "reference_requirement": "The answer must be only Tokyo.",
+      "paraphrases": {
+        "calibration": [
+          "Name Japan's capital city. Return only its name.",
+          "Which city is the capital of Japan? Give just the city name.",
+          "Tell me the name of Japan's capital, with nothing else."
+        ],
+        "heldout": [
+          "Identify the capital city of Japan; reply with the city name alone.",
+          "Japan has which capital? Respond solely with the city's name.",
+          "Give only the name of the city that serves as Japan's capital."
+        ]
+      }
+    },
+    {
+      "id": "python3-list-tuple",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "canonical": "In Python 3, give exactly two short bullet points comparing lists and tuples: mutability and literal syntax.",
+      "reference_requirement": "Exactly two short bullets cover list/tuple mutability and literal syntax; tuple literals require commas, with parentheses commonly used.",
+      "paraphrases": {
+        "calibration": [
+          "Compare Python 3 lists with tuples in two concise bullets, one about mutability and one about literal syntax.",
+          "For Python 3, briefly contrast lists and tuples using exactly two bullets covering mutability and how their literals are written.",
+          "Give two short list-versus-tuple bullet points for Python 3: whether each can change, then its literal notation."
+        ],
+        "heldout": [
+          "Using exactly two brief bullets, explain how Python 3 lists and tuples differ in mutability and literal notation.",
+          "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+          "Describe Python 3 list/tuple differences in two concise bullet points: mutability first and literal-writing syntax second."
+        ]
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "calibration-france-capital-positive-1",
+      "split": "calibration",
+      "text": "Name France's capital city. Return only its name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-france-capital-positive-2",
+      "split": "calibration",
+      "text": "Which city is the capital of France? Give just the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-france-capital-positive-3",
+      "split": "calibration",
+      "text": "Tell me the name of France's capital, with nothing else.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-france-capital-positive-1",
+      "split": "heldout",
+      "text": "Identify the capital city of France; reply with the city name alone.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-france-capital-positive-2",
+      "split": "heldout",
+      "text": "France has which capital? Respond solely with the city's name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-france-capital-positive-3",
+      "split": "heldout",
+      "text": "Give only the name of the city that serves as France's capital.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-japan-capital-positive-1",
+      "split": "calibration",
+      "text": "Name Japan's capital city. Return only its name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-japan-capital-positive-2",
+      "split": "calibration",
+      "text": "Which city is the capital of Japan? Give just the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-japan-capital-positive-3",
+      "split": "calibration",
+      "text": "Tell me the name of Japan's capital, with nothing else.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-japan-capital-positive-1",
+      "split": "heldout",
+      "text": "Identify the capital city of Japan; reply with the city name alone.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-japan-capital-positive-2",
+      "split": "heldout",
+      "text": "Japan has which capital? Respond solely with the city's name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-japan-capital-positive-3",
+      "split": "heldout",
+      "text": "Give only the name of the city that serves as Japan's capital.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-python3-list-tuple-positive-1",
+      "split": "calibration",
+      "text": "Compare Python 3 lists with tuples in two concise bullets, one about mutability and one about literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-python3-list-tuple-positive-2",
+      "split": "calibration",
+      "text": "For Python 3, briefly contrast lists and tuples using exactly two bullets covering mutability and how their literals are written.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-python3-list-tuple-positive-3",
+      "split": "calibration",
+      "text": "Give two short list-versus-tuple bullet points for Python 3: whether each can change, then its literal notation.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-python3-list-tuple-positive-1",
+      "split": "heldout",
+      "text": "Using exactly two brief bullets, explain how Python 3 lists and tuples differ in mutability and literal notation.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-python3-list-tuple-positive-2",
+      "split": "heldout",
+      "text": "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "heldout-python3-list-tuple-positive-3",
+      "split": "heldout",
+      "text": "Describe Python 3 list/tuple differences in two concise bullet points: mutability first and literal-writing syntax second.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "reviewed-paraphrase"
+    },
+    {
+      "id": "calibration-france-capital-negative-1",
+      "split": "calibration",
+      "text": "What is the capital of Germany? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "Paris is not Germany's capital."
+    },
+    {
+      "id": "calibration-france-capital-negative-2",
+      "split": "calibration",
+      "text": "Name a city that is not the capital of France. Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "negation",
+      "reason": "The cached capital is explicitly excluded."
+    },
+    {
+      "id": "calibration-france-capital-negative-3",
+      "split": "calibration",
+      "text": "Name two French cities. Answer with exactly two city names.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "number",
+      "reason": "A single city does not satisfy the two-city requirement."
+    },
+    {
+      "id": "calibration-france-capital-negative-4",
+      "split": "calibration",
+      "text": "What is the capital of France? Return a JSON object with a city field.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "format",
+      "reason": "A bare city name does not satisfy the JSON requirement."
+    },
+    {
+      "id": "calibration-france-capital-negative-5",
+      "split": "calibration",
+      "text": "My private itinerary says Paris. Which city should I fly to? Give only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "user-context",
+      "reason": "A personal travel decision is outside this public factual family."
+    },
+    {
+      "id": "calibration-france-capital-negative-6",
+      "split": "calibration",
+      "text": "Name France's capital city. Return only its name.",
+      "scope": "private-client-context-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "scope-boundary",
+      "reason": "Identical text in a private context must not cross scope boundaries."
+    },
+    {
+      "id": "heldout-france-capital-negative-1",
+      "split": "heldout",
+      "text": "What is the capital of Brazil? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "Paris is not Brazil's capital."
+    },
+    {
+      "id": "heldout-france-capital-negative-2",
+      "split": "heldout",
+      "text": "Which French city is not Paris? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "negation",
+      "reason": "Paris is explicitly excluded."
+    },
+    {
+      "id": "heldout-france-capital-negative-3",
+      "split": "heldout",
+      "text": "What is the capital of France? Reply with only the lower-case city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "case-requirement",
+      "reason": "The family's Paris response does not satisfy a lower-case-only requirement."
+    },
+    {
+      "id": "heldout-france-capital-negative-4",
+      "split": "heldout",
+      "text": "What is the capital of France and which continent is it in? Give both.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "additional-requirement",
+      "reason": "The city-only response omits the requested continent."
+    },
+    {
+      "id": "heldout-france-capital-negative-5",
+      "split": "heldout",
+      "text": "Identify the capital city of France; reply with the city name alone.",
+      "scope": "custom-system-instructions-v2",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "system-context",
+      "reason": "Unmatched system-instruction scope forbids reuse of identical text."
+    },
+    {
+      "id": "heldout-france-capital-negative-6",
+      "split": "heldout",
+      "text": "For my personal visa application, should I list Paris or Lyon as my destination? Give only a city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "user-context",
+      "reason": "A user-specific administrative question is outside the approved public family."
+    },
+    {
+      "id": "calibration-japan-capital-negative-1",
+      "split": "calibration",
+      "text": "What is the capital of China? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "Tokyo is not China's capital."
+    },
+    {
+      "id": "calibration-japan-capital-negative-2",
+      "split": "calibration",
+      "text": "Name a Japanese city that is not its capital. Give only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "negation",
+      "reason": "Tokyo does not meet the explicit non-capital constraint."
+    },
+    {
+      "id": "calibration-japan-capital-negative-3",
+      "split": "calibration",
+      "text": "What was Japan's capital in 1850? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "historical-time",
+      "reason": "The historical question requires Kyoto rather than the current capital."
+    },
+    {
+      "id": "calibration-japan-capital-negative-4",
+      "split": "calibration",
+      "text": "What is the capital of Japan and its population? Answer with both.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "additional-requirement",
+      "reason": "A city-only response omits population."
+    },
+    {
+      "id": "calibration-japan-capital-negative-5",
+      "split": "calibration",
+      "text": "I live in Tokyo. Which city should I move to for my job? Give only a city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "user-context",
+      "reason": "A personal recommendation is not the approved static capital question."
+    },
+    {
+      "id": "calibration-japan-capital-negative-6",
+      "split": "calibration",
+      "text": "Which city is the capital of Japan? Give just the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-and-country-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "response-boundary",
+      "reason": "Metadata requests a city-and-country response rather than city-only."
+    },
+    {
+      "id": "heldout-japan-capital-negative-1",
+      "split": "heldout",
+      "text": "What is the capital of South Korea? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "Tokyo is not South Korea's capital."
+    },
+    {
+      "id": "heldout-japan-capital-negative-2",
+      "split": "heldout",
+      "text": "Which Japanese city is not Tokyo? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "negation",
+      "reason": "Tokyo is explicitly excluded."
+    },
+    {
+      "id": "heldout-japan-capital-negative-3",
+      "split": "heldout",
+      "text": "Name three Japanese cities. Answer with exactly three city names.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "number",
+      "reason": "The cached single-city response is insufficient."
+    },
+    {
+      "id": "heldout-japan-capital-negative-4",
+      "split": "heldout",
+      "text": "What will the capital of Japan be in 2050? Answer with only the city name.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "future-time",
+      "reason": "A future political fact is outside the current static family."
+    },
+    {
+      "id": "heldout-japan-capital-negative-5",
+      "split": "heldout",
+      "text": "What is the capital of Japan? Reply in a full sentence containing the country and city.",
+      "scope": "public-static-v1",
+      "response_requirement": "city-name-only-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "format",
+      "reason": "A bare city does not meet the full-sentence requirement."
+    },
+    {
+      "id": "heldout-japan-capital-negative-6",
+      "split": "heldout",
+      "text": "Give only the name of the city that serves as Japan's capital.",
+      "scope": "public-static-v1",
+      "response_requirement": "json-city-field-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "response-boundary",
+      "reason": "Identical text must not override a different declared response contract."
+    },
+    {
+      "id": "calibration-python3-list-tuple-negative-1",
+      "split": "calibration",
+      "text": "In Python 3, give two short bullets comparing lists and sets: mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "The requested second container is a set, not a tuple."
+    },
+    {
+      "id": "calibration-python3-list-tuple-negative-2",
+      "split": "calibration",
+      "text": "In Python 3, compare NumPy arrays with tuples in two short bullets about mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "A NumPy array is not a Python list."
+    },
+    {
+      "id": "calibration-python3-list-tuple-negative-3",
+      "split": "calibration",
+      "text": "In Python 3, give exactly two short bullets comparing lists and tuples: memory usage and speed.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "topic-constraint",
+      "reason": "The required comparison topics differ."
+    },
+    {
+      "id": "calibration-python3-list-tuple-negative-4",
+      "split": "calibration",
+      "text": "In Python 3, demonstrate a list and a tuple using only executable code, with no explanation.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "format",
+      "reason": "The approved two-bullet prose answer violates code-only output."
+    },
+    {
+      "id": "calibration-python3-list-tuple-negative-5",
+      "split": "calibration",
+      "text": "In Python 2, give exactly two short bullet points comparing lists and tuples: mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "version",
+      "reason": "Python 2 is an unreviewed version boundary even where these facts may overlap."
+    },
+    {
+      "id": "calibration-python3-list-tuple-negative-6",
+      "split": "calibration",
+      "text": "Ignore the two-bullet constraint. Write a long essay on Python 3 list and tuple mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "instruction",
+      "reason": "The requested response length and structure differ."
+    },
+    {
+      "id": "heldout-python3-list-tuple-negative-1",
+      "split": "heldout",
+      "text": "In Python 3, give two short bullets comparing lists and dictionaries: mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "The question asks about dictionaries rather than tuples."
+    },
+    {
+      "id": "heldout-python3-list-tuple-negative-2",
+      "split": "heldout",
+      "text": "In Python 3, give exactly three short bullet points comparing lists and tuples.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "number",
+      "reason": "A two-bullet answer cannot satisfy exactly three bullets."
+    },
+    {
+      "id": "heldout-python3-list-tuple-negative-3",
+      "split": "heldout",
+      "text": "In JavaScript, give exactly two short bullets comparing arrays and tuples: mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "language-version",
+      "reason": "The language and type system are outside the Python 3 family."
+    },
+    {
+      "id": "heldout-python3-list-tuple-negative-4",
+      "split": "heldout",
+      "text": "For CPython 3.13 specifically, compare list and tuple memory overhead in exactly two short bullets.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "version-topic",
+      "reason": "Implementation/version-specific memory behavior is outside this family's topics."
+    },
+    {
+      "id": "heldout-python3-list-tuple-negative-5",
+      "split": "heldout",
+      "text": "In Python 3, return only a table comparing list and tuple mutability and literal syntax.",
+      "scope": "public-static-v1",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "format",
+      "reason": "Bullet points do not satisfy table-only output."
+    },
+    {
+      "id": "heldout-python3-list-tuple-negative-6",
+      "split": "heldout",
+      "text": "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+      "scope": "custom-system-instructions-v2",
+      "response_requirement": "two-short-bullets-mutability-and-literal-syntax-v1",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "system-context",
+      "reason": "Identical wording in an unmatched custom-system scope must bypass."
+    }
+  ]
+}
