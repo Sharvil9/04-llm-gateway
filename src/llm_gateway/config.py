@@ -116,6 +116,7 @@ class GatewayConfig(StrictModel):
     client_rate_limits: dict[str, RateLimitConfig] = Field(default_factory=dict)
     exact_cache: ExactCacheConfig = Field(default_factory=ExactCacheConfig)
     semantic_cache: SemanticCacheConfig = Field(default_factory=SemanticCacheConfig)
+    log_requests: bool = False
 
     @model_validator(mode="after")
     def valid_routes(self) -> "GatewayConfig":
@@ -141,6 +142,7 @@ class Settings:
     config: GatewayConfig
     client_key_hashes: dict[bytes, str] = field(repr=False)
     backend_tokens: dict[str, str] = field(default_factory=dict, repr=False)
+    metrics_key_hash: bytes | None = field(default=None, repr=False)
 
 
 def load_settings() -> Settings:
@@ -176,6 +178,15 @@ def load_settings() -> Settings:
     if config.client_rate_limits.keys() - set(hashes.values()):
         raise RuntimeError("Rate-limit override refers to an unconfigured client ID")
 
+    metrics_key_hash = None
+    metrics_key = os.environ.get("GATEWAY_METRICS_KEY")
+    if metrics_key is not None:
+        if not re.fullmatch(r"[A-Za-z0-9_-]{32,256}", metrics_key):
+            raise RuntimeError("GATEWAY_METRICS_KEY must be a 32–256 character URL-safe key")
+        metrics_key_hash = hashlib.sha256(metrics_key.encode()).digest()
+        if metrics_key_hash in hashes:
+            raise RuntimeError("Metrics credential must be distinct from client credentials")
+
     backend_tokens = {}
     for name, backend in config.backends.items():
         if backend.api_key_env:
@@ -183,4 +194,9 @@ def load_settings() -> Settings:
             if not token or any(ord(char) < 33 or ord(char) > 126 for char in token):
                 raise RuntimeError("Missing or invalid configured backend API credential")
             backend_tokens[name] = token
-    return Settings(config=config, client_key_hashes=hashes, backend_tokens=backend_tokens)
+    return Settings(
+        config=config,
+        client_key_hashes=hashes,
+        backend_tokens=backend_tokens,
+        metrics_key_hash=metrics_key_hash,
+    )

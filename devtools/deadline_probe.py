@@ -65,9 +65,11 @@ def main() -> None:
             )
             port = free_port()
             key = secrets.token_urlsafe(32)
+            operator_key = secrets.token_urlsafe(32)
             environment = os.environ.copy()
             environment["GATEWAY_CONFIG"] = str(config)
             environment["GATEWAY_CLIENT_KEYS_JSON"] = json.dumps({"probe": key})
+            environment["GATEWAY_METRICS_KEY"] = operator_key
             process = subprocess.Popen(
                 [
                     str(ROOT / ".venv/bin/python"),
@@ -104,6 +106,15 @@ def main() -> None:
                     for name, value in [item.split(";dur=")]
                 }
                 assert response.status_code == 504 and len(chunks) >= 2
+                observed = client.get(
+                    f"{base}/v1/metrics",
+                    headers={"Authorization": f"Bearer {operator_key}"},
+                )
+                observed.raise_for_status()
+                metrics = observed.json()
+                assert metrics["status"]["exact"]["504"] == 1
+                assert metrics["counts"]["upstream_attempts"] == 1
+                assert metrics["gauges"]["inference_in_flight"] == 0
                 result = {
                     "backend": "deterministic_http_trickle",
                     "real_model_inference": False,
@@ -114,6 +125,7 @@ def main() -> None:
                     "client_full_response_ms": round(elapsed_ms, 3),
                     "gateway_to_response_start_ms": measured["gateway"],
                     "adapter_roundtrip_ms": measured["adapter"],
+                    "gateway_metrics": metrics,
                     "interpretation": (
                         "Scope differences include scheduling and transport; not CPU overhead"
                     ),

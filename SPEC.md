@@ -2,9 +2,10 @@
 
 ## Status and architecture
 
-Milestones 1–5 provide an async gateway, verified local Gemma inference, client
+Milestones 1–6 provide an async gateway, verified local Gemma inference, client
 request quotas, bounded inference admission, exact caching and optional reviewed-
-domain semantic reuse. Operational metrics and comprehensive benchmarks remain.
+domain semantic reuse, operator-only operational metrics and reproducible HTTP
+benchmarks. Semantic safety remains finite reviewed-policy enforcement.
 Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
@@ -21,6 +22,8 @@ non-streaming subset used by Ollama. There is no automatic model fallback.
 
 - `GET /healthz`: public liveness only, not model readiness.
 - `GET /v1/models`: authenticated public aliases, no backend addresses.
+- `GET /v1/metrics`: separate operator bearer credential; disabled 404 unless
+  `GATEWAY_METRICS_KEY` is configured. Client keys cannot read global metrics.
 - `POST /v1/chat/completions`: authenticated JSON with `model`, `messages`,
   optional `temperature`, `top_p`, `max_tokens`, `seed`, and `stream: false`.
   String content only; roles `system`, `user`, `assistant`; final message must
@@ -177,7 +180,7 @@ Internal counters: hits, misses, bypasses, stores, evictions, expirations and
 upstream_calls, plus occupancy. `upstream_calls` counts admitted **adapter
 attempts**, including connection/pool failures, not confirmed inference. Verification
 also counts fixture requests or dedicated Ollama access-log POSTs independently.
-No public stats endpoint or comprehensive telemetry yet. Restart clears responses,
+Protected metrics expose aggregate diagnostics, never cache contents. Restart clears responses,
 HMAC secret and counters. No persistence, cross-instance sharing or cache fairness.
 
 ## Reviewed-domain semantic cache (milestone 5)
@@ -252,7 +255,7 @@ separate exact hits/misses, semantic hits/misses/busy/failures and admitted adap
 attempts. An exact miss followed by a semantic hit is one request with two stages;
 response dispositions are mutually exclusive. `Server-Timing: semantic` measures
 worker submission/encoding/retrieval, separate from adapter elapsed. No public
-metrics endpoint, persistence, thread safety, cross-worker/distributed consistency
+metrics access, persistence, thread safety, cross-worker/distributed consistency
 or model-generation throughput claim.
 
 ## Traffic controls (implemented in milestone 3)
@@ -291,12 +294,82 @@ All state is in-memory and process-local, reset on restart, neither thread-safe
 nor shared between event loops/instances. Run **one Uvicorn worker**, no replicas
 or rolling multi-instance enforcement. Do not claim distributed consistency.
 
-## Planned operational metrics
+## Operational metrics and measurements (milestone 6)
 
-Add protected metrics for requests/outcomes, cache disposition, quota rejection,
-in-flight counts, upstream errors, latency histograms, and reported token usage.
-Measure gateway overhead separately from inference and queue/embedding time.
-Structured logs contain operational identifiers/timing, never content.
+`GET /v1/metrics` is disabled 404 unless a distinct 32–256 character URL-safe
+`GATEWAY_METRICS_KEY` is configured. Store its digest in repr-hidden Settings;
+operator authentication is separate from client identity and completion quotas.
+Do not expose aggregate multi-tenant state through ordinary client credentials.
+No public/reset/configuration/administrative write endpoint.
+
+Fixed-cardinality standard-library counters, gauges and cumulative histograms,
+owned by the same event loop. No awaits in mutations; no locks/distributed claims.
+Only exact `POST /v1/chat/completions` scopes count, including unauthorized and
+invalid attempts. Health/model/metrics routes do not count. Started/finished,
+completed/success/error/aborted, observed status families and 429/503/504 counters
+have explicit semantics. Only a successful final ASGI body send and normal
+application outcome count as completed; status-start 200 can coexist with an abort.
+A disconnected 499 is internal bookkeeping. In-flight gauges release in finally
+through cancellation, disconnect and send errors. ASGI acceptance is not receipt.
+
+Rates report numerators/denominators; exact/semantic dispositions are mutually
+exclusive completed request outcomes, while original cache counters remain
+lookup-stage statistics. Upstream attempts come from admitted adapter attempts.
+Provider usage adds only new successful upstream reported counts, never cached
+usage or estimates. Unsupported telemetry magnitudes increment ignored reports
+without changing valid API responses. Metadata labels are fixed; no request path,
+model, tenant, credentials, text, bodies, or raw latency samples are retained.
+
+Histograms cover gateway-to-start, lifecycle, adapter, exact lookup, semantic and
+residual walltime. Lifecycle ends after final send/cache commit before metric
+update. Residual subtracts sequential adapter/exact/semantic stages from gateway-
+to-start; it contains scheduling and is not pure CPU. Header exact/residual timing
+extends the prior contract after cache decisions; early errors keep gateway only.
+Fixed inclusive bounds 0.1/0.5/1/2.5/5/10/25/50/100/250/500/1000/2500/5000/10000/
+30000/60000/300000 ms plus unbounded bucket. JSON upper bound null means +infinity;
+no histogram-derived p95/p99 promises. Optional top-level log_requests defaults false;
+when true, JSON stderr records contain event/status/outcome/cache/duration only.
+Its synchronous I/O is off in performance measurements.
+
+`devtools.benchmark` uses bounded closed-loop HTTP workers (1–64), at most 10000
+requests/point, deterministic mixed scheduling and bounded raw client samples.
+Scenarios compare direct/mock HTTP and gateway/no-cache using the same message/
+generation settings and mock 10 ms delay, plus primed exact/semantic and 40/40/20
+mixed request kinds. At concurrent semantic opt-in, busy embedding falls through
+and can create later exact hits; report actual dispositions, not just workload name.
+Warm-up and seeding are excluded. Fresh gateway per point, one Uvicorn worker,
+fixed routing/model pins, pooled HTTPX, no logs, no retries. Auth/quota/admission/
+cache protections remain active. High benchmark quotas avoid accidental throttling;
+separate held-backend probes validate quota/overload/recovery/failure behavior.
+
+Count attempted, HTTP-completed, verified-success, rejected, other errors and
+transport failures separately; successful RPS must not include fast rejection.
+Nearest-rank p50; p95 only N>=100, p99 only N>=1000; withhold absent/undersampled
+quantiles. These are empirical tails, not confidence guarantees. Record duration,
+request sizes, seed, concurrency, warmup, cache configuration, model/backend/pipeline
+versions, hardware/cgroup limits, source/lock hashes and raw outcomes. Independently
+count fixture calls or dedicated Ollama chat POSTs; reconcile with adapter attempts.
+Verify source response hashes for controlled warmed replay measurements.
+
+Linux sampling of explicitly owned process trees records CPUtime/walltime cores
+and sampled RSS peaks on a nominal 100 ms cadence. Bounded GNU ps fallback
+handles absent proc child files; discovery and sampling run off the driver loop. Unsupported/vanished PIDs are unavailable, not zero.
+RSS can double-count shared pages and miss spikes. Client/sampler/backend/gateway
+share hardware. Repeated real prompts can reuse Ollama KV state even with gateway
+caching disabled. Direct-vs-gateway differences include network/process/scheduling
+and must not be called CPU overhead. No optimization or speedup claim without a
+matched measured workload; no model-generation throughput from cache or mock RPS.
+
+The semantic audit recomputes calibration-only selections but establishes all
+nine M05 held-out positive literals were preapproved. A membership-only lookup
+reproduces guarded admission outcomes; the 21-phrase approval registry is not an
+independent semantic-equivalence oracle. A second SHA-frozen final audit uses 18
+previously unseen phrases, fixed L3/0.75, no expansion/retuning: raw 4/6 positive
+retrievals with 6/12 false negative-case matches; unchanged production bypasses all 18,
+including 6 genuine equivalents. This is an explicit generalization limitation,
+not evidence to broaden eligibility. Five original metadata-only negatives still
+require explicit wire context; bare approved text remains eligible. Preserve
+original and final datasets/results without tuning on the final set.
 
 ## Measurable completion gates
 

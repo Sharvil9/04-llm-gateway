@@ -1,6 +1,8 @@
 import asyncio
 import hashlib
 import hmac
+import json
+import logging
 import time
 from contextlib import asynccontextmanager
 from http.cookiejar import CookieJar, DefaultCookiePolicy
@@ -16,6 +18,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from llm_gateway.backend import GatewayError, HTTPBackend, ResponseCachePolicy
 from llm_gateway.cache import ExactResponseCache
 from llm_gateway.config import Settings, load_settings
+from llm_gateway.metrics import Metrics
 from llm_gateway.schemas import ChatRequest, ChatResponse
 from llm_gateway.semantic import SemanticCache
 from llm_gateway.traffic import CapacityFull, InferenceAdmission, RequestLimiter
@@ -47,18 +50,45 @@ class RequestBoundary:
         cache_chunks = []
         cache_bytes = 0
         cache_overflow = False
+        body_complete = False
+        send_failed = False
+        outcome = "completed"
+        gateway_ms = None
+        tracked = scope["method"] == "POST" and scope["path"] == "/v1/chat/completions"
+        metrics = scope["app"].state.metrics
+        if tracked:
+            metrics.start()
+
+        async def observed_receive():
+            message = await receive()
+            if message["type"] == "http.disconnect":
+                scope.setdefault("state", {})["client_disconnected"] = True
+            return message
 
         async def timed_send(message):
-            nonlocal response_status, cache_bytes, cache_overflow
+            nonlocal response_status, cache_bytes, cache_overflow, body_complete, send_failed
+            nonlocal gateway_ms
             state = scope.get("state", {})
             if message["type"] == "http.response.start":
                 response_status = message["status"]
-                timings = [f"gateway;dur={(time.perf_counter() - started) * 1000:.3f}"]
+                gateway_ms = (time.perf_counter() - started) * 1000
+                timings = [f"gateway;dur={gateway_ms:.3f}"]
                 adapter_ms = scope.get("state", {}).get("adapter_ms")
                 if adapter_ms is not None:
                     timings.append(f"adapter;dur={adapter_ms:.3f}")
                 if (semantic_ms := state.get("semantic_ms")) is not None:
                     timings.append(f"semantic;dur={semantic_ms:.3f}")
+                if (exact_ms := state.get("exact_ms")) is not None:
+                    timings.append(f"exact;dur={exact_ms:.3f}")
+                if tracked and "exact_ms" in state:
+                    residual = max(
+                        0.0,
+                        gateway_ms
+                        - sum(
+                            state.get(key, 0.0) for key in ("adapter_ms", "semantic_ms", "exact_ms")
+                        ),
+                    )
+                    timings.append(f"residual;dur={residual:.3f}")
                 message = dict(message)
                 message["headers"] = list(message.get("headers", [])) + [
                     (b"server-timing", ", ".join(timings).encode("ascii")),
@@ -77,7 +107,13 @@ class RequestBoundary:
                     cache_chunks.clear()
                 else:
                     cache_chunks.append(body)
-            await send(message)
+            try:
+                await send(message)
+            except BaseException:
+                send_failed = True
+                raise
+            if message["type"] == "http.response.body" and not message.get("more_body", False):
+                body_complete = True
             if (
                 message["type"] == "http.response.body"
                 and not message.get("more_body", False)
@@ -94,7 +130,61 @@ class RequestBoundary:
                 )
                 state.pop("cache_pending", None)
 
-        await self.handle(scope, receive, timed_send)
+        try:
+            await self.handle(scope, observed_receive, timed_send)
+        except asyncio.CancelledError:
+            outcome = "cancelled"
+            raise
+        except BaseException:
+            outcome = "send_error" if send_failed else "unhandled_error"
+            raise
+        finally:
+            if tracked:
+                state = scope.get("state", {})
+                if outcome == "completed" and (
+                    state.get("client_disconnected", False) or response_status == 499
+                ):
+                    outcome = "disconnected"
+                elif outcome == "completed" and not body_complete:
+                    outcome = "aborted"
+                durations = {"request_lifecycle": (time.perf_counter() - started) * 1000}
+                for source, target in (
+                    ("adapter_ms", "adapter"),
+                    ("semantic_ms", "semantic"),
+                    ("exact_ms", "exact_lookup"),
+                ):
+                    if source in state:
+                        durations[target] = state[source]
+                if gateway_ms is not None:
+                    durations["gateway_to_start"] = gateway_ms
+                    durations["gateway_residual"] = max(
+                        0.0,
+                        gateway_ms
+                        - sum(
+                            durations.get(key, 0.0)
+                            for key in ("adapter", "semantic", "exact_lookup")
+                        ),
+                    )
+                metrics.finish(
+                    status=response_status or None,
+                    complete=body_complete,
+                    outcome=outcome,
+                    durations_ms=durations,
+                    cache_status=state.get("cache_status"),
+                )
+                if logger := scope["app"].state.request_logger:
+                    logger.info(
+                        json.dumps(
+                            {
+                                "event": "chat_request",
+                                "status": response_status or None,
+                                "outcome": outcome,
+                                "cache": state.get("cache_status", "EARLY"),
+                                "duration_ms": round(durations["request_lifecycle"], 3),
+                            },
+                            allow_nan=False,
+                        )
+                    )
 
     async def handle(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http" or not scope["path"].startswith("/v1/"):
@@ -103,6 +193,26 @@ class RequestBoundary:
 
         settings = scope["app"].state.settings
         auth = [value for name, value in scope["headers"] if name.lower() == b"authorization"]
+        if scope["path"] == "/v1/metrics":
+            if settings.metrics_key_hash is None:
+                await error_response(404, "not_found", "Endpoint is not enabled")(
+                    scope, receive, send
+                )
+                return
+            valid = False
+            if len(auth) == 1:
+                scheme, _, token = auth[0].partition(b" ")
+                if scheme.lower() == b"bearer" and 32 <= len(token) <= 256:
+                    valid = hmac.compare_digest(
+                        hashlib.sha256(token).digest(), settings.metrics_key_hash
+                    )
+            if not valid:
+                await error_response(
+                    401, "unauthorized", "A valid operator metrics key is required"
+                )(scope, receive, send)
+                return
+            await self.app(scope, receive, send)
+            return
         client_id = None
         if len(auth) == 1:
             scheme, _, token = auth[0].partition(b" ")
@@ -178,6 +288,15 @@ def create_app(
     async def lifespan(app: FastAPI):
         resolved = settings if settings is not None else load_settings()
         app.state.settings = resolved
+        app.state.metrics = Metrics()
+        app.state.request_logger = None
+        handler = None
+        if resolved.config.log_requests:
+            logger = logging.Logger("llm_gateway.requests", level=logging.INFO)
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter("%(message)s"))
+            logger.addHandler(handler)
+            app.state.request_logger = logger
         app.state.request_limiter = RequestLimiter(
             set(resolved.client_key_hashes.values()),
             resolved.config.rate_limit,
@@ -222,6 +341,8 @@ def create_app(
             finally:
                 if embedder is not None:
                     await embedder.close()
+                if handler is not None:
+                    handler.close()
 
     app = FastAPI(
         title="Local LLM Gateway",
@@ -266,11 +387,24 @@ def create_app(
             ],
         }
 
+    @app.get("/v1/metrics")
+    async def operational_metrics():
+        snapshot = app.state.metrics.snapshot()
+        snapshot["scope"] = "POST /v1/chat/completions; process-local; since startup"
+        snapshot["counts"]["upstream_attempts"] = app.state.response_cache.stats.upstream_calls
+        snapshot["gauges"]["inference_in_flight"] = app.state.admission.active
+        snapshot["cache_storage"] = app.state.response_cache.snapshot()
+        snapshot["semantic_lookup"] = (
+            app.state.semantic_cache.snapshot() if app.state.semantic_cache else None
+        )
+        return snapshot
+
     @app.post("/v1/chat/completions", response_model=ChatResponse, response_model_exclude_none=True)
     async def complete(payload: ChatRequest, request: Request):
         if payload.model not in app.state.settings.config.models:
             raise GatewayError(404, "unknown_model", "The requested model is not configured")
 
+        exact_started = time.perf_counter()
         cache = app.state.response_cache
         controls = {
             directive.split("=", 1)[0].strip().lower()
@@ -293,7 +427,9 @@ def create_app(
         client_id = request.state.client_id
         key = cache.key_for(payload, client_id, opt_in, semantic=semantic_opt_in)
         request.state.cache_status = "BYPASS" if key is None else "MISS"
-        if key is not None and (cached := cache.get(key)) is not None:
+        cached = cache.get(key) if key is not None else None
+        request.state.exact_ms = (time.perf_counter() - exact_started) * 1000
+        if cached is not None:
             request.state.cache_status = "HIT"
             return Response(content=cached, media_type="application/json")
 
@@ -326,6 +462,17 @@ def create_app(
                 try:
                     cache.stats.upstream_calls += 1
                     result = await app.state.backend.complete(payload, cache_policy=cache_policy)
+                    if result.usage is not None:
+                        try:
+                            app.state.metrics.record_upstream_usage(
+                                result.usage.prompt_tokens,
+                                result.usage.completion_tokens,
+                                result.usage.total_tokens,
+                            )
+                        except ValueError:
+                            # Telemetry bounds must not change an otherwise
+                            # supported provider response or cache compatibility.
+                            app.state.metrics.ignore_upstream_usage()
                 finally:
                     request.state.adapter_ms = (time.perf_counter() - started) * 1000
                 if (

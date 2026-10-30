@@ -1,0 +1,3673 @@
+{
+  "schema_version": 1,
+  "verified_date_utc": "2026-10-30",
+  "code_manifest": {
+    "devtools/benchmark.py": "890d3a1d43383d709eb7729b502deb649fb3cf8e2bc8a50bfa217b1eba6016fd",
+    "devtools/semantic_eval.py": "633e3b941429988209e374abf1beef83f8e05bc5f24fc8748fe5a896d6887b1a",
+    "devtools/semantic_probe.py": "ff41da31c5807f290a5dd0a9859ec8c18744b984f27fad819bb75eebbf8f37f5",
+    "devtools/smoke.py": "37efb71ece2467d28f25e954120904700f8d4330a05fbf83d23b9961dc37b0f5",
+    "src/llm_gateway/__init__.py": "717b78cbb6791ca1c8e730ce7fa61f79918e208aaa7a5fc91c0e82da63c28828",
+    "src/llm_gateway/app.py": "b30ceb6009bd464ddcf645692a40a03f9e3990045d555fbd7e322cbcbc142652",
+    "src/llm_gateway/backend.py": "e15217b9191967879ea9c2bc07346621624761f660796153b41c2dad5e0e331d",
+    "src/llm_gateway/cache.py": "b3361651316a6a704a7f61a8f61c026b95234a9195aaea9524184e3367f16a2a",
+    "src/llm_gateway/config.py": "115d6132f67f025ac5c09740d04a2c0c737de963c48453f3b57e7d4ef9639dc5",
+    "src/llm_gateway/embeddings.py": "48ec89a7a3f474b8490c7c8c6f3eceaf3c9496c912fc5221ede45f849dd29e05",
+    "src/llm_gateway/metrics.py": "f9daabbd5575b265370966a417a21157cdc2809b3cdd000f06f3e4abb41e5536",
+    "src/llm_gateway/schemas.py": "8c009bdaacea952b8c6487a837eeabb02815c90286a00b973fa15f015ca83c01",
+    "src/llm_gateway/semantic.py": "7fb0eda909a2c3db2419f3e1199a43878d684d1cfb13f11ec7ae223cef6ae530",
+    "src/llm_gateway/traffic.py": "a18c31c05ce67b772f01c091f5a2f55f49753c2cf0ec844f1b80bfd47c536be9",
+    "uv.lock": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "hardware_and_software": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "logical_cpus": 3,
+    "cgroup_cpu_max": "200000 100000",
+    "cgroup_memory_max": "8589934592",
+    "packages": {
+      "fastapi": "0.141.1",
+      "starlette": "1.10.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.14.1",
+      "uvicorn": "0.52.4",
+      "numpy": "2.5.4",
+      "onnxruntime": "1.31.1",
+      "tokenizers": "0.23.3"
+    },
+    "source_sha256": "890d3a1d43383d709eb7729b502deb649fb3cf8e2bc8a50bfa217b1eba6016fd",
+    "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "trials": {
+    "mock-benchmark": {
+      "raw_report": "mock-benchmark.json.gz",
+      "uncompressed_sha256": "cdef4f1480057e25c5bd2a5692923ea844d5153c137c928bd7f1241cd6cee75f",
+      "gzip_sha256": "5018de04ffeddb74c58862be3bc1f0d344afb0dce67435edcf24487c6f03b43c",
+      "command": ".venv/bin/python -m devtools.benchmark --requests 1000 --concurrency 1 4 8 16 --warmup 5 --seed 42 --delay-ms 10 --scenarios direct uncached exact semantic mixed --output artifacts/milestone06/mock-benchmark.json",
+      "started_utc": "2026-10-30T09:06:28.709490+00:00",
+      "finished_utc": "2026-10-30T09:08:47.066499+00:00",
+      "request_payloads": {
+        "direct": {
+          "bytes": 176,
+          "sha256": "df3fe2cab7b39b958092122d87b68c6965d411649550b07261fc0992da2b6178"
+        },
+        "uncached": {
+          "bytes": 176,
+          "sha256": "df3fe2cab7b39b958092122d87b68c6965d411649550b07261fc0992da2b6178"
+        },
+        "exact": {
+          "bytes": 176,
+          "sha256": "df3fe2cab7b39b958092122d87b68c6965d411649550b07261fc0992da2b6178"
+        },
+        "semantic": {
+          "bytes": 182,
+          "sha256": "3215d0e62164f4d51ed25b31a6b2d05c9e0c0890e4b8a1feb02cfb4572a9f555"
+        }
+      },
+      "generation_settings": {
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32
+      },
+      "seed": 42,
+      "warmup_concurrency": 1,
+      "backend": "deterministic_mock"
+    },
+    "gemma-uncached": {
+      "raw_report": "gemma-uncached.json.gz",
+      "uncompressed_sha256": "eea9d1495606792cb7bc4d7df8b033d250012f5483e009639773d353700a6f95",
+      "gzip_sha256": "e489d54cb71f0c20cf99d4082f1ca6556c606dff38e1c3ef480375258b61addd",
+      "command": ".venv/bin/python -m devtools.benchmark --requests 30 --concurrency 1 --warmup 5 --seed 42 --scenarios direct uncached --ollama-log artifacts/milestone06/ollama.log --ollama-pid \"$OLLAMA_PID\" --output artifacts/milestone06/gemma-uncached.json",
+      "started_utc": "2026-10-30T09:09:22.503919+00:00",
+      "finished_utc": "2026-10-30T09:10:06.428579+00:00",
+      "request_payloads": {
+        "direct": {
+          "bytes": 181,
+          "sha256": "67d2830a23eff14f64f2e05c4d1674ebaa9a063b87ec465813e5a09817d09363"
+        },
+        "uncached": {
+          "bytes": 177,
+          "sha256": "48cb1ce3ffaf5021497fc45418bb35ac86bdd2019c6b2da7b4154b84f1727fde"
+        },
+        "exact": {
+          "bytes": 177,
+          "sha256": "48cb1ce3ffaf5021497fc45418bb35ac86bdd2019c6b2da7b4154b84f1727fde"
+        },
+        "semantic": {
+          "bytes": 183,
+          "sha256": "df12c04504720aea2605d2a9f98f1f53c6a2bb14170186a3c9c4e7dcd8b14f59"
+        }
+      },
+      "generation_settings": {
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32
+      },
+      "seed": 42,
+      "warmup_concurrency": 1,
+      "backend": "ollama"
+    },
+    "gemma-cache": {
+      "raw_report": "gemma-cache.json.gz",
+      "uncompressed_sha256": "a31da07ecebd59047939385c5e966619d1d98427c7bdb4d231058ec3a1a53a49",
+      "gzip_sha256": "bb72005f7ebf18de0137a8513044048e4c695e5ec3daead0fa9cb37c8b47563a",
+      "command": ".venv/bin/python -m devtools.benchmark --requests 1000 --concurrency 1 --warmup 5 --seed 42 --scenarios exact semantic --ollama-log artifacts/milestone06/ollama.log --ollama-pid \"$OLLAMA_PID\" --output artifacts/milestone06/gemma-cache.json",
+      "started_utc": "2026-10-30T09:10:07.103389+00:00",
+      "finished_utc": "2026-10-30T09:10:23.870478+00:00",
+      "request_payloads": {
+        "direct": {
+          "bytes": 181,
+          "sha256": "67d2830a23eff14f64f2e05c4d1674ebaa9a063b87ec465813e5a09817d09363"
+        },
+        "uncached": {
+          "bytes": 177,
+          "sha256": "48cb1ce3ffaf5021497fc45418bb35ac86bdd2019c6b2da7b4154b84f1727fde"
+        },
+        "exact": {
+          "bytes": 177,
+          "sha256": "48cb1ce3ffaf5021497fc45418bb35ac86bdd2019c6b2da7b4154b84f1727fde"
+        },
+        "semantic": {
+          "bytes": 183,
+          "sha256": "df12c04504720aea2605d2a9f98f1f53c6a2bb14170186a3c9c4e7dcd8b14f59"
+        }
+      },
+      "generation_settings": {
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32
+      },
+      "seed": 42,
+      "warmup_concurrency": 1,
+      "backend": "ollama"
+    },
+    "gemma-mixed": {
+      "raw_report": "gemma-mixed.json.gz",
+      "uncompressed_sha256": "e41fb0c9efd918c6b790ade6419045018b8c7bfe11361093f54fa7e87cbf2915",
+      "gzip_sha256": "8b10e4700e3bb30142a086f38ae6ec05768d96582d97ea3c1870124b4cfee7a3",
+      "command": ".venv/bin/python -m devtools.benchmark --requests 100 --concurrency 1 --warmup 5 --seed 42 --scenarios mixed --ollama-log artifacts/milestone06/ollama.log --ollama-pid \"$OLLAMA_PID\" --output artifacts/milestone06/gemma-mixed.json",
+      "started_utc": "2026-10-30T09:10:24.573187+00:00",
+      "finished_utc": "2026-10-30T09:10:39.071509+00:00",
+      "request_payloads": {
+        "direct": {
+          "bytes": 181,
+          "sha256": "67d2830a23eff14f64f2e05c4d1674ebaa9a063b87ec465813e5a09817d09363"
+        },
+        "uncached": {
+          "bytes": 177,
+          "sha256": "48cb1ce3ffaf5021497fc45418bb35ac86bdd2019c6b2da7b4154b84f1727fde"
+        },
+        "exact": {
+          "bytes": 177,
+          "sha256": "48cb1ce3ffaf5021497fc45418bb35ac86bdd2019c6b2da7b4154b84f1727fde"
+        },
+        "semantic": {
+          "bytes": 183,
+          "sha256": "df12c04504720aea2605d2a9f98f1f53c6a2bb14170186a3c9c4e7dcd8b14f59"
+        }
+      },
+      "generation_settings": {
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32
+      },
+      "seed": 42,
+      "warmup_concurrency": 1,
+      "backend": "ollama"
+    }
+  },
+  "points": [
+    {
+      "scenario": "direct",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 17.646981269001117,
+      "attempted_rps": 56.66691570396865,
+      "completed_rps": 56.66691570396865,
+      "successful_rps": 56.66691570396865,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "UNLABELLED": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 14.470810998318484,
+        "p95_ms": 24.582603000453673,
+        "p99_ms": 128.26462100201752,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 14.470810998318484,
+        "p95_ms": 24.582603000453673,
+        "p99_ms": 128.26462100201752,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 160,
+        "sampling_window_seconds": 17.650870150999253,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 4.74,
+            "mean_cpu_cores": 0.26854200158124547,
+            "sampled_peak_rss_bytes": 46649344,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.45,
+            "mean_cpu_cores": 0.1388033552476902,
+            "sampled_peak_rss_bytes": 43565056,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "UNLABELLED": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "uncached",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 18.213536991999717,
+      "attempted_rps": 54.90421769474261,
+      "completed_rps": 54.90421769474261,
+      "successful_rps": 54.90421769474261,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "BYPASS": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 17.30087900068611,
+        "p95_ms": 23.365912998997374,
+        "p99_ms": 27.742352001951076,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 17.30087900068611,
+        "p95_ms": 23.365912998997374,
+        "p99_ms": 27.742352001951076,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 14.492,
+          "p95_ms": 19.118,
+          "p99_ms": 22.211,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 1000,
+          "p50_ms": 13.737,
+          "p95_ms": 17.783,
+          "p99_ms": 20.792,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.011,
+          "p95_ms": 0.016,
+          "p99_ms": 0.526,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.446,
+          "p95_ms": 2.25,
+          "p99_ms": 3.308,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 179,
+        "sampling_window_seconds": 18.22125475700159,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.61,
+            "mean_cpu_cores": 0.1432393122650951,
+            "sampled_peak_rss_bytes": 49254400,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 4.62,
+            "mean_cpu_cores": 0.25355004699798445,
+            "sampled_peak_rss_bytes": 46792704,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.45,
+            "mean_cpu_cores": 0.07957739570283061,
+            "sampled_peak_rss_bytes": 43585536,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "BYPASS": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "exact",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 4.065460349997011,
+      "attempted_rps": 245.9746040816104,
+      "completed_rps": 245.9746040816104,
+      "successful_rps": 245.9746040816104,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 3.59804799882113,
+        "p95_ms": 7.442817000992363,
+        "p99_ms": 9.960561998013873,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 3.59804799882113,
+        "p95_ms": 7.442817000992363,
+        "p99_ms": 9.960561998013873,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 0.41,
+          "p95_ms": 1.766,
+          "p99_ms": 2.696,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.108,
+          "p95_ms": 0.404,
+          "p99_ms": 1.05,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.249,
+          "p95_ms": 1.394,
+          "p99_ms": 2.348,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 41,
+        "sampling_window_seconds": 4.072256439001649,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.14,
+            "mean_cpu_cores": 0.7710712837057482,
+            "sampled_peak_rss_bytes": 51195904,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.13,
+            "mean_cpu_cores": 0.2774874364928329,
+            "sampled_peak_rss_bytes": 46604288,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.0,
+            "mean_cpu_cores": 0.0,
+            "sampled_peak_rss_bytes": 43585536,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "semantic",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 6.635203300000285,
+      "attempted_rps": 150.7112826520262,
+      "completed_rps": 150.7112826520262,
+      "successful_rps": 150.7112826520262,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 5.5118809978011996,
+        "p95_ms": 12.108942999475403,
+        "p99_ms": 16.890115999558475,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 5.5118809978011996,
+        "p95_ms": 12.108942999475403,
+        "p99_ms": 16.890115999558475,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 2.899,
+          "p95_ms": 6.162,
+          "p99_ms": 9.256,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.114,
+          "p95_ms": 0.445,
+          "p99_ms": 0.985,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 1000,
+          "p50_ms": 2.163,
+          "p95_ms": 4.563,
+          "p99_ms": 7.442,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.472,
+          "p95_ms": 1.553,
+          "p99_ms": 2.882,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 65,
+        "sampling_window_seconds": 6.639592637999158,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.98,
+            "mean_cpu_cores": 0.448822715861379,
+            "sampled_peak_rss_bytes": 53116928,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 4.0,
+            "mean_cpu_cores": 0.6024465984716497,
+            "sampled_peak_rss_bytes": 127066112,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.02,
+            "mean_cpu_cores": 0.0030122329923582486,
+            "sampled_peak_rss_bytes": 43589632,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "mixed",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 8.001365162999718,
+      "attempted_rps": 124.97867296748886,
+      "completed_rps": 124.97867296748886,
+      "successful_rps": 124.97867296748886,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 400,
+        "HIT": 400,
+        "BYPASS": 200
+      },
+      "independent_upstream_calls": 200,
+      "cache_avoidance_fraction_of_attempts": 0.8,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 800,
+      "total_cache_hits": 800,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 5.706130999897141,
+        "p95_ms": 20.02010700016399,
+        "p99_ms": 24.69061800002237,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 5.706130999897141,
+        "p95_ms": 20.02010700016399,
+        "p99_ms": 24.69061800002237,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 2.955,
+          "p95_ms": 16.655,
+          "p99_ms": 20.347,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 200,
+          "p50_ms": 14.335,
+          "p95_ms": 19.37,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.115,
+          "p95_ms": 0.934,
+          "p99_ms": 1.738,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 400,
+          "p50_ms": 2.727,
+          "p95_ms": 5.565,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.404,
+          "p95_ms": 2.08,
+          "p99_ms": 3.334,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 80,
+        "sampling_window_seconds": 8.006455603001086,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.44,
+            "mean_cpu_cores": 0.3047540785819641,
+            "sampled_peak_rss_bytes": 55029760,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.57,
+            "mean_cpu_cores": 0.4458901887449229,
+            "sampled_peak_rss_bytes": 127082496,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.34,
+            "mean_cpu_cores": 0.04246573226142123,
+            "sampled_peak_rss_bytes": 43589632,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 2,
+          "HIT": 2,
+          "BYPASS": 1
+        },
+        "upstream_calls_expected": 2,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "direct",
+      "concurrency": 4,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.735345935998339,
+      "attempted_rps": 267.71282155229136,
+      "completed_rps": 267.71282155229136,
+      "successful_rps": 267.71282155229136,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "UNLABELLED": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 14.447603000007803,
+        "p95_ms": 18.632940998941194,
+        "p99_ms": 23.498302998632425,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 14.447603000007803,
+        "p95_ms": 18.632940998941194,
+        "p99_ms": 23.498302998632425,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 39,
+        "sampling_window_seconds": 3.737872943998809,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.99,
+            "mean_cpu_cores": 0.5323883475480257,
+            "sampled_peak_rss_bytes": 56066048,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.95,
+            "mean_cpu_cores": 0.25415524129177103,
+            "sampled_peak_rss_bytes": 43646976,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "UNLABELLED": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "uncached",
+      "concurrency": 4,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 7.431931549999717,
+      "attempted_rps": 134.55452237043787,
+      "completed_rps": 134.55452237043787,
+      "successful_rps": 134.55452237043787,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "BYPASS": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 28.429562000383157,
+        "p95_ms": 45.401244999084156,
+        "p99_ms": 55.01748199822032,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 28.429562000383157,
+        "p95_ms": 45.401244999084156,
+        "p99_ms": 55.01748199822032,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 23.239,
+          "p95_ms": 37.696,
+          "p99_ms": 47.059,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 1000,
+          "p50_ms": 19.826,
+          "p95_ms": 31.643,
+          "p99_ms": 38.307,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.011,
+          "p95_ms": 0.016,
+          "p99_ms": 0.466,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 2.699,
+          "p95_ms": 9.474,
+          "p99_ms": 13.717,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 75,
+        "sampling_window_seconds": 7.4370067169984395,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.17,
+            "mean_cpu_cores": 0.2917840580996285,
+            "sampled_peak_rss_bytes": 58478592,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 5.91,
+            "mean_cpu_cores": 0.7946745545478361,
+            "sampled_peak_rss_bytes": 47022080,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.11,
+            "mean_cpu_cores": 0.1492535965394413,
+            "sampled_peak_rss_bytes": 43651072,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "BYPASS": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "exact",
+      "concurrency": 4,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 4.006329824998829,
+      "attempted_rps": 249.6050109904,
+      "completed_rps": 249.6050109904,
+      "successful_rps": 249.6050109904,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 14.732432999153389,
+        "p95_ms": 29.467288000887493,
+        "p99_ms": 40.93399900011718,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 14.732432999153389,
+        "p95_ms": 29.467288000887493,
+        "p99_ms": 40.93399900011718,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 1.364,
+          "p95_ms": 5.379,
+          "p99_ms": 9.19,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.133,
+          "p95_ms": 0.42,
+          "p99_ms": 0.963,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 1.173,
+          "p95_ms": 5.202,
+          "p99_ms": 9.0,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 36,
+        "sampling_window_seconds": 4.009876672000246,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.9,
+            "mean_cpu_cores": 0.9725984909292893,
+            "sampled_peak_rss_bytes": 59580416,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.18,
+            "mean_cpu_cores": 0.29427338956322086,
+            "sampled_peak_rss_bytes": 46714880,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.01,
+            "mean_cpu_cores": 0.0024938422844340753,
+            "sampled_peak_rss_bytes": 43651072,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "semantic",
+      "concurrency": 4,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.3837387559979106,
+      "attempted_rps": 295.5310891620788,
+      "completed_rps": 295.5310891620788,
+      "successful_rps": 295.5310891620788,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 2,
+        "MISS": 3,
+        "HIT": 995
+      },
+      "independent_upstream_calls": 3,
+      "cache_avoidance_fraction_of_attempts": 0.997,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 997,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 12.446706001355778,
+        "p95_ms": 22.97903600265272,
+        "p99_ms": 34.47750999839627,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 12.446706001355778,
+        "p95_ms": 22.97903600265272,
+        "p99_ms": 34.47750999839627,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 1.258,
+          "p95_ms": 4.788,
+          "p99_ms": 8.872,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 3,
+          "p50_ms": 31.612,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.128,
+          "p95_ms": 0.664,
+          "p99_ms": 2.056,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 5,
+          "p50_ms": 0.411,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.974,
+          "p95_ms": 4.502,
+          "p99_ms": 7.854,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 32,
+        "sampling_window_seconds": 3.3892861579988676,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.24,
+            "mean_cpu_cores": 0.9559535102556787,
+            "sampled_peak_rss_bytes": 60821504,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.35,
+            "mean_cpu_cores": 0.3983139626065328,
+            "sampled_peak_rss_bytes": 127152128,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.01,
+            "mean_cpu_cores": 0.002950473797085428,
+            "sampled_peak_rss_bytes": 43651072,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "mixed",
+      "concurrency": 4,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 4.986091398997814,
+      "attempted_rps": 200.55789595052275,
+      "completed_rps": 200.55789595052275,
+      "successful_rps": 200.55789595052275,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 3,
+        "HIT": 796,
+        "BYPASS": 200,
+        "MISS": 1
+      },
+      "independent_upstream_calls": 201,
+      "cache_avoidance_fraction_of_attempts": 0.799,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 400,
+      "total_cache_hits": 799,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 16.687742001522565,
+        "p95_ms": 38.685827999870526,
+        "p99_ms": 49.97817299954477,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 16.687742001522565,
+        "p95_ms": 38.685827999870526,
+        "p99_ms": 49.97817299954477,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 1.943,
+          "p95_ms": 19.558,
+          "p99_ms": 25.429,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 201,
+          "p50_ms": 14.307,
+          "p95_ms": 20.186,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.113,
+          "p95_ms": 0.606,
+          "p99_ms": 1.293,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 4,
+          "p50_ms": 3.41,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 1.176,
+          "p95_ms": 6.234,
+          "p99_ms": 9.534,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 45,
+        "sampling_window_seconds": 4.99785220099875,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 4.86,
+            "mean_cpu_cores": 0.9724177115579364,
+            "sampled_peak_rss_bytes": 62046208,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.8,
+            "mean_cpu_cores": 0.3601547079844209,
+            "sampled_peak_rss_bytes": 126976000,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.26,
+            "mean_cpu_cores": 0.052022346708860794,
+            "sampled_peak_rss_bytes": 43651072,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 2,
+          "HIT": 2,
+          "BYPASS": 1
+        },
+        "upstream_calls_expected": 2,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "direct",
+      "concurrency": 8,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 5.525563044000592,
+      "attempted_rps": 180.97703203038378,
+      "completed_rps": 180.97703203038378,
+      "successful_rps": 180.97703203038378,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "UNLABELLED": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 38.73681699769804,
+        "p95_ms": 87.75757499824977,
+        "p99_ms": 146.93127800273942,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 38.73681699769804,
+        "p95_ms": 87.75757499824977,
+        "p99_ms": 146.93127800273942,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 47,
+        "sampling_window_seconds": 5.533287938000285,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 5.41,
+            "mean_cpu_cores": 0.977718864555449,
+            "sampled_peak_rss_bytes": 63037440,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.18,
+            "mean_cpu_cores": 0.21325476158510714,
+            "sampled_peak_rss_bytes": 43737088,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "UNLABELLED": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "uncached",
+      "concurrency": 8,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 4.180930848000571,
+      "attempted_rps": 239.18118628492164,
+      "completed_rps": 239.18118628492164,
+      "successful_rps": 239.18118628492164,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "BYPASS": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 31.1224389988638,
+        "p95_ms": 50.7936179965327,
+        "p99_ms": 75.83015000273008,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 31.1224389988638,
+        "p95_ms": 50.7936179965327,
+        "p99_ms": 75.83015000273008,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 23.665,
+          "p95_ms": 34.766,
+          "p99_ms": 48.361,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 1000,
+          "p50_ms": 19.074,
+          "p95_ms": 27.891,
+          "p99_ms": 43.143,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.014,
+          "p95_ms": 0.026,
+          "p99_ms": 0.154,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 4.218,
+          "p95_ms": 9.161,
+          "p99_ms": 13.513,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 42,
+        "sampling_window_seconds": 4.185492590000649,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.72,
+            "mean_cpu_cores": 0.6498637714705829,
+            "sampled_peak_rss_bytes": 63807488,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.77,
+            "mean_cpu_cores": 0.9007303008985653,
+            "sampled_peak_rss_bytes": 47280128,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.95,
+            "mean_cpu_cores": 0.22697447900626974,
+            "sampled_peak_rss_bytes": 43745280,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "BYPASS": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "exact",
+      "concurrency": 8,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.491470593999111,
+      "attempted_rps": 286.4122647112447,
+      "completed_rps": 286.4122647112447,
+      "successful_rps": 286.4122647112447,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 13.146815999789396,
+        "p95_ms": 20.52011500200024,
+        "p99_ms": 33.17167299974244,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 13.146815999789396,
+        "p95_ms": 20.52011500200024,
+        "p99_ms": 33.17167299974244,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 1.601,
+          "p95_ms": 3.289,
+          "p99_ms": 5.041,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.148,
+          "p95_ms": 0.473,
+          "p99_ms": 0.819,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 1.381,
+          "p95_ms": 2.967,
+          "p99_ms": 4.696,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 32,
+        "sampling_window_seconds": 3.4983658309975,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.51,
+            "mean_cpu_cores": 1.003325601027604,
+            "sampled_peak_rss_bytes": 64851968,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.28,
+            "mean_cpu_cores": 0.3658851194630579,
+            "sampled_peak_rss_bytes": 46747648,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.01,
+            "mean_cpu_cores": 0.00285847749580514,
+            "sampled_peak_rss_bytes": 43745280,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "semantic",
+      "concurrency": 8,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 4.396265966002829,
+      "attempted_rps": 227.46576474971997,
+      "completed_rps": 227.46576474971997,
+      "successful_rps": 227.46576474971997,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 4,
+        "MISS": 7,
+        "HIT": 989
+      },
+      "independent_upstream_calls": 7,
+      "cache_avoidance_fraction_of_attempts": 0.993,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 993,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 13.226387000031536,
+        "p95_ms": 39.204887001687894,
+        "p99_ms": 470.3963960018882,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 13.226387000031536,
+        "p95_ms": 39.204887001687894,
+        "p99_ms": 470.3963960018882,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 1.651,
+          "p95_ms": 4.36,
+          "p99_ms": 29.93,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 7,
+          "p50_ms": 39.345,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.157,
+          "p95_ms": 0.55,
+          "p99_ms": 0.945,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 11,
+          "p50_ms": 0.15,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 1.425,
+          "p95_ms": 4.039,
+          "p99_ms": 8.879,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 35,
+        "sampling_window_seconds": 4.399907920997066,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 4.26,
+            "mean_cpu_cores": 0.9682020797913967,
+            "sampled_peak_rss_bytes": 66142208,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.6,
+            "mean_cpu_cores": 0.3636439736305716,
+            "sampled_peak_rss_bytes": 127270912,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.12,
+            "mean_cpu_cores": 0.027273298022292867,
+            "sampled_peak_rss_bytes": 43745280,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "mixed",
+      "concurrency": 8,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 2.4389029720005055,
+      "attempted_rps": 410.0204114228259,
+      "completed_rps": 410.0204114228259,
+      "successful_rps": 410.0204114228259,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 6,
+        "HIT": 791,
+        "BYPASS": 200,
+        "MISS": 3
+      },
+      "independent_upstream_calls": 203,
+      "cache_avoidance_fraction_of_attempts": 0.797,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 400,
+      "total_cache_hits": 797,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 13.864860997273354,
+        "p95_ms": 46.33464099970297,
+        "p99_ms": 74.49813299899688,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 13.864860997273354,
+        "p95_ms": 46.33464099970297,
+        "p99_ms": 74.49813299899688,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 1.486,
+          "p95_ms": 22.382,
+          "p99_ms": 27.461,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 203,
+          "p50_ms": 15.339,
+          "p95_ms": 23.226,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.111,
+          "p95_ms": 0.466,
+          "p99_ms": 1.017,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 9,
+          "p50_ms": 4.344,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 1.224,
+          "p95_ms": 5.426,
+          "p99_ms": 9.037,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 24,
+        "sampling_window_seconds": 2.442547458002082,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.39,
+            "mean_cpu_cores": 0.978486617392047,
+            "sampled_peak_rss_bytes": 67751936,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.5,
+            "mean_cpu_cores": 0.6141129397858035,
+            "sampled_peak_rss_bytes": 127410176,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.22,
+            "mean_cpu_cores": 0.09006989783525118,
+            "sampled_peak_rss_bytes": 43745280,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 2,
+          "HIT": 2,
+          "BYPASS": 1
+        },
+        "upstream_calls_expected": 2,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "direct",
+      "concurrency": 16,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.061052272998495,
+      "attempted_rps": 326.6850451463988,
+      "completed_rps": 326.6850451463988,
+      "successful_rps": 326.6850451463988,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "UNLABELLED": 1000
+      },
+      "independent_upstream_calls": 1000,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 31.281843002943788,
+        "p95_ms": 139.80816699768184,
+        "p99_ms": 234.91772200213745,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 31.281843002943788,
+        "p95_ms": 139.80816699768184,
+        "p99_ms": 234.91772200213745,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 29,
+        "sampling_window_seconds": 3.0640217899999698,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.07,
+            "mean_cpu_cores": 1.0019510990488192,
+            "sampled_peak_rss_bytes": 68313088,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.84,
+            "mean_cpu_cores": 0.27414948638469316,
+            "sampled_peak_rss_bytes": 43896832,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "UNLABELLED": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "uncached",
+      "concurrency": 16,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 667,
+      "http_200": 667,
+      "rejected": 333,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.1564205569993646,
+      "attempted_rps": 316.81456318693,
+      "completed_rps": 316.81456318693,
+      "successful_rps": 211.31531364568232,
+      "status_counts": {
+        "200": 667,
+        "503": 333
+      },
+      "cache_dispositions": {
+        "BYPASS": 1000
+      },
+      "independent_upstream_calls": 667,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 47.76076299822307,
+        "p95_ms": 95.49391800101148,
+        "p99_ms": 160.47077899929718,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 667,
+        "p50_ms": 54.93392700009281,
+        "p95_ms": 100.46292200058815,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 30.098,
+          "p95_ms": 58.811,
+          "p99_ms": 83.94,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 667,
+          "p50_ms": 26.998,
+          "p95_ms": 52.656,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.011,
+          "p95_ms": 0.058,
+          "p99_ms": 0.393,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 9.761,
+          "p95_ms": 19.671,
+          "p99_ms": 25.928,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 31,
+        "sampling_window_seconds": 3.1621736800007056,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.55,
+            "mean_cpu_cores": 0.806407319157571,
+            "sampled_peak_rss_bytes": 70066176,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.87,
+            "mean_cpu_cores": 0.9076035317577369,
+            "sampled_peak_rss_bytes": 47616000,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.74,
+            "mean_cpu_cores": 0.23401624163788337,
+            "sampled_peak_rss_bytes": 43896832,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "BYPASS": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.33299999999999996
+    },
+    {
+      "scenario": "exact",
+      "concurrency": 16,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.3054248860025837,
+      "attempted_rps": 302.5329676177728,
+      "completed_rps": 302.5329676177728,
+      "successful_rps": 302.5329676177728,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 25.13181500034989,
+        "p95_ms": 167.69376799857127,
+        "p99_ms": 332.92209899809677,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 25.13181500034989,
+        "p95_ms": 167.69376799857127,
+        "p99_ms": 332.92209899809677,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 2.403,
+          "p95_ms": 5.224,
+          "p99_ms": 7.881,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.109,
+          "p95_ms": 0.349,
+          "p99_ms": 0.7,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 2.268,
+          "p95_ms": 5.04,
+          "p99_ms": 7.474,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 30,
+        "sampling_window_seconds": 3.312146470998414,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.32,
+            "mean_cpu_cores": 1.0023711297402915,
+            "sampled_peak_rss_bytes": 70967296,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.93,
+            "mean_cpu_cores": 0.28078468393327444,
+            "sampled_peak_rss_bytes": 46657536,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.01,
+            "mean_cpu_cores": 0.0030191901498201556,
+            "sampled_peak_rss_bytes": 43896832,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "semantic",
+      "concurrency": 16,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 995,
+      "http_200": 995,
+      "rejected": 5,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.9355774209980154,
+      "attempted_rps": 254.09232065022164,
+      "completed_rps": 254.09232065022164,
+      "successful_rps": 252.8218590469705,
+      "status_counts": {
+        "200": 995,
+        "503": 5
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 5,
+        "MISS": 13,
+        "HIT": 982
+      },
+      "independent_upstream_calls": 8,
+      "cache_avoidance_fraction_of_attempts": 0.987,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 987,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 26.454630999069195,
+        "p95_ms": 255.36589799958165,
+        "p99_ms": 366.525156001444,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 995,
+        "p50_ms": 26.41798600234324,
+        "p95_ms": 256.0312999994494,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 2.986,
+          "p95_ms": 6.287,
+          "p99_ms": 18.383,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 8,
+          "p50_ms": 42.227,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.153,
+          "p95_ms": 0.471,
+          "p99_ms": 0.876,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 18,
+          "p50_ms": 0.143,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 2.787,
+          "p95_ms": 5.781,
+          "p99_ms": 9.601,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 35,
+        "sampling_window_seconds": 3.9391963650014077,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.93,
+            "mean_cpu_cores": 0.9976654210277217,
+            "sampled_peak_rss_bytes": 71811072,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.29,
+            "mean_cpu_cores": 0.32747796262742007,
+            "sampled_peak_rss_bytes": 127557632,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.02,
+            "mean_cpu_cores": 0.0050771777151537995,
+            "sampled_peak_rss_bytes": 43896832,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0050000000000000044
+    },
+    {
+      "scenario": "mixed",
+      "concurrency": 16,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 998,
+      "http_200": 998,
+      "rejected": 2,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 4.090119494998362,
+      "attempted_rps": 244.49163434536783,
+      "completed_rps": 244.49163434536783,
+      "successful_rps": 244.0026510766771,
+      "status_counts": {
+        "200": 998,
+        "503": 2
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 8,
+        "HIT": 787,
+        "BYPASS": 200,
+        "MISS": 5
+      },
+      "independent_upstream_calls": 203,
+      "cache_avoidance_fraction_of_attempts": 0.795,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 400,
+      "total_cache_hits": 795,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 37.99906300264411,
+        "p95_ms": 213.21436500147684,
+        "p99_ms": 329.50816599986865,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 998,
+        "p50_ms": 38.00965200207429,
+        "p95_ms": 213.39236499989056,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 3.39,
+          "p95_ms": 22.256,
+          "p99_ms": 39.603,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 203,
+          "p50_ms": 15.118,
+          "p95_ms": 28.504,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.149,
+          "p95_ms": 0.484,
+          "p99_ms": 0.894,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 13,
+          "p50_ms": 7.132,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 2.846,
+          "p95_ms": 7.341,
+          "p99_ms": 11.466,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 36,
+        "sampling_window_seconds": 4.095472421999148,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 4.1,
+            "mean_cpu_cores": 1.0011055081158724,
+            "sampled_peak_rss_bytes": 73502720,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.87,
+            "mean_cpu_cores": 0.456601780530898,
+            "sampled_peak_rss_bytes": 127627264,
+            "reason": null
+          },
+          "mock_backend": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.25,
+            "mean_cpu_cores": 0.06104301878755321,
+            "sampled_peak_rss_bytes": 43900928,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "4fe960385eb33d7e35726d8aa08fe2649960d3a8c69c79660dac369cea553a1b",
+        "measured_cache": {
+          "SEMANTIC_HIT": 2,
+          "HIT": 2,
+          "BYPASS": 1
+        },
+        "upstream_calls_expected": 2,
+        "excluded_from_measurement": true
+      },
+      "model_identity": null,
+      "trial": "mock-benchmark",
+      "backend": "deterministic_mock",
+      "error_fraction_of_attempts": 0.0020000000000000018
+    },
+    {
+      "scenario": "direct",
+      "concurrency": 1,
+      "attempted": 30,
+      "completed": 30,
+      "successful": 30,
+      "http_200": 30,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 16.578051296000922,
+      "attempted_rps": 1.809621617423564,
+      "completed_rps": 1.809621617423564,
+      "successful_rps": 1.809621617423564,
+      "status_counts": {
+        "200": 30
+      },
+      "cache_dispositions": {
+        "UNLABELLED": 30
+      },
+      "independent_upstream_calls": 30,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 30,
+        "p50_ms": 539.4232899998315,
+        "p95_ms": null,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 30,
+        "p50_ms": 539.4232899998315,
+        "p95_ms": null,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 97,
+        "sampling_window_seconds": 16.668389279999246,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.59,
+            "mean_cpu_cores": 0.035396341547407555,
+            "sampled_peak_rss_bytes": 45187072,
+            "reason": null
+          },
+          "owned_ollama_tree": {
+            "available": true,
+            "observed_process_identities": 3,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "ps_ppid"
+            ],
+            "cpu_core_seconds": 30.84,
+            "mean_cpu_cores": 1.8502087683424557,
+            "sampled_peak_rss_bytes": 945299456,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "UNLABELLED": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": {
+        "version": "0.40.11",
+        "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "backend_revision": "ollama-0.40.11-ctx2048-template-default-v1",
+        "observed_context_length": 2048
+      },
+      "trial": "gemma-uncached",
+      "backend": "ollama",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "uncached",
+      "concurrency": 1,
+      "attempted": 30,
+      "completed": 30,
+      "successful": 30,
+      "http_200": 30,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 17.001313284003118,
+      "attempted_rps": 1.7645695658245184,
+      "completed_rps": 1.7645695658245184,
+      "successful_rps": 1.7645695658245184,
+      "status_counts": {
+        "200": 30
+      },
+      "cache_dispositions": {
+        "BYPASS": 30
+      },
+      "independent_upstream_calls": 30,
+      "cache_avoidance_fraction_of_attempts": 0.0,
+      "cache_wire_replay_verified": null,
+      "checked_cache_wire_replays": 0,
+      "total_cache_hits": 0,
+      "latency_all": {
+        "count": 30,
+        "p50_ms": 569.3472579987429,
+        "p95_ms": null,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 30,
+        "p50_ms": 569.3472579987429,
+        "p95_ms": null,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 30,
+          "p50_ms": 566.925,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 30,
+          "p50_ms": 566.341,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 30,
+          "p50_ms": 0.016,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 30,
+          "p50_ms": 0.77,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 99,
+        "sampling_window_seconds": 17.087459379999927,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.68,
+            "mean_cpu_cores": 0.039795266509654925,
+            "sampled_peak_rss_bytes": 47222784,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.18,
+            "mean_cpu_cores": 0.010534041134908656,
+            "sampled_peak_rss_bytes": 46686208,
+            "reason": null
+          },
+          "owned_ollama_tree": {
+            "available": true,
+            "observed_process_identities": 3,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "ps_ppid"
+            ],
+            "cpu_core_seconds": 31.380000000000003,
+            "mean_cpu_cores": 1.836434504519076,
+            "sampled_peak_rss_bytes": 945512448,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 5,
+        "seed_cache": null,
+        "primed_source_sha256": null,
+        "measured_cache": {
+          "BYPASS": 5
+        },
+        "upstream_calls_expected": 5,
+        "excluded_from_measurement": true
+      },
+      "model_identity": {
+        "version": "0.40.11",
+        "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "backend_revision": "ollama-0.40.11-ctx2048-template-default-v1",
+        "observed_context_length": 2048
+      },
+      "trial": "gemma-uncached",
+      "backend": "ollama",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "exact",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 3.5307723629994143,
+      "attempted_rps": 283.22414961651435,
+      "completed_rps": 283.22414961651435,
+      "successful_rps": 283.22414961651435,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 2.9693510005017743,
+        "p95_ms": 6.748748000973137,
+        "p99_ms": 9.598945998732233,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 2.9693510005017743,
+        "p95_ms": 6.748748000973137,
+        "p99_ms": 9.598945998732233,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 0.443,
+          "p95_ms": 1.443,
+          "p99_ms": 2.737,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.11,
+          "p95_ms": 0.54,
+          "p99_ms": 0.896,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.277,
+          "p95_ms": 1.153,
+          "p99_ms": 2.483,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 28,
+        "sampling_window_seconds": 3.575169207997533,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 2.64,
+            "mean_cpu_cores": 0.7384265880603383,
+            "sampled_peak_rss_bytes": 47861760,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 1.23,
+            "mean_cpu_cores": 0.34403966034629396,
+            "sampled_peak_rss_bytes": 46460928,
+            "reason": null
+          },
+          "owned_ollama_tree": {
+            "available": true,
+            "observed_process_identities": 3,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "ps_ppid"
+            ],
+            "cpu_core_seconds": 0.09,
+            "mean_cpu_cores": 0.02517363368387517,
+            "sampled_peak_rss_bytes": 945491968,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "2f94f016172c72b6f41600fa38210cdf544f88353f8171192abf97c484cc5da9",
+        "measured_cache": {
+          "HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": {
+        "version": "0.40.11",
+        "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "backend_revision": "ollama-0.40.11-ctx2048-template-default-v1",
+        "observed_context_length": 2048
+      },
+      "trial": "gemma-cache",
+      "backend": "ollama",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "semantic",
+      "concurrency": 1,
+      "attempted": 1000,
+      "completed": 1000,
+      "successful": 1000,
+      "http_200": 1000,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 8.910211244998209,
+      "attempted_rps": 112.230784714712,
+      "completed_rps": 112.230784714712,
+      "successful_rps": 112.230784714712,
+      "status_counts": {
+        "200": 1000
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 1000
+      },
+      "independent_upstream_calls": 0,
+      "cache_avoidance_fraction_of_attempts": 1.0,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 1000,
+      "total_cache_hits": 1000,
+      "latency_all": {
+        "count": 1000,
+        "p50_ms": 7.929406001494499,
+        "p95_ms": 16.350898000382585,
+        "p99_ms": 21.22521199999028,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 1000,
+        "p50_ms": 7.929406001494499,
+        "p95_ms": 16.350898000382585,
+        "p99_ms": 21.22521199999028,
+        "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 1000,
+          "p50_ms": 4.465,
+          "p95_ms": 9.328,
+          "p99_ms": 13.417,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 0,
+          "p50_ms": null,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 1000,
+          "p50_ms": 0.132,
+          "p95_ms": 0.916,
+          "p99_ms": 2.046,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 1000,
+          "p50_ms": 3.301,
+          "p95_ms": 7.402,
+          "p99_ms": 10.651,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 1000,
+          "p50_ms": 0.677,
+          "p95_ms": 2.535,
+          "p99_ms": 3.822,
+          "caveat": "nearest-rank empirical tails; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 65,
+        "sampling_window_seconds": 8.969875580998632,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 3.58,
+            "mean_cpu_cores": 0.3991136741722155,
+            "sampled_peak_rss_bytes": 49790976,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 5.64,
+            "mean_cpu_cores": 0.6287712632210322,
+            "sampled_peak_rss_bytes": 128888832,
+            "reason": null
+          },
+          "owned_ollama_tree": {
+            "available": true,
+            "observed_process_identities": 3,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "ps_ppid"
+            ],
+            "cpu_core_seconds": 0.02,
+            "mean_cpu_cores": 0.002229685330571036,
+            "sampled_peak_rss_bytes": 945491968,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "6e5caa886b17e3fb4ac813f7b840bbf99e3f1751fabb119c188fb158801de60c",
+        "measured_cache": {
+          "SEMANTIC_HIT": 5
+        },
+        "upstream_calls_expected": 1,
+        "excluded_from_measurement": true
+      },
+      "model_identity": {
+        "version": "0.40.11",
+        "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "backend_revision": "ollama-0.40.11-ctx2048-template-default-v1",
+        "observed_context_length": 2048
+      },
+      "trial": "gemma-cache",
+      "backend": "ollama",
+      "error_fraction_of_attempts": 0.0
+    },
+    {
+      "scenario": "mixed",
+      "concurrency": 1,
+      "attempted": 100,
+      "completed": 100,
+      "successful": 100,
+      "http_200": 100,
+      "rejected": 0,
+      "other_http_errors": 0,
+      "transport_failures": 0,
+      "incorrect_responses": 0,
+      "duration_seconds": 11.766429979998065,
+      "attempted_rps": 8.498754521974085,
+      "completed_rps": 8.498754521974085,
+      "successful_rps": 8.498754521974085,
+      "status_counts": {
+        "200": 100
+      },
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 40,
+        "HIT": 40,
+        "BYPASS": 20
+      },
+      "independent_upstream_calls": 20,
+      "cache_avoidance_fraction_of_attempts": 0.8,
+      "cache_wire_replay_verified": true,
+      "checked_cache_wire_replays": 80,
+      "total_cache_hits": 80,
+      "latency_all": {
+        "count": 100,
+        "p50_ms": 6.49748299838393,
+        "p95_ms": 575.8645800015074,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "latency_successful": {
+        "count": 100,
+        "p50_ms": 6.49748299838393,
+        "p95_ms": 575.8645800015074,
+        "p99_ms": null,
+        "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+      },
+      "server_timing": {
+        "gateway": {
+          "count": 100,
+          "p50_ms": 3.681,
+          "p95_ms": 559.59,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "adapter": {
+          "count": 20,
+          "p50_ms": 528.677,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "exact": {
+          "count": 100,
+          "p50_ms": 0.154,
+          "p95_ms": 0.412,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "semantic": {
+          "count": 40,
+          "p50_ms": 3.415,
+          "p95_ms": null,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        },
+        "residual": {
+          "count": 100,
+          "p50_ms": 0.618,
+          "p95_ms": 1.761,
+          "p99_ms": null,
+          "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+        }
+      },
+      "resources": {
+        "available": true,
+        "sample_interval_seconds": 0.1,
+        "samples": 71,
+        "sampling_window_seconds": 11.865215789999638,
+        "maximum_recorded_process_identities": 128,
+        "groups": {
+          "load_generator": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.61,
+            "mean_cpu_cores": 0.05141078011527834,
+            "sampled_peak_rss_bytes": 46587904,
+            "reason": null
+          },
+          "gateway": {
+            "available": true,
+            "observed_process_identities": 1,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "supplied_pid"
+            ],
+            "cpu_core_seconds": 0.37,
+            "mean_cpu_cores": 0.031183587938775386,
+            "sampled_peak_rss_bytes": 128299008,
+            "reason": null
+          },
+          "owned_ollama_tree": {
+            "available": true,
+            "observed_process_identities": 3,
+            "descendant_discovery_complete": true,
+            "discovery_methods": [
+              "ps_ppid"
+            ],
+            "cpu_core_seconds": 21.26,
+            "mean_cpu_cores": 1.7917921069685534,
+            "sampled_peak_rss_bytes": 945709056,
+            "reason": null
+          }
+        },
+        "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+      },
+      "warmup": {
+        "requests": 6,
+        "seed_cache": {
+          "MISS": 1
+        },
+        "primed_source_sha256": "cfb1f7f7a643aca43e7deca933b08e0182de35d75dcbdd465d41d5b8e570a2ae",
+        "measured_cache": {
+          "SEMANTIC_HIT": 2,
+          "HIT": 2,
+          "BYPASS": 1
+        },
+        "upstream_calls_expected": 2,
+        "excluded_from_measurement": true
+      },
+      "model_identity": {
+        "version": "0.40.11",
+        "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "backend_revision": "ollama-0.40.11-ctx2048-template-default-v1",
+        "observed_context_length": 2048
+      },
+      "trial": "gemma-mixed",
+      "backend": "ollama",
+      "error_fraction_of_attempts": 0.0
+    }
+  ],
+  "limitations": [
+    "Closed-loop fixed workers; one observed run per point, not an arrival-rate test.",
+    "Cache RPS is not model generation speed; no token-rate or monetary savings claim.",
+    "Header durations are walltime, not CPU; direct/gateway differences are not CPU costs.",
+    "Concurrent semantic fallback can create later exact hits; dispositions show this.",
+    "Sampler, client and servers share hardware; CPU ticks and RSS samples are coarse.",
+    "Repeated real prompts can reuse backend KV caches independently of gateway caching.",
+    "Single observed final trial per point; run order and shared host variability prevent precise causal overhead attribution.",
+    "A first sampler omitted Ollama descendants on this kernel; those resource data were excluded and all final trials rerun.",
+    "Semantic serving remains finite reviewed-vocabulary reuse; the final unseen-wording audit has zero production positive recall."
+  ]
+}

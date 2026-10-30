@@ -1,0 +1,359 @@
+{
+  "original_protocol_audit": {
+    "dataset_sha256": "80e0ba7b0acaf85afaca2e9bd8fa468c426fe67d50acdfa07541bb98d1a04885",
+    "report_checks": {
+      "l3": {
+        "source_vectors": 3,
+        "selection": {
+          "raw": {
+            "threshold": 0.75,
+            "calibration_only_recomputation_matches": true
+          },
+          "guarded": {
+            "threshold": 0.75,
+            "calibration_only_recomputation_matches": true
+          }
+        }
+      },
+      "l6": {
+        "source_vectors": 3,
+        "selection": {
+          "raw": {
+            "threshold": 0.85,
+            "calibration_only_recomputation_matches": true
+          },
+          "guarded": {
+            "threshold": 0.75,
+            "calibration_only_recomputation_matches": true
+          }
+        }
+      }
+    },
+    "canonical_source_vectors": 3,
+    "approval_registry_phrases": 21,
+    "positive_phrases_preapproved": 18,
+    "positive_cases": 18,
+    "heldout_positive_phrases_preapproved": 9,
+    "heldout_positive_cases": 9,
+    "membership_only_oracle_without_embeddings": {
+      "queries": 54,
+      "positives": 18,
+      "negatives": 36,
+      "true_hits": 18,
+      "positive_misses": 0,
+      "false_hits": 0,
+      "negative_hits": 0,
+      "admission_bypasses": 36,
+      "accepted_reuses": 18,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "metadata_only_negative_cases": [
+      {
+        "id": "calibration-france-capital-negative-6",
+        "split": "calibration",
+        "bare_text_family": "france-capital",
+        "component_policy_result": "BYPASS",
+        "wire_mapping": "explicit system message, then original user text"
+      },
+      {
+        "id": "heldout-france-capital-negative-5",
+        "split": "heldout",
+        "bare_text_family": "france-capital",
+        "component_policy_result": "BYPASS",
+        "wire_mapping": "explicit system message, then original user text"
+      },
+      {
+        "id": "calibration-japan-capital-negative-6",
+        "split": "calibration",
+        "bare_text_family": "japan-capital",
+        "component_policy_result": "BYPASS",
+        "wire_mapping": "explicit system message, then original user text"
+      },
+      {
+        "id": "heldout-japan-capital-negative-6",
+        "split": "heldout",
+        "bare_text_family": "japan-capital",
+        "component_policy_result": "BYPASS",
+        "wire_mapping": "explicit system message, then original user text"
+      },
+      {
+        "id": "heldout-python3-list-tuple-negative-6",
+        "split": "heldout",
+        "bare_text_family": "python3-list-tuple",
+        "component_policy_result": "BYPASS",
+        "wire_mapping": "explicit system message, then original user text"
+      }
+    ],
+    "finding": "Threshold arithmetic reproduces calibration-only selection. However every held-out positive literal was already in the approval registry; guarded recall is not unseen-wording generalization. A membership-to-family lookup could reproduce the guarded admission outcomes without embeddings. Only three canonical source vectors were stored, so the raw cosine scores are genuine query-to-source retrieval, not cached query vectors.",
+    "limits": "Recomputation cannot prove the absence of human inspection or pretrained-data overlap. The approval registry is not an independent semantic correctness oracle. Metadata-only component cases need explicit wire context; bare text alone stays eligible."
+  },
+  "new_wording_audit": {
+    "dataset_version": "semantic-final-audit-v1",
+    "dataset_sha256": "b819653ab102a268a1720db80e5f7719a56f9743b7eb305efe46bc68460d4661",
+    "fixed_threshold": 0.75,
+    "threshold_retuned": false,
+    "actual_local_embeddings": true,
+    "model_fingerprint": "embedding-v1:05d0bc5e51790e091ee51fce277d198a843efdda5b0dbb4cc5823f53f9a60508",
+    "source_vectors": 3,
+    "query_source_expansion": false,
+    "raw_retrieval": {
+      "queries": 18,
+      "positives": 6,
+      "negatives": 12,
+      "true_hits": 4,
+      "positive_misses": 2,
+      "false_hits": 6,
+      "negative_hits": 6,
+      "admission_bypasses": 0,
+      "accepted_reuses": 10,
+      "precision": 0.4,
+      "recall": 0.6666666666666666,
+      "f1": 0.5
+    },
+    "unchanged_production_guard": {
+      "queries": 18,
+      "positives": 6,
+      "negatives": 12,
+      "true_hits": 0,
+      "positive_misses": 6,
+      "false_hits": 0,
+      "negative_hits": 0,
+      "admission_bypasses": 18,
+      "accepted_reuses": 0,
+      "precision": null,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    "query_encoding_timing": {
+      "count": 18,
+      "median_ms": 1.3989905000357794,
+      "p95_ms": null,
+      "total_ms": 25.774504999844794,
+      "note": "Only 18 diagnostic query encodings; p95 is withheld below 100 observations. These samples measure neither HTTP latency nor throughput."
+    },
+    "case_scores": [
+      {
+        "id": "audit-france-equivalent-1",
+        "kind": "equivalent",
+        "category": "unseen-phrasing",
+        "expected_family": "france-capital",
+        "raw_family": "france-capital",
+        "raw_similarity": 0.5874841986326983,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.500874999919688
+      },
+      {
+        "id": "audit-france-equivalent-2",
+        "kind": "equivalent",
+        "category": "unseen-phrasing",
+        "expected_family": "france-capital",
+        "raw_family": "france-capital",
+        "raw_similarity": 0.7906343698359305,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.2353219999567955
+      },
+      {
+        "id": "audit-france-negative-1",
+        "kind": "answer_mismatch",
+        "category": "entity",
+        "expected_family": null,
+        "raw_family": "france-capital",
+        "raw_similarity": 0.6144595439588056,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.3068370000155483
+      },
+      {
+        "id": "audit-france-negative-2",
+        "kind": "answer_mismatch",
+        "category": "negation",
+        "expected_family": null,
+        "raw_family": "france-capital",
+        "raw_similarity": 0.8233212017787791,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 2.078769000036118
+      },
+      {
+        "id": "audit-france-negative-3",
+        "kind": "answer_mismatch",
+        "category": "output-format",
+        "expected_family": null,
+        "raw_family": "france-capital",
+        "raw_similarity": 0.5250595553581819,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.4643339999338423
+      },
+      {
+        "id": "audit-france-negative-4",
+        "kind": "answer_mismatch",
+        "category": "quantity",
+        "expected_family": null,
+        "raw_family": "france-capital",
+        "raw_similarity": 0.8428806803143354,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.1220839999168675
+      },
+      {
+        "id": "audit-japan-equivalent-1",
+        "kind": "equivalent",
+        "category": "unseen-phrasing",
+        "expected_family": "japan-capital",
+        "raw_family": "japan-capital",
+        "raw_similarity": 0.8030828640832204,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.0025029999951585
+      },
+      {
+        "id": "audit-japan-equivalent-2",
+        "kind": "equivalent",
+        "category": "unseen-phrasing",
+        "expected_family": "japan-capital",
+        "raw_family": "japan-capital",
+        "raw_similarity": 0.7436030706107324,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.4170770000418997
+      },
+      {
+        "id": "audit-japan-negative-1",
+        "kind": "answer_mismatch",
+        "category": "entity",
+        "expected_family": null,
+        "raw_family": "japan-capital",
+        "raw_similarity": 0.6091270696403832,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.2266730000192183
+      },
+      {
+        "id": "audit-japan-negative-2",
+        "kind": "answer_mismatch",
+        "category": "negation",
+        "expected_family": null,
+        "raw_family": "japan-capital",
+        "raw_similarity": 0.7963556884988029,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.1322750000317683
+      },
+      {
+        "id": "audit-japan-negative-3",
+        "kind": "policy_exclusion",
+        "category": "dynamic-person",
+        "expected_family": null,
+        "raw_family": "japan-capital",
+        "raw_similarity": 0.6042580899675729,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 0.9782399999949121
+      },
+      {
+        "id": "audit-japan-negative-4",
+        "kind": "answer_mismatch",
+        "category": "output-case",
+        "expected_family": null,
+        "raw_family": "japan-capital",
+        "raw_similarity": 0.6037866599643533,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.0968520000460558
+      },
+      {
+        "id": "audit-python-equivalent-1",
+        "kind": "equivalent",
+        "category": "unseen-phrasing",
+        "expected_family": "python3-list-tuple",
+        "raw_family": "python3-list-tuple",
+        "raw_similarity": 0.7502240230899235,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.6253119999873888
+      },
+      {
+        "id": "audit-python-equivalent-2",
+        "kind": "equivalent",
+        "category": "unseen-phrasing",
+        "expected_family": "python3-list-tuple",
+        "raw_family": "python3-list-tuple",
+        "raw_similarity": 0.7676990188456505,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.530766999962907
+      },
+      {
+        "id": "audit-python-negative-1",
+        "kind": "policy_exclusion",
+        "category": "version-context",
+        "expected_family": null,
+        "raw_family": "python3-list-tuple",
+        "raw_similarity": 0.9153066754025982,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.380904000029659
+      },
+      {
+        "id": "audit-python-negative-2",
+        "kind": "answer_mismatch",
+        "category": "quantity-and-extra-topic",
+        "expected_family": null,
+        "raw_family": "python3-list-tuple",
+        "raw_similarity": 0.8154631604257732,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 2.582407999966563
+      },
+      {
+        "id": "audit-python-negative-3",
+        "kind": "answer_mismatch",
+        "category": "entities",
+        "expected_family": null,
+        "raw_family": "python3-list-tuple",
+        "raw_similarity": 0.778996382910208,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.434850999999071
+      },
+      {
+        "id": "audit-python-negative-4",
+        "kind": "answer_mismatch",
+        "category": "reversed-constraint",
+        "expected_family": null,
+        "raw_family": "python3-list-tuple",
+        "raw_similarity": 0.7262196514950325,
+        "production_family": null,
+        "production_similarity": null,
+        "production_disposition": "BYPASS",
+        "encode_ms": 1.658421999991333
+      }
+    ],
+    "finding": "Production bypasses all unseen wording, including every genuine equivalent. Its zero false hits therefore do not demonstrate useful unseen-paraphrase recall. Raw retrieval is diagnostic only and cannot authorize cache serving.",
+    "limitations": "These cases were authored after viewing M05 results, but frozen before scoring their new wording. This is a curated follow-up audit, not an independent external study or a claim of training-data novelty. No model-answer quality is evaluated.",
+    "answer_quality_evaluated": false,
+    "throughput_benchmark": false
+  }
+}

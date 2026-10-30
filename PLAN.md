@@ -372,15 +372,141 @@ Python/RSS overhead; native jobs cannot be killed. Comprehensive metrics and
 scenario A–F throughput benchmarks remain milestone 6. No Redis, embeddings service,
 new LLM provider, training, dashboard, distributed state or unrelated optimization.
 
-## 6 — Operational metrics and reproducible performance evidence
+## 6 — Observability and reproducible benchmarking (complete)
 
-- [ ] Protected metrics, sanitized structured logs and usage provenance.
-- [ ] Lightweight HTTP benchmark harness; fixed seeds, warmup, hardware/version
-  capture and raw JSON results for scenarios A–F.
-- [ ] Separate mock overhead/cache measurements from real-model inference results.
-- [ ] Report RPS, median/p95, errors, hit/false-hit rates, quota correctness,
-  upstream-call reduction; optimize only observed bottlenecks.
-- [ ] Final portfolio demonstration and concise reproducible documentation.
+- [x] Operator-only fixed-cardinality metrics and optional sanitized JSON logs;
+  completion-aware outcomes, quota/capacity/deadline counts and usage provenance.
+- [x] Bounded closed-loop HTTP benchmark driver; fixed scheduling, warm-up,
+  sample-aware percentiles, source/lock manifests and independent upstream counts.
+- [x] Separate direct/mock, gateway, cache, mixed and genuine Gemma measurements;
+  record process CPU/RSS and preserve raw machine-readable evidence.
+- [x] Semantic provenance audit and frozen unseen-wording follow-up; preserve
+  existing eligibility and report the limits of curated vocabulary honestly.
+- [x] Final regressions, HTTP enforcement/recovery/failure probes, reproducible
+  commands and performance table in README.
 
-Exit: completion gates in `SPEC.md` all have evidence; full project is complete
-only here.
+Verified 2026-10-30 on Linux x86_64, Python 3.12.14, **8 GiB / two CPU cores' quota**
+(three visible CPUs), one Uvicorn worker. No dependencies or production performance
+optimizations added. Ollama **0.40.11 / gemma3:1b Q4_K_M**, existing manifest
+`97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`, context 2048,
+CPU only, one loaded model. macOS/Metal remains untested.
+
+Metrics/security:
+
+- `GET /v1/metrics` requires a distinct operator credential from
+  `GATEWAY_METRICS_KEY`; disabled 404 if absent. Ordinary client keys cannot read
+  aggregate state, operator keys cannot infer. No client/model/path labels,
+  prompts, credentials, response bodies or retained raw metric samples.
+- Completion scope includes authentication/schema/quota/backend errors; health,
+  models and metrics scrapes do not spend quota or count themselves. Fixed counters
+  distinguish response-start status from successful final sends, aborts, cache
+  dispositions, upstream attempts and reported usage. Histograms use fixed buckets;
+  rates expose denominators. Only new upstream usage is added, not cached history.
+- An independent review found consistent large provider usage could exceed the
+  telemetry 64-bit bound and turn 200 into 500. Fixed without narrowing the API:
+  preserve response/cache bytes and increment ignored_usage_reports. Regression
+  covers this boundary. Optional JSON logging is off during measured trials.
+- Header/histogram stages distinguish gateway-to-start, exact, semantic, adapter,
+  residual and request lifecycle. Residual contains scheduling, not isolated CPU;
+  lifecycle includes final send/cache commit before metric update.
+
+Recorded trials, source frozen and verified unchanged end-to-end:
+
+- Benchmark source SHA256
+  `890d3a1d43383d709eb7729b502deb649fb3cf8e2bc8a50bfa217b1eba6016fd`;
+  raw reports contain the complete runtime/helper/lock manifests and UTC windows.
+- **20 mock points**: 1,000 requests each, concurrency 1/4/8/16, deterministic 10 ms
+  backend, direct/no-cache/warm-exact/warm-semantic/40-40-20 mixed. Fresh gateway
+  per point, five sequential warm-ups plus cache seed, excluded from measurements;
+  seed 42, request cap 32 output tokens, temperature 0/top_p 1/seed 42. High benchmark
+  request quotas avoid accidental 429; capacity 8 and zero waiting queue remain.
+- **Real trials**: 30 direct + 30 uncached gateway requests (p50 only); 1,000 exact
+  + 1,000 semantic warm replays (p50/p95/p99); 100 mixed requests (p50/p95). All at
+  concurrency 1/capacity 1. Exactly **30/30/0/0/20 independently counted chat POSTs**
+  during the respective measured windows. Warm-up/seed calls are excluded.
+- Final c1 mock results: direct **56.67 RPS, 14.47 ms p50**; gateway uncached
+  **54.90 RPS, 17.30 ms**; exact **245.97 RPS, 3.60 ms**; semantic **150.71 RPS, 5.51 ms**;
+  mixed **124.98 RPS, 5.71 ms**, 200 upstream calls. Gateway residual median 0.446 ms.
+- Final real results: direct **1.81 RPS, 539.42 ms p50**, gateway uncached
+  **1.76 RPS, 569.35 ms**; exact **283.22 RPS, 2.97/6.75/9.60 ms p50/p95/p99**;
+  semantic **112.23 RPS, 7.93/16.35/21.23 ms**. Cached RPS is gateway replay, not new
+  model generation. Mixed **8.50 RPS, 6.50/575.86 ms p50/p95**, 40 exact + 40 semantic
+  hits, 20 no-store, 20 actual upstream calls: 80 calls avoided for this workload.
+- Real model CPU averaged **1.84 cores** for uncached gateway inference; median
+  adapter 566.341 ms vs gateway residual 0.770 ms. Real semantic lookup median 3.301 ms.
+  Gateway sampled RSS **44.5 MiB uncached / 44.3 exact / 122.9 semantic**; model tree
+  **~902 MiB** including during hits, when model CPU stayed below 0.03 core.
+  Caching avoids inference work, not model residency. CPU ticks/RSS are sampled,
+  shared pages may be counted twice, brief spikes may be missed, discovery adds
+  measurement work. Client/sampler/servers share the same CPU budget.
+- Mock uncached c8 **239.18 successful RPS**, no errors; c16 **316.81 attempted /
+  211.32 successful RPS**, 333 HTTP 503, 667 upstream calls. Permits remain bounded.
+  Concurrent semantic opt-in c4 was **995 exact hits, 2 semantic hits, 3 misses**;
+  never label that result pure semantic serving. Warm controlled replays compare
+  response SHA256; all HTTP 200 city-answer checks passed, no transport failures.
+- Only one final observed trial per point: shared-host scheduling, sequential
+  run order and load-generator work limit causal inference. Direct/gateway
+  differences are not pure CPU costs; no optimization/speedup claim follows.
+  Higher concurrency has noisy tails and saturation; profile/repeat before tuning.
+
+A first sampler wrongly observed only bubblewrap because this kernel lacks
+`/proc/PID/task/TID/children`. Excluded those resource results. Added bounded
+GNU `ps --ppid` discovery for owned trees, completeness/null reporting, cap 32
+processes/128 identities and one serial off-loop sampling job. Tests cover the
+missing-proc path and cancellation. Reran **all four final suites** afterward;
+real model resource windows observed all three processes with complete discovery.
+An earlier setup trial was also interrupted before final source freeze and is
+excluded. Final source manifests now reject changes during a suite.
+
+Reliability and semantic audit:
+
+- Real loopback quota probe: 24 attempts, client A 3 accepted/9 HTTP 429, B 2/10;
+  exactly 5 upstream calls. Protected metrics agree: 24 completed, 5 success,
+  19 quota errors. Positive Retry-After and client isolation verified.
+- Held capacity 2: 20 excess requests all 503, no guessed Retry-After; upstream
+  calls remain 2 until release. Recovery 200, 3 calls total, 23 completed responses,
+  metrics report 20 overloads and zero remaining inference permits.
+- Real HTTP trickle probe: 1 s cooperative upstream budget returns 504 in 1009.257 ms
+  external / 1002.947 ms adapter; metrics record one timeout/attempt and no held slot.
+  Cancellation, disconnect, slow cleanup, failed final sends and cache isolation
+  remain covered by regressions. HTTP smoke, exact and actual-ONNX semantic probes
+  passed; semantic probe independently counts 5 calls / 8 requests.
+- Final audit frozen in commit **`95cba86`**, SHA256
+  `b819653ab102a268a1720db80e5f7719a56f9743b7eb305efe46bc68460d4661`.
+  Calibration-only threshold arithmetic reproduces M05, but all nine held-out
+  positive literals were already approved. A membership-only lookup reproduces
+  guarded admission; it is not independent unseen-wording equivalence evidence.
+  New 18 phrases were absent from the registry and original cases. Fixed L3/0.75
+  retrieves **4/6 equivalents, misses 2, accepts 6/12 negatives** before guards.
+  Production bypasses all 18, including 6 true equivalents: served unseen recall 0/6.
+  No threshold/approval expansion, no tuning on the final set. Five original
+  metadata-only negatives require explicit system context at the wire boundary.
+  The follow-up was authored after M05 results, not an independent external study.
+
+Artifacts and commands:
+
+- `benchmarks/summary.json`: all 25 points, durations, percentiles, counts, resource
+  aggregates, source/lock hashes and exact commands. README has the concise table.
+- `benchmarks/*.json.gz`: full bounded per-request raw trials, metrics snapshots,
+  configs, UTC windows, replay hashes and sampler completeness. Integrity hashes
+  are in the summary. `benchmarks/reliability.json` preserves the HTTP probes.
+- `evaluation/semantic_audit_cases.json` and `semantic_audit_results.json`: frozen
+  wording, protocol audit and per-case scores. Both original datasets stay intact.
+- Reproduction: README benchmark commands; real commands use the dedicated
+  loopback Ollama server with OLLAMA_NUM_PARALLEL=1, MAX_LOADED_MODELS=1,
+  CONTEXT_LENGTH=2048, KEEP_ALIVE=1m, NO_CLOUD=1 and the repository-backed sandbox.
+
+Final checks: **262 passed in 5.67 s**, Ruff lint passed, **40 files formatted**,
+`git diff --check` clean. Core-only install: **235 passed, 6 skipped in 4.12 s**;
+optional extra restored and full regressions rerun. The NumPy integration module
+is skipped as a unit without the extra. No OOM/max memory events. All owned
+verification servers are stopped afterward.
+
+Highest-value remaining work: validate an independent equivalence gate on truly
+unseen requests while maintaining negative safety, or keep curated alias reuse;
+measure the target MacBook; use a separate load generator and repeated/randomized
+baseline trials plus profiling before tuning concurrency or serialization. The
+functional portfolio prototype is measurable and reproducible, with these limits.
+No distributed consistency, streaming, native hard-kill, public-Internet security
+or general semantic/model-performance guarantee is claimed. No Redis, training,
+provider expansion, dashboard or production performance optimization was added.

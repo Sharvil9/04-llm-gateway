@@ -73,7 +73,7 @@ async def complete(request: ChatRequest):
 
 
 @contextmanager
-def servers(policy: str):
+def servers(policy: str, *, metrics_key: str | None = None):
     artifacts = ROOT / "artifacts"
     artifacts.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="traffic-probe-", dir=artifacts) as directory:
@@ -91,6 +91,8 @@ def servers(policy: str):
         keys = {name: secrets.token_urlsafe(32) for name in ["client-a", "client-b"]}
         environment = os.environ.copy()
         environment.update(GATEWAY_CONFIG=str(config), GATEWAY_CLIENT_KEYS_JSON=json.dumps(keys))
+        if metrics_key:
+            environment["GATEWAY_METRICS_KEY"] = metrics_key
         processes = []
         try:
             for app, port, factory in [
@@ -154,12 +156,26 @@ async def clean_requests(client: httpx.AsyncClient, backend: str, tasks: list) -
         await asyncio.gather(*tasks, return_exceptions=True)
 
 
+async def metrics_snapshot(client: httpx.AsyncClient, gateway: str, key: str) -> dict:
+    for _ in range(100):
+        response = await client.get(
+            f"{gateway}/v1/metrics", headers={"Authorization": f"Bearer {key}"}
+        )
+        assert response.status_code == 200
+        result = response.json()
+        if result["gauges"]["requests_in_flight"] == 0:
+            return result
+        await asyncio.sleep(0.01)
+    raise RuntimeError("Completion metrics did not settle")
+
+
 async def quota_phase(client: httpx.AsyncClient) -> dict:
     policy = (
         "max_in_flight = 8\n[rate_limit]\nburst = 3\nrequests_per_second = 0.000001\n"
         "[client_rate_limits.client-b]\nburst = 2\nrequests_per_second = 0.000001\n"
     )
-    with servers(policy) as (backend, gateway, keys):
+    operator_key = secrets.token_urlsafe(32)
+    with servers(policy, metrics_key=operator_key) as (backend, gateway, keys):
         await client.post(f"{backend}/_probe/reset")
         tagged = [
             (name, asyncio.create_task(post_chat(client, gateway, key)))
@@ -191,6 +207,10 @@ async def quota_phase(client: httpx.AsyncClient) -> dict:
             }
             assert counts == {"client-a": {200: 3, 429: 9}, "client-b": {200: 2, 429: 10}}
             assert (await client.get(f"{backend}/_probe/stats")).json()["active"] == 0
+            metrics = await metrics_snapshot(client, gateway, operator_key)
+            assert metrics["counts"]["responses_completed"] == 24
+            assert metrics["status"]["exact"]["429"] == 19
+            assert metrics["counts"]["upstream_attempts"] == 5
             return {
                 "requests_per_client": 12,
                 "client_status_counts": counts,
@@ -198,6 +218,7 @@ async def quota_phase(client: httpx.AsyncClient) -> dict:
                 "backend_peak_in_flight": 5,
                 "positive_retry_after": True,
                 "client_isolation_verified": True,
+                "gateway_metrics": metrics,
             }
         finally:
             await clean_requests(client, backend, tasks)
@@ -205,7 +226,8 @@ async def quota_phase(client: httpx.AsyncClient) -> dict:
 
 async def capacity_phase(client: httpx.AsyncClient) -> dict:
     policy = "max_in_flight = 2\n[rate_limit]\nburst = 100\nrequests_per_second = 0.000001\n"
-    with servers(policy) as (backend, gateway, keys):
+    operator_key = secrets.token_urlsafe(32)
+    with servers(policy, metrics_key=operator_key) as (backend, gateway, keys):
         await client.post(f"{backend}/_probe/reset")
         admitted = [
             asyncio.create_task(post_chat(client, gateway, keys["client-a"])) for _ in range(2)
@@ -240,6 +262,11 @@ async def capacity_phase(client: httpx.AsyncClient) -> dict:
                 "active": 0,
                 "peak": 2,
             }
+            metrics = await metrics_snapshot(client, gateway, operator_key)
+            assert metrics["counts"]["responses_completed"] == 23
+            assert metrics["status"]["exact"]["503"] == 20
+            assert metrics["counts"]["upstream_attempts"] == 3
+            assert metrics["gauges"]["inference_in_flight"] == 0
             return {
                 "configured_capacity": 2,
                 "admitted": 2,
@@ -250,6 +277,7 @@ async def capacity_phase(client: httpx.AsyncClient) -> dict:
                 "retry_after_omitted": True,
                 "recovery_status": recovery.status_code,
                 "backend_calls_after_recovery": 3,
+                "gateway_metrics": metrics,
             }
         finally:
             await clean_requests(client, backend, admitted)

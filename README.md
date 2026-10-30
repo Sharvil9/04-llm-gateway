@@ -2,9 +2,10 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with conservative caching and process-local traffic controls.
-**Current status: milestone 5, optional reviewed-domain semantic caching, exact
-caching, quotas and bounded inference admission; genuine Gemma inference verified.**
-Operational metrics and comprehensive throughput benchmarks remain pending.
+**Current status: milestone 6, protected operational metrics and reproducible
+HTTP benchmarks, with safe exact/reviewed-domain caching and bounded traffic
+controls. Genuine Gemma inference is verified.** Semantic reuse remains a finite
+reviewed-vocabulary feature; unseen-phrase support is not established.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
 and one pooled HTTPX async client. A separate deterministic HTTP service validates
@@ -377,8 +378,215 @@ neither. `app.state.response_cache.snapshot()` counts exact hits/lookup misses
 and admitted upstream attempts; `app.state.semantic_cache.snapshot()` separately
 counts semantic hits/misses, busy skips and failures. These are stage counters:
 an exact miss followed by a semantic hit is one request with two lookup stages.
-Use the response disposition for mutually exclusive request outcomes. No public
-metrics endpoint. State resets on restart; one worker only, no distributed claims.
+Use the response disposition for mutually exclusive request outcomes. The new
+operator-only metrics endpoint reports these stages and completed dispositions.
+State resets on restart; one worker only, no distributed claims.
+
+## Operational metrics
+
+`GET /v1/metrics` provides JSON counters, gauges and fixed cumulative latency
+histograms. Set a **separate** `GATEWAY_METRICS_KEY` before gateway startup;
+without it the endpoint returns 404. Client credentials cannot read global
+metrics, and the operator key cannot make inference requests. For example:
+
+```sh
+export GATEWAY_METRICS_KEY="$(.venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+# Start/restart the gateway with this environment, then:
+curl -sS http://127.0.0.1:8000/v1/metrics \
+  -H "Authorization: Bearer $GATEWAY_METRICS_KEY"
+```
+
+Measurements cover `POST /v1/chat/completions`, including failed authentication,
+validation, quota/overload and backend errors. Health, model listing and metrics
+scrapes do not count or spend completion quotas. Started/finished requests,
+completed responses, successful 2xx, errors, aborts and observed 429/503/504 are
+separate. A response-start 200 followed by a cancelled/failed body send is not
+counted as a successful completion. ASGI acceptance is not proof of client receipt.
+Gauges distinguish HTTP requests in progress from admitted inference operations.
+Fixed status families/outcomes replace per-client/model/path labels; prompts,
+credentials, responses and raw latency samples are never retained as metrics.
+
+Exact/semantic hit rates expose numerator and denominator (eligible completed
+lookups); cache storage counters are separate stage diagnostics. Upstream attempts
+include admitted connection failures and are distinct from independently observed
+backend calls. Token counters add only newly reported upstream usage, never
+historical cache-hit usage or estimates. Consistent counts outside the telemetry
+64-bit range remain in the API response but increment `ignored_usage_reports`
+instead of changing request behavior. Scrapes expose global state only to the
+operator and do not include bearer keys, backend addresses or tenant identifiers.
+
+Latency scopes, all in milliseconds:
+
+| Measurement | Scope |
+| --- | --- |
+| `gateway` / histogram `gateway_to_start` | Middleware entry through response-start |
+| `adapter` | Upstream request preparation, pool/network/model wait, normalization and cleanup |
+| `exact` / `exact_lookup` | Eligibility, canonical fingerprint and exact lookup |
+| `semantic` | Worker submission, embedding, cosine retrieval and compatibility checks |
+| `residual` / `gateway_residual` | Gateway-to-start minus those sequential stages |
+| `request_lifecycle` histogram | Middleware entry through final send/cache commit, before final metric update |
+| Benchmark client latency | Request submission through full HTTP response receipt |
+
+Residual includes authentication, parsing, serialization and event-loop scheduling;
+it is **not isolated gateway CPU time**. Adapter is not pure token-generation
+latency. Residual headers are present after the cache decision; early rejections
+retain only gateway timing. Histograms keep fixed bucket counts/sum/max, not raw
+samples or fabricated quantiles. Labels/state are process-local and reset on
+restart; use one worker. Benchmarks compute empirical percentiles from bounded
+raw client samples instead.
+
+Optional top-level TOML `log_requests = true` writes one JSON operational record
+per completion attempt to stderr: event/status/outcome/cache/elapsed time only.
+Default off; no prompts, keys, model or client identifiers. Logging is synchronous
+and excluded from the recorded performance configuration.
+
+## Reproducible benchmarks and semantic audit
+
+The recorded profile is Linux x86_64, Python 3.12.14, **8 GiB / two CPU cores'
+quota**, one Uvicorn worker, loopback HTTP/1.1, pooled HTTPX, no request/access logs.
+The driver and servers share that CPU budget. The mock adds a deterministic 10 ms
+wait and returns a known city. Real tests use pinned Ollama 0.40.11 / Gemma 3 1B
+Q4_K_M, context 2048, CPU only. Message/generation settings match direct/gateway
+baselines; real model identifiers differ only by public alias vs physical name.
+Repeated real prompts may reuse Ollama KV state even when gateway caching is off.
+This is a short city-answer workload, not general model-generation performance.
+
+Each point uses a fresh gateway and five sequential warm-up requests (plus one
+cache seed where needed), excluded from measurement. Seed 42 fixes mixed request
+kinds at 40% exact / 40% semantic / 20% no-store. Benchmark quotas are deliberately
+10000 burst/refill per second; inference capacity is 8 mock / 1 real and HTTP pool 64.
+Caches retain the existing 60 s TTL, bounded entries/bytes, tenant partitioning,
+revision pins, request opt-in and response safety checks. Exact and semantic
+workloads are verified warm; source-response hashes check controlled replays.
+Concurrent semantic opt-in can fall through on a busy worker and then become
+exact hits; actual dispositions are recorded and must accompany its throughput.
+
+The bounded closed-loop driver records attempted, HTTP-completed, verified-correct
+successful, rejected and failed requests separately. RPS means successful RPS in
+the tables. p50/p95/p99 use nearest rank; p95 is withheld below 100 samples, p99
+below 1000. Empirical tails are not confidence guarantees. Source/lock manifests
+must remain unchanged throughout each suite. Independent fixture/quiet Ollama
+access-log counts must reconcile with gateway upstream attempts. Linux owned-PID
+sampling records CPU cores used and RSS on a nominal 100 ms cadence; missing
+or incomplete process trees are null, not zero. Bounded GNU `ps --ppid` discovery
+handles kernels without proc child files; sampling runs off the driver loop.
+RSS excludes unsampled spikes and may count shared pages more than once.
+
+Reproduce sequentially after installing the semantic extra/model as above:
+
+```sh
+.venv/bin/python -m devtools.benchmark --requests 1000 --concurrency 1 4 8 16 \
+  --warmup 5 --seed 42 --delay-ms 10 --scenarios direct uncached exact semantic mixed \
+  --output artifacts/milestone06/mock-benchmark.json
+# Use only the Ollama-server portion of the setup below, with KEEP_ALIVE=1m
+# and log destination artifacts/milestone06/ollama.log (create its directory).
+# Set OLLAMA_PID=$OLLAMA_DEMO_PID. Do not run other inference traffic. Optionally add
+# --ollama-pid "$OLLAMA_PID" to sample only that owned server and its children.
+.venv/bin/python -m devtools.benchmark --requests 30 --concurrency 1 --warmup 5 \
+  --seed 42 --scenarios direct uncached --ollama-log artifacts/milestone06/ollama.log \
+  --output artifacts/milestone06/gemma-uncached.json
+.venv/bin/python -m devtools.benchmark --requests 1000 --concurrency 1 --warmup 5 \
+  --seed 42 --scenarios exact semantic --ollama-log artifacts/milestone06/ollama.log \
+  --output artifacts/milestone06/gemma-cache.json
+.venv/bin/python -m devtools.benchmark --requests 100 --concurrency 1 --warmup 5 \
+  --seed 42 --scenarios mixed --ollama-log artifacts/milestone06/ollama.log \
+  --output artifacts/milestone06/gemma-mixed.json
+.venv/bin/python -m devtools.traffic_probe --output artifacts/milestone06/traffic-probe.json
+.venv/bin/python -m devtools.deadline_probe --output artifacts/milestone06/deadline-probe.json
+.venv/bin/python -m devtools.semantic_audit --validate-only
+.venv/bin/python -m devtools.semantic_audit --output artifacts/milestone06/semantic-audit.json
+```
+
+Observed final trial, **concurrency 1**, all shown requests HTTP 200 with correct
+city answers. Latencies are client p50/p95/p99 in milliseconds; — is withheld.
+Cached response RPS describes gateway replay, not new model inference.
+
+| Backend / path | N | Successful RPS | p50 / p95 / p99 ms | Actual upstream calls |
+| --- | ---: | ---: | ---: | ---: |
+| Mock 10 ms — direct baseline | 1000 | 56.67 | 14.47 / 24.58 / 128.26 | 1000 |
+| Mock 10 ms — gateway, no cache | 1000 | 54.90 | 17.30 / 23.37 / 27.74 | 1000 |
+| Mock 10 ms — warm exact replay | 1000 | 245.97 | 3.60 / 7.44 / 9.96 | 0 |
+| Mock 10 ms — warm semantic replay | 1000 | 150.71 | 5.51 / 12.11 / 16.89 | 0 |
+| Mock 10 ms — 40/40/20 mixed | 1000 | 124.98 | 5.71 / 20.02 / 24.69 | 200 |
+| Gemma — direct baseline | 30 | 1.81 | 539.42 / — / — | 30 |
+| Gemma — gateway, no cache | 30 | 1.76 | 569.35 / — / — | 30 |
+| Gemma — warm exact replay | 1000 | 283.22 | 2.97 / 6.75 / 9.60 | 0 |
+| Gemma — warm semantic replay | 1000 | 112.23 | 7.93 / 16.35 / 21.23 | 0 |
+| Gemma — 40/40/20 mixed | 100 | 8.50 | 6.50 / 575.86 / — | 20 |
+
+Mock uncached saturation, 1,000 attempts per point, capacity 8:
+
+| Client concurrency | Attempted RPS | Successful RPS | HTTP 503 | Upstream calls |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 54.90 | 54.90 | 0 | 1000 |
+| 4 | 134.55 | 134.55 | 0 | 1000 |
+| 8 | 239.18 | 239.18 | 0 | 1000 |
+| 16 | 316.81 | 211.32 | 333 | 667 |
+
+The concurrent semantic opt-in scenario at 4 workers had **995 exact hits,
+2 semantic hits and 3 misses**, not 1,000 semantic hits. Its workload label must
+not be interpreted as semantic-serving throughput. All measured HTTP 200 responses passed
+the fixed city-answer check; only intentional saturation produced HTTP errors.
+Controlled warm replays were also checked against the source response SHA256.
+
+The matched mock baseline observed 14.47 ms direct versus 17.30 ms gateway median
+client latency; median gateway residual was 0.446 ms. At 8 uncached workers, the
+gateway used 0.90 CPU core and the load generator 0.65, sharing the two-core quota.
+At 16, their CPU use plus the mock approached 1.95 cores and 333 requests were
+rejected. The observed CPU time approaches the quota, with noisy tail/scaling behavior.
+It cannot isolate a precise causal CPU overhead or prove a speedup.
+No gateway performance optimization was made from these measurements.
+
+Real uncached inference used **1.84 model CPU cores**, versus a median gateway
+residual of **0.770 ms** inside a roughly 569 ms client request. Semantic lookup
+itself took **3.301 ms median** in the real-response cache trial. Gateway sampled
+RSS was **44.5 MiB uncached / 44.3 MiB exact / 122.9 MiB semantic**. Ollama plus its
+model runner remained about **902 MiB resident**, including during cache hits;
+caching avoided inference work, not model residency. Model CPU during warm-hit
+windows was below 0.03 core. These are sampled process RSS, not allocator or
+whole-machine memory guarantees.
+
+Real mixed traffic made **20 upstream calls for 100 requests** (40 exact + 40
+semantic hits, 20 no-store), avoiding 80 calls for this workload. New reported
+usage was 460 prompt / 40 completion / 500 total tokens, excluding cache replays.
+No monetary or general token-generation-rate claim follows.
+
+The held-backend reliability probe independently verified **19 HTTP 429 across
+24 quota attempts**, isolated client bursts 3 and 2, then **20 overload 503**
+rejections while two inference slots were held. Recovery succeeded after release.
+A separate real HTTP trickle returned 504 in **1009.257 ms** for a 1 s cooperative
+upstream deadline; its metrics recorded one timeout/attempt and zero held permits.
+Cancellation, disconnect, send failures, private/tenant boundaries and TTL/races
+remain covered by regression tests.
+
+Machine-readable [summary](benchmarks/summary.json), [reliability evidence](benchmarks/reliability.json),
+and full bounded raw trials: [mock](benchmarks/mock-benchmark.json.gz),
+[Gemma uncached](benchmarks/gemma-uncached.json.gz), [Gemma cache](benchmarks/gemma-cache.json.gz),
+[Gemma mixed](benchmarks/gemma-mixed.json.gz). JSON Gzip files retain every bounded
+request record, metrics snapshots, source/configuration and sampled resource aggregates;
+the summary records content hashes and exact commands. Read one without extra tools:
+
+```sh
+.venv/bin/python -c 'import gzip,json; d=json.load(gzip.open("benchmarks/gemma-uncached.json.gz")); print(d["results"][1]["latency_all"])'
+```
+
+The new semantic audit verifies calibration-only threshold recomputation, but
+**all nine original held-out positive literals were already approved**. A
+membership-only lookup reproduces the guarded admission result without embeddings.
+Only three canonical vectors were stored, so raw cosine retrieval was real;
+perfect guarded recall nevertheless does not demonstrate unseen-phrase support.
+
+A second 18-case set was committed before scoring (`95cba86`, SHA256
+`b819653ab102a268a1720db80e5f7719a56f9743b7eb305efe46bc68460d4661`).
+All wording is absent from the original cases/approval registry. With the unchanged
+L3 model and threshold 0.75, raw retrieval finds **4/6 equivalents**, misses 2, and
+incorrectly accepts **6/12 negatives**. Production correctly bypasses all 18 new
+phrases, including all six equivalents: **served unseen-positive recall 0/6**.
+Thresholds, original labels and eligibility were not relaxed or retuned. This
+follow-up was authored after M05 results and is not an independent external study;
+training-data overlap and prior human inspection cannot be disproved. The finite
+reviewed vocabulary remains the operational safety boundary. See the frozen
+[audit cases](evaluation/semantic_audit_cases.json) and [results](evaluation/semantic_audit_results.json).
 
 ## Timeout scope and investigation
 
@@ -601,13 +809,14 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestones 1–5 evidence is recorded in `PLAN.md`, including **195 passing tests**,
+Milestones 1–6 evidence is recorded in `PLAN.md`, including **262 passing tests**,
 lint/format checks, deterministic HTTP enforcement/deadline probes, and real-model
 verification. Concurrent forwarding tests are not a load benchmark.
-**No model-generation RPS, general cost savings or broad throughput is claimed.**
-Semantic component median/p95 timings are reported with their sample size above.
+Recorded RPS applies only to the named workload and conditions. Cache/mock RPS
+is separate from actual Gemma inference; no general token-rate, cost or hardware
+performance guarantee is claimed.
 
-Use loopback and one worker. There is no public metrics endpoint, ingress
+Use loopback and one worker. There is no public metrics endpoint or ingress
 slow-client deadline, or shared state across workers. Pool capacity and inference
 admission are distinct from request quotas. Task/ASGI-disconnect cancellation
 closes active HTTPX responses; the automated disconnect tests inject ASGI events.
@@ -616,8 +825,8 @@ cannot guarantee the model server stops inference. Do not expose this foundation
 directly to the Internet. Prompts, credentials, and upstream error bodies are not
 logged by application code; access logging is disabled in examples.
 
-Comprehensive throughput benchmarks remain deferred to milestone 6.
-Milestone 6 will add a reproducible harness for uncached/exact/semantic,
-concurrency, quota and failure scenarios, with raw results and separate mock,
-gateway-overhead and real-model measurements. See [SPEC.md](SPEC.md) for cache
+The benchmark harness covers uncached/exact/semantic/mixed, concurrency, quotas
+and failure probes with raw results and separate mock, overhead and real-model
+measurements. Remaining priorities are unseen-wording equivalence validation,
+target-MacBook measurements and profiling before any performance optimization. See [SPEC.md](SPEC.md) for cache
 safety/security boundaries and [PLAN.md](PLAN.md) for the remaining gates.
