@@ -15,8 +15,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 
 from llm_gateway.config import SemanticFamily, Settings
-from llm_gateway.eligibility import CapitalIntent, capital_intent
-from llm_gateway.schemas import ChatRequest, ChatResponse
+from llm_gateway.schemas import ChatRequest
 
 _POLICY_VERSION = "exact-v1"
 
@@ -70,14 +69,9 @@ class ExactResponseCache:
         self._bytes_used = 0
         self.stats = CacheStats()
 
-    def family_for(self, request: ChatRequest) -> SemanticFamily | CapitalIntent | None:
+    def family_for(self, request: ChatRequest) -> SemanticFamily | None:
         if len(request.messages) != 1 or request.messages[0].role != "user":
             return None
-        intent = capital_intent(
-            request.messages[0].content, self._settings.config.semantic_cache.capital_entities
-        )
-        if intent is not None:
-            return intent
         return next(
             (
                 family
@@ -86,26 +80,6 @@ class ExactResponseCache:
             ),
             None,
         )
-
-    def response_suitable(self, request: ChatRequest, response: bytes | ChatResponse) -> bool:
-        """Additional factual/output oracle only for the opt-in parsed domain.
-
-        Reviewed-only families retain their original operator assertion. A bad
-        model answer is returned normally but cannot seed/replay parsed reuse.
-        """
-        intent = self.family_for(request)
-        if not isinstance(intent, CapitalIntent):
-            return True
-        try:
-            result = (
-                ChatResponse.model_validate_json(response)
-                if isinstance(response, bytes)
-                else response
-            )
-            choice = result.choices[0]
-            return choice.finish_reason == "stop" and choice.message.content.strip() == intent.city
-        except (ValueError, IndexError):
-            return False
 
     def key_for(
         self, request: ChatRequest, client_id: str, opt_in: bool, *, semantic: bool = False
@@ -141,14 +115,14 @@ class ExactResponseCache:
     def semantic_partition(
         self, request: ChatRequest, client_id: str, embedding_fingerprint: str
     ) -> bytes:
-        """Replace authorized wording; every other request/config field remains."""
+        """Replace only reviewed wording; every other request/config field remains."""
         family = self.family_for(request)
         if family is None:
-            raise ValueError("semantic partition requires authorized scope")
+            raise ValueError("semantic partition requires reviewed membership")
         values = request.model_dump(mode="json")
         values["messages"] = [{"role": "user", "reviewed_family": family.model_dump()}]
         values["embedding_fingerprint"] = embedding_fingerprint
-        values["semantic_policy"] = "scoped-equivalence-v2"
+        values["semantic_policy"] = "reviewed-equivalence-v1"
         route = self._settings.config.models[request.model]
         return self._fingerprint(values, client_id, route.backend)
 

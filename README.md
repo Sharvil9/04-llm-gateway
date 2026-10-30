@@ -2,10 +2,10 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with conservative caching and process-local traffic controls.
-**Current status: milestone 6, protected operational metrics and reproducible
-HTTP benchmarks, with safe exact/reviewed-domain caching and bounded traffic
-controls. Genuine Gemma inference is verified.** Semantic reuse remains a finite
-reviewed-vocabulary feature; unseen-phrase support is not established.
+**Current status: milestone 7 evaluated independent unseen-wording reuse and
+did not establish useful generalization.** Exact/reviewed-phrase caching, bounded
+traffic controls, protected metrics and verified Gemma inference remain intact.
+The experimental eligibility gate was not promoted to the serving runtime.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
 and one pooled HTTPX async client. A separate deterministic HTTP service validates
@@ -588,6 +588,121 @@ training-data overlap and prior human inspection cannot be disproved. The finite
 reviewed vocabulary remains the operational safety boundary. See the frozen
 [audit cases](evaluation/semantic_audit_cases.json) and [results](evaluation/semantic_audit_results.json).
 
+## Independent generalization validation (milestone 7)
+
+**Verdict: useful unseen-paraphrase generalization remains unproven.** The frozen
+candidate reused development wording but bypassed every independently authored
+positive. `main` retains the verified reviewed-phrase policy; unknown wording
+continues to reach inference. No new eligibility option ships in configuration.
+
+| Complete production pipeline | Valid semantic reuses | False negative-case reuses | Semantic-hit precision | Bypasses |
+|---|---:|---:|---:|---:|
+| Development, reviewed baseline | 0/14 | 0/22 | undefined | 36/36 |
+| Development, candidate | 12/14 (85.7%) | 0/22 | 12/12 | 24/36 |
+| Independent final, baseline | 0/24 | 0/48 | undefined | 72/72 |
+| Independent final, candidate | 0/24 | 0/48 | undefined | 72/72 |
+
+The genuine-Gemma-source replay evaluations produced the same counts. All 12
+development reuses satisfied the actual factual/output requirement: exactly
+`Paris` or `Tokyo` after trimming surrounding whitespace. Final replay suitability
+is **unobserved (0 reuses)**. The raw frozen report's `all_semantic_answers_suitable`
+boolean is vacuously true when empty; it is not a measured 100% success rate.
+Zero final false hits here reflects abstention, not demonstrated useful safety.
+
+Why the earlier six positives bypassed: literal family membership failed before
+embedding, retrieval or compatibility checks ran. Four exceeded the existing
+0.75 cosine threshold; two additionally scored 0.58748/0.74360. Raw similarity
+also accepted 6/12 earlier negatives, so removing membership was unsafe.
+
+The tested candidate required operator approval of France/Japan and a complete,
+bounded ASCII grammar: a national-capital question, explicit sentence boundary,
+and city-name-only instruction, with no unconsumed modifiers or context. Only
+case and ordinary repeated spaces normalized. Parsed entity, fixed answer
+contract and grammar version replaced wording in the existing isolated HMAC
+partition. Exact lookup remained first; the pinned L3 encoder and **unchanged
+0.75 threshold** supplied an additional retrieval filter. Correct city-only
+answers were required before insertion and replay. Authentication, quotas,
+tenant/model/revision/settings compatibility, opt-in, context/cookie/directive
+restrictions, TTL, bounded storage and worker/admission cancellation stayed intact.
+Python remained reviewed-only. This was rule composition, not a language judge.
+
+Final positives used different linguistic constructions, all outside that
+grammar. They bypassed before embedding: the result measures eligibility
+coverage, not a failure of final candidate retrieval or embeddings. Final
+negative cases also failed grammar, so they do not isolate downstream controls;
+accepted-syntax security, concurrency, isolation and expiry tests cover those
+separately. The candidate was reverted after evaluation rather than widened
+using final outcomes. Any future gate needs a fresh independent final set.
+
+The final set was frozen in **`f9686d5`** before gate development/scoring, SHA256
+`ad05be1634d5a890e62a74eceedcff4e1c6b2cc5ec218fcff1230077f5684845`.
+Candidate code, tests, harness and source manifest were frozen in **`d9955fa`**
+before reading final wording. Development: 36 cases; final: 72 cases with 24
+positives/48 negatives. There is zero wording overlap between final and development,
+prior cases or approved literals. Final positives have 12 linguistic patterns
+paired across countries; eight repeated final strings test different wire inputs.
+An independently delegated internal author created the final set without seeing
+the gate/development set. This is not an external study, random sample, or proof
+of training-data novelty. No threshold, grammar or approvals were tuned afterward.
+
+Each case traversed the real authenticated ASGI gateway with actual local ONNX
+embeddings; only two canonical source entries were restored before each case.
+Evaluation queries could not expand retrieval sources. Cold requests used a
+counted no-store fixture; these calls are not real model inference. Separately,
+the frozen candidate's genuine loopback HTTP probe made six requests and **four
+independently counted Ollama calls**: two source inferences (`Paris`, `Tokyo`),
+two suitable unseen development replays, Germany→`Berlin` BYPASS, tenant-B MISS.
+Captured genuine source answers were replayed through both full datasets.
+Ollama 0.40.11 / pinned Gemma 3 1B Q4_K_M, context 2048, CPU-only Linux 8 GiB /
+two-core quota; macOS remains untested. This is correctness evidence, not a new
+performance experiment. The restored release's real semantic probe also passed.
+
+Artifacts: [summary](evaluation/generalization_summary.json),
+[independent review](evaluation/generalization_review.json),
+[protocol](evaluation/generalization_protocol.md),
+[final cases](evaluation/generalization_holdout.json),
+[candidate freeze](evaluation/generalization_candidate_freeze.json),
+`evaluation/generalization_*results.json`, and
+[genuine samples](evaluation/generalization_gemma_sources.json).
+Frozen candidate: **314 passing tests**; release: **262 passing tests**.
+
+Reproduce the unmodified experiment in an isolated worktree inside this project.
+The editable installation points at `main`, so `PYTHONPATH` explicitly selects
+the frozen source. Reuse the installed semantic extra and pinned L3 files above:
+
+```sh
+# From the project root; use a fresh worktree path.
+git worktree add --detach artifacts/m07-candidate d9955fa00f345d55b13c1dbf5d8afe2f451e693f
+ln -s ../../.venv artifacts/m07-candidate/.venv
+cd artifacts/m07-candidate
+PYTHONPATH="$PWD/src" .venv/bin/pytest
+PYTHONPATH="$PWD/src" .venv/bin/python -m devtools.generalization_eval \
+  --dataset dev --model-dir ../embeddings/l3 --output ../milestone07/reproduced-dev.json
+PYTHONPATH="$PWD/src" .venv/bin/python -m devtools.generalization_eval \
+  --dataset holdout --model-dir ../embeddings/l3 \
+  --gemma-sources ../../evaluation/generalization_gemma_sources.json \
+  --output ../milestone07/reproduced-heldout-gemma.json
+# Optional fresh inference: first start the dedicated, quiet Ollama using the
+# README server recipe, logging to main's artifacts/milestone07/ollama.log.
+PYTHONPATH="$PWD/src" .venv/bin/python -m devtools.generalization_live \
+  --model-dir ../embeddings/l3 --ollama-log ../milestone07/ollama.log \
+  --output ../milestone07/reproduced-sources.json
+cd ../..
+git worktree remove --force artifacts/m07-candidate
+```
+
+The exact final/Gemma replay command above was verified from the frozen worktree.
+Using captured sources performs no new model inference. Current release checks:
+
+```sh
+.venv/bin/pytest
+.venv/bin/ruff check .
+.venv/bin/ruff format --check .
+.venv/bin/python -m devtools.semantic_probe \
+  --ollama-log artifacts/milestone07/ollama.log \
+  --output artifacts/milestone07/release-semantic-probe.json
+```
+
 ## Timeout scope and investigation
 
 `request_timeout_seconds` bounds the upstream operation: connection/pool wait,
@@ -809,7 +924,7 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestones 1–6 evidence is recorded in `PLAN.md`, including **262 passing tests**,
+Milestones 1–7 evidence is recorded in `PLAN.md`, including **262 release tests**,
 lint/format checks, deterministic HTTP enforcement/deadline probes, and real-model
 verification. Concurrent forwarding tests are not a load benchmark.
 Recorded RPS applies only to the named workload and conditions. Cache/mock RPS
@@ -827,6 +942,7 @@ logged by application code; access logging is disabled in examples.
 
 The benchmark harness covers uncached/exact/semantic/mixed, concurrency, quotas
 and failure probes with raw results and separate mock, overhead and real-model
-measurements. Remaining priorities are unseen-wording equivalence validation,
-target-MacBook measurements and profiling before any performance optimization. See [SPEC.md](SPEC.md) for cache
+measurements. Generalization remains outside the supported cache policy. Remaining
+priorities are independent-load benchmarking, target-MacBook measurements and final
+release-readiness verification, with profiling before optimization. See [SPEC.md](SPEC.md) for cache
 safety/security boundaries and [PLAN.md](PLAN.md) for the remaining gates.

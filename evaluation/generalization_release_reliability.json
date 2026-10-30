@@ -1,0 +1,1869 @@
+{
+  "traffic": {
+    "backend": "deterministic_mock",
+    "transport": "loopback_http",
+    "real_model_inference": false,
+    "process_local_limits": true,
+    "quota_scenario": {
+      "requests_per_client": 12,
+      "client_status_counts": {
+        "client-a": {
+          "200": 3,
+          "429": 9
+        },
+        "client-b": {
+          "200": 2,
+          "429": 10
+        }
+      },
+      "backend_calls": 5,
+      "backend_peak_in_flight": 5,
+      "positive_retry_after": true,
+      "client_isolation_verified": true,
+      "gateway_metrics": {
+        "schema_version": 1,
+        "scope": "POST /v1/chat/completions; process-local; since startup",
+        "counts": {
+          "requests_started": 24,
+          "requests_finished": 24,
+          "responses_completed": 24,
+          "successful_responses": 5,
+          "http_error_responses": 19,
+          "aborted_requests": 0,
+          "ignored_duration_samples": 0,
+          "ignored_cache_dispositions": 0,
+          "upstream_attempts": 5
+        },
+        "gauges": {
+          "requests_in_flight": 0,
+          "peak_requests_in_flight": 6,
+          "inference_in_flight": 0
+        },
+        "status": {
+          "by_family": {
+            "1xx": 0,
+            "2xx": 5,
+            "3xx": 0,
+            "4xx": 19,
+            "5xx": 0,
+            "none": 0,
+            "other": 0
+          },
+          "exact": {
+            "429": 19,
+            "503": 0,
+            "504": 0
+          }
+        },
+        "outcomes": {
+          "completed": 24,
+          "cancelled": 0,
+          "disconnected": 0,
+          "send_error": 0,
+          "unhandled_error": 0,
+          "aborted": 0,
+          "other": 0
+        },
+        "cache": {
+          "completed_dispositions": {
+            "HIT": 0,
+            "SEMANTIC_HIT": 0,
+            "MISS": 0,
+            "BYPASS": 5,
+            "EARLY": 19
+          },
+          "eligible_completed_requests": 0
+        },
+        "rates": {
+          "success_per_finished": {
+            "numerator": 5,
+            "denominator": 24,
+            "value": 0.20833333333333334
+          },
+          "http_errors_per_completed": {
+            "numerator": 19,
+            "denominator": 24,
+            "value": 0.7916666666666666
+          },
+          "exact_hit_per_eligible_completed": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "semantic_hit_per_eligible_completed": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "any_hit_per_eligible_completed": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "latency_ms": {
+          "gateway_to_start": {
+            "count": 24,
+            "sum": 310.14150899864035,
+            "max": 80.31621900227037,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 17
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 18
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 18
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 20
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 24
+              }
+            ]
+          },
+          "request_lifecycle": {
+            "count": 24,
+            "sum": 314.27433799399296,
+            "max": 80.55340799910482,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 6
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 17
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 18
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 20
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 24
+              }
+            ]
+          },
+          "adapter": {
+            "count": 5,
+            "sum": 163.33545899760793,
+            "max": 48.092774999531684,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 5
+              }
+            ]
+          },
+          "exact_lookup": {
+            "count": 5,
+            "sum": 0.05913499990128912,
+            "max": 0.020108000171603635,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 5
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 5
+              }
+            ]
+          },
+          "semantic": {
+            "count": 0,
+            "sum": 0.0,
+            "max": null,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 0
+              }
+            ]
+          },
+          "gateway_residual": {
+            "count": 24,
+            "sum": 146.74691500113113,
+            "max": 52.89429000185919,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 17
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 18
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 18
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 20
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 22
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 24
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 24
+              }
+            ]
+          }
+        },
+        "usage": {
+          "responses_with_reported_usage": 0,
+          "reported_prompt_tokens": 0,
+          "reported_completion_tokens": 0,
+          "reported_total_tokens": 0,
+          "ignored_usage_reports": 0
+        },
+        "cache_storage": {
+          "hits": 0,
+          "misses": 0,
+          "bypasses": 5,
+          "stores": 0,
+          "evictions": 0,
+          "expirations": 0,
+          "upstream_calls": 5,
+          "entries": 0,
+          "bytes_used": 0
+        },
+        "semantic_lookup": null
+      }
+    },
+    "capacity_scenario": {
+      "configured_capacity": 2,
+      "admitted": 2,
+      "excess_requests": 20,
+      "overload_rejections": 20,
+      "backend_calls_before_release": 2,
+      "backend_peak_in_flight": 2,
+      "retry_after_omitted": true,
+      "recovery_status": 200,
+      "backend_calls_after_recovery": 3,
+      "gateway_metrics": {
+        "schema_version": 1,
+        "scope": "POST /v1/chat/completions; process-local; since startup",
+        "counts": {
+          "requests_started": 23,
+          "requests_finished": 23,
+          "responses_completed": 23,
+          "successful_responses": 3,
+          "http_error_responses": 20,
+          "aborted_requests": 0,
+          "ignored_duration_samples": 0,
+          "ignored_cache_dispositions": 0,
+          "upstream_attempts": 3
+        },
+        "gauges": {
+          "requests_in_flight": 0,
+          "peak_requests_in_flight": 22,
+          "inference_in_flight": 0
+        },
+        "status": {
+          "by_family": {
+            "1xx": 0,
+            "2xx": 3,
+            "3xx": 0,
+            "4xx": 0,
+            "5xx": 20,
+            "none": 0,
+            "other": 0
+          },
+          "exact": {
+            "429": 0,
+            "503": 20,
+            "504": 0
+          }
+        },
+        "outcomes": {
+          "completed": 23,
+          "cancelled": 0,
+          "disconnected": 0,
+          "send_error": 0,
+          "unhandled_error": 0,
+          "aborted": 0,
+          "other": 0
+        },
+        "cache": {
+          "completed_dispositions": {
+            "HIT": 0,
+            "SEMANTIC_HIT": 0,
+            "MISS": 0,
+            "BYPASS": 23,
+            "EARLY": 0
+          },
+          "eligible_completed_requests": 0
+        },
+        "rates": {
+          "success_per_finished": {
+            "numerator": 3,
+            "denominator": 23,
+            "value": 0.13043478260869565
+          },
+          "http_errors_per_completed": {
+            "numerator": 20,
+            "denominator": 23,
+            "value": 0.8695652173913043
+          },
+          "exact_hit_per_eligible_completed": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "semantic_hit_per_eligible_completed": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          },
+          "any_hit_per_eligible_completed": {
+            "numerator": 0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "latency_ms": {
+          "gateway_to_start": {
+            "count": 23,
+            "sum": 439.610505989549,
+            "max": 133.74804399791174,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 20
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 23
+              }
+            ]
+          },
+          "request_lifecycle": {
+            "count": 23,
+            "sum": 443.3749669988174,
+            "max": 133.86905399966054,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 19
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 23
+              }
+            ]
+          },
+          "adapter": {
+            "count": 3,
+            "sum": 197.58667799760588,
+            "max": 128.72091800090857,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 1
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 1
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 1
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 2
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 3
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 3
+              }
+            ]
+          },
+          "exact_lookup": {
+            "count": 23,
+            "sum": 0.1703970119706355,
+            "max": 0.020982002752134576,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 23
+              }
+            ]
+          },
+          "semantic": {
+            "count": 0,
+            "sum": 0.0,
+            "max": null,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 0
+              }
+            ]
+          },
+          "gateway_residual": {
+            "count": 23,
+            "sum": 241.85343097997247,
+            "max": 69.54898399999365,
+            "sum_saturated": false,
+            "buckets": [
+              {
+                "upper_bound_ms": 0.1,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 0.5,
+                "count": 0
+              },
+              {
+                "upper_bound_ms": 1.0,
+                "count": 1
+              },
+              {
+                "upper_bound_ms": 2.5,
+                "count": 1
+              },
+              {
+                "upper_bound_ms": 5.0,
+                "count": 1
+              },
+              {
+                "upper_bound_ms": 10.0,
+                "count": 21
+              },
+              {
+                "upper_bound_ms": 25.0,
+                "count": 22
+              },
+              {
+                "upper_bound_ms": 50.0,
+                "count": 22
+              },
+              {
+                "upper_bound_ms": 100.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 250.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 1000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 2500.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 5000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 10000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 30000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 60000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": 300000.0,
+                "count": 23
+              },
+              {
+                "upper_bound_ms": null,
+                "count": 23
+              }
+            ]
+          }
+        },
+        "usage": {
+          "responses_with_reported_usage": 0,
+          "reported_prompt_tokens": 0,
+          "reported_completion_tokens": 0,
+          "reported_total_tokens": 0,
+          "ignored_usage_reports": 0
+        },
+        "cache_storage": {
+          "hits": 0,
+          "misses": 0,
+          "bypasses": 23,
+          "stores": 0,
+          "evictions": 0,
+          "expirations": 0,
+          "upstream_calls": 3,
+          "entries": 0,
+          "bytes_used": 0
+        },
+        "semantic_lookup": null
+      }
+    }
+  },
+  "deadline": {
+    "backend": "deterministic_http_trickle",
+    "real_model_inference": false,
+    "status": 504,
+    "configured_upstream_deadline_ms": 1000,
+    "fixture_chunk_interval_ms": 50,
+    "fixture_chunks_sent": 19,
+    "client_full_response_ms": 1006.956,
+    "gateway_to_response_start_ms": 1005.215,
+    "adapter_roundtrip_ms": 1003.277,
+    "gateway_metrics": {
+      "schema_version": 1,
+      "scope": "POST /v1/chat/completions; process-local; since startup",
+      "counts": {
+        "requests_started": 1,
+        "requests_finished": 1,
+        "responses_completed": 1,
+        "successful_responses": 0,
+        "http_error_responses": 1,
+        "aborted_requests": 0,
+        "ignored_duration_samples": 0,
+        "ignored_cache_dispositions": 0,
+        "upstream_attempts": 1
+      },
+      "gauges": {
+        "requests_in_flight": 0,
+        "peak_requests_in_flight": 1,
+        "inference_in_flight": 0
+      },
+      "status": {
+        "by_family": {
+          "1xx": 0,
+          "2xx": 0,
+          "3xx": 0,
+          "4xx": 0,
+          "5xx": 1,
+          "none": 0,
+          "other": 0
+        },
+        "exact": {
+          "429": 0,
+          "503": 0,
+          "504": 1
+        }
+      },
+      "outcomes": {
+        "completed": 1,
+        "cancelled": 0,
+        "disconnected": 0,
+        "send_error": 0,
+        "unhandled_error": 0,
+        "aborted": 0,
+        "other": 0
+      },
+      "cache": {
+        "completed_dispositions": {
+          "HIT": 0,
+          "SEMANTIC_HIT": 0,
+          "MISS": 0,
+          "BYPASS": 1,
+          "EARLY": 0
+        },
+        "eligible_completed_requests": 0
+      },
+      "rates": {
+        "success_per_finished": {
+          "numerator": 0,
+          "denominator": 1,
+          "value": 0.0
+        },
+        "http_errors_per_completed": {
+          "numerator": 1,
+          "denominator": 1,
+          "value": 1.0
+        },
+        "exact_hit_per_eligible_completed": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "semantic_hit_per_eligible_completed": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        },
+        "any_hit_per_eligible_completed": {
+          "numerator": 0,
+          "denominator": 0,
+          "value": null
+        }
+      },
+      "latency_ms": {
+        "gateway_to_start": {
+          "count": 1,
+          "sum": 1005.2152739990561,
+          "max": 1005.2152739990561,
+          "sum_saturated": false,
+          "buckets": [
+            {
+              "upper_bound_ms": 0.1,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 0.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 5.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 10.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 25.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 50.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 100.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 250.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 500.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 30000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 60000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 300000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": null,
+              "count": 1
+            }
+          ]
+        },
+        "request_lifecycle": {
+          "count": 1,
+          "sum": 1005.6340449991694,
+          "max": 1005.6340449991694,
+          "sum_saturated": false,
+          "buckets": [
+            {
+              "upper_bound_ms": 0.1,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 0.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 5.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 10.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 25.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 50.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 100.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 250.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 500.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 30000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 60000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 300000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": null,
+              "count": 1
+            }
+          ]
+        },
+        "adapter": {
+          "count": 1,
+          "sum": 1003.2774249993963,
+          "max": 1003.2774249993963,
+          "sum_saturated": false,
+          "buckets": [
+            {
+              "upper_bound_ms": 0.1,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 0.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 5.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 10.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 25.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 50.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 100.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 250.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 500.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 30000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 60000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 300000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": null,
+              "count": 1
+            }
+          ]
+        },
+        "exact_lookup": {
+          "count": 1,
+          "sum": 0.018892998923547566,
+          "max": 0.018892998923547566,
+          "sum_saturated": false,
+          "buckets": [
+            {
+              "upper_bound_ms": 0.1,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 0.5,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 1.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 2.5,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 25.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 50.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 100.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 250.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 1000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 2500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 30000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 60000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 300000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": null,
+              "count": 1
+            }
+          ]
+        },
+        "semantic": {
+          "count": 0,
+          "sum": 0.0,
+          "max": null,
+          "sum_saturated": false,
+          "buckets": [
+            {
+              "upper_bound_ms": 0.1,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 0.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 5.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 10.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 25.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 50.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 100.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 250.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 500.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2500.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 5000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 10000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 30000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 60000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 300000.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": null,
+              "count": 0
+            }
+          ]
+        },
+        "gateway_residual": {
+          "count": 1,
+          "sum": 1.918956000736216,
+          "max": 1.918956000736216,
+          "sum_saturated": false,
+          "buckets": [
+            {
+              "upper_bound_ms": 0.1,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 0.5,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 1.0,
+              "count": 0
+            },
+            {
+              "upper_bound_ms": 2.5,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 25.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 50.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 100.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 250.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 1000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 2500.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 5000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 10000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 30000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 60000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": 300000.0,
+              "count": 1
+            },
+            {
+              "upper_bound_ms": null,
+              "count": 1
+            }
+          ]
+        }
+      },
+      "usage": {
+        "responses_with_reported_usage": 0,
+        "reported_prompt_tokens": 0,
+        "reported_completion_tokens": 0,
+        "reported_total_tokens": 0,
+        "ignored_usage_reports": 0
+      },
+      "cache_storage": {
+        "hits": 0,
+        "misses": 0,
+        "bypasses": 1,
+        "stores": 0,
+        "evictions": 0,
+        "expirations": 0,
+        "upstream_calls": 1,
+        "entries": 0,
+        "bytes_used": 0
+      },
+      "semantic_lookup": null
+    },
+    "interpretation": "Scope differences include scheduling and transport; not CPU overhead"
+  }
+}

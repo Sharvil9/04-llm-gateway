@@ -1,0 +1,272 @@
+{
+  "real_model_inference": true,
+  "transport": "loopback_http",
+  "model_identity": {
+    "backend_version": "0.40.11",
+    "model": "gemma3:1b",
+    "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+    "context_length": 2048,
+    "hardware": "CPU-only Linux, 8 GiB, two-core cgroup quota"
+  },
+  "actual_upstream_calls": 2,
+  "call_count_source": "dedicated_quiet_ollama_gin_log",
+  "live_probe_total_upstream_calls": 4,
+  "live_probe_requests": 6,
+  "sources": {
+    "france-capital": {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of France? Answer with only the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "response": {
+        "id": "chatcmpl-421",
+        "object": "chat.completion",
+        "created": 1793353770,
+        "model": "gemma",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Paris"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 23,
+          "completion_tokens": 2,
+          "total_tokens": 25
+        }
+      }
+    },
+    "japan-capital": {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of Japan? Answer with only the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "response": {
+        "id": "chatcmpl-336",
+        "object": "chat.completion",
+        "created": 1793353771,
+        "model": "gemma",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Tokyo"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 23,
+          "completion_tokens": 2,
+          "total_tokens": 25
+        }
+      }
+    }
+  },
+  "live_probe_rows": [
+    {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of France? Answer with only the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "client": "client-a",
+      "cache": "MISS",
+      "status": 200,
+      "assistant_text": "Paris",
+      "expected_city": "Paris",
+      "answer_suitable": true,
+      "server_timing_ms": {
+        "gateway": 3327.044,
+        "adapter": 3316.916,
+        "semantic": 3.988,
+        "exact": 1.02,
+        "residual": 5.12
+      },
+      "response_sha256": "fbd0d8e9495b7784049c1877e2e7e78e325629d957a11f9f262ca37325825f5f"
+    },
+    {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of Japan? Answer with only the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "client": "client-a",
+      "cache": "MISS",
+      "status": 200,
+      "assistant_text": "Tokyo",
+      "expected_city": "Tokyo",
+      "answer_suitable": true,
+      "server_timing_ms": {
+        "gateway": 962.349,
+        "adapter": 958.087,
+        "semantic": 3.124,
+        "exact": 0.224,
+        "residual": 0.915
+      },
+      "response_sha256": "688749366811a33af29388aaf8bde9741e289fcdd40b072fd521529b4154cc18"
+    },
+    {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "client": "client-a",
+      "cache": "SEMANTIC_HIT",
+      "status": 200,
+      "assistant_text": "Paris",
+      "expected_city": "Paris",
+      "answer_suitable": true,
+      "server_timing_ms": {
+        "gateway": 8.545,
+        "semantic": 7.619,
+        "exact": 0.236,
+        "residual": 0.69
+      },
+      "response_sha256": "fbd0d8e9495b7784049c1877e2e7e78e325629d957a11f9f262ca37325825f5f"
+    },
+    {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of Japan. Return just the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "client": "client-a",
+      "cache": "SEMANTIC_HIT",
+      "status": 200,
+      "assistant_text": "Tokyo",
+      "expected_city": "Tokyo",
+      "answer_suitable": true,
+      "server_timing_ms": {
+        "gateway": 4.104,
+        "semantic": 3.307,
+        "exact": 0.202,
+        "residual": 0.595
+      },
+      "response_sha256": "688749366811a33af29388aaf8bde9741e289fcdd40b072fd521529b4154cc18"
+    },
+    {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of Germany? Answer with only the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "client": "client-a",
+      "cache": "BYPASS",
+      "status": 200,
+      "assistant_text": "Berlin",
+      "expected_city": "Berlin",
+      "answer_suitable": true,
+      "server_timing_ms": {
+        "gateway": 971.802,
+        "adapter": 971.08,
+        "exact": 0.075,
+        "residual": 0.647
+      },
+      "response_sha256": "66eeaabd6329262f9af4c5225c8852f168d3b3bf4716d3ba50a67b2e6a022768"
+    },
+    {
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of France? Answer with only the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "seed": 42,
+        "max_tokens": 32,
+        "stream": false
+      },
+      "client": "client-b",
+      "cache": "MISS",
+      "status": 200,
+      "assistant_text": "Paris",
+      "expected_city": "Paris",
+      "answer_suitable": true,
+      "server_timing_ms": {
+        "gateway": 438.717,
+        "adapter": 433.966,
+        "semantic": 3.78,
+        "exact": 0.192,
+        "residual": 0.779
+      },
+      "response_sha256": "24829527a738029a791bd5d321e3396b2cca0a70820296abed1ac404bdb2dc9b"
+    }
+  ],
+  "answer_oracle": "Exact city name; trim surrounding whitespace only",
+  "limitations": "Two static facts; no general answer-quality or language-equivalence guarantee."
+}

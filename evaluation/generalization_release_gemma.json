@@ -1,0 +1,162 @@
+{
+  "backend": "ollama",
+  "transport": "loopback_http",
+  "real_model_inference": true,
+  "actual_local_embeddings": true,
+  "throughput_benchmark": false,
+  "answer_correctness_evaluated": true,
+  "dataset_sha256": "80e0ba7b0acaf85afaca2e9bd8fa468c426fe67d50acdfa07541bb98d1a04885",
+  "embedding_fingerprint": "embedding-v1:05d0bc5e51790e091ee51fce277d198a843efdda5b0dbb4cc5823f53f9a60508",
+  "embedding_model_directory": "artifacts/embeddings/l3",
+  "calibration_selected_threshold": 0.75,
+  "model_identity": {
+    "backend_version": "0.40.11",
+    "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+    "observed_context_length": 2048
+  },
+  "requests": 8,
+  "cache_dispositions": {
+    "MISS": 3,
+    "HIT": 1,
+    "SEMANTIC_HIT": 2,
+    "BYPASS": 2
+  },
+  "actual_upstream_calls": 5,
+  "call_count_source": "dedicated_quiet_ollama_gin_log",
+  "uncached_reference_calls": 8,
+  "upstream_calls_avoided": 3,
+  "relative_upstream_call_reduction": 0.375,
+  "client_isolation_verified": true,
+  "negative_and_sampling_bypass_verified": true,
+  "first_response": {
+    "id": "chatcmpl-188",
+    "object": "chat.completion",
+    "created": 1793353911,
+    "model": "gemma",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Paris"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 23,
+      "completion_tokens": 2,
+      "total_tokens": 25
+    }
+  },
+  "request_observations": [
+    {
+      "case": "france_canonical",
+      "cache": "MISS",
+      "status": 200,
+      "assistant_text": "Paris",
+      "client_latency_ms": 3088.3048300020164,
+      "server_timing_ms": {
+        "gateway": 3085.089,
+        "adapter": 3075.404,
+        "semantic": 5.456,
+        "exact": 0.852,
+        "residual": 3.377
+      }
+    },
+    {
+      "case": "france_exact",
+      "cache": "HIT",
+      "status": 200,
+      "assistant_text": "Paris",
+      "client_latency_ms": 3.903619999618968,
+      "server_timing_ms": {
+        "gateway": 0.692,
+        "exact": 0.317,
+        "residual": 0.374
+      }
+    },
+    {
+      "case": "france_paraphrase",
+      "cache": "SEMANTIC_HIT",
+      "status": 200,
+      "assistant_text": "Paris",
+      "client_latency_ms": 5.347156002244446,
+      "server_timing_ms": {
+        "gateway": 4.103,
+        "semantic": 3.47,
+        "exact": 0.139,
+        "residual": 0.494
+      }
+    },
+    {
+      "case": "japan_canonical",
+      "cache": "MISS",
+      "status": 200,
+      "assistant_text": "Tokyo",
+      "client_latency_ms": 914.9089220009046,
+      "server_timing_ms": {
+        "gateway": 913.308,
+        "adapter": 910.122,
+        "semantic": 2.372,
+        "exact": 0.126,
+        "residual": 0.688
+      }
+    },
+    {
+      "case": "japan_paraphrase",
+      "cache": "SEMANTIC_HIT",
+      "status": 200,
+      "assistant_text": "Tokyo",
+      "client_latency_ms": 7.476713999494677,
+      "server_timing_ms": {
+        "gateway": 4.801,
+        "semantic": 4.14,
+        "exact": 0.115,
+        "residual": 0.547
+      }
+    },
+    {
+      "case": "germany_negative",
+      "cache": "BYPASS",
+      "status": 200,
+      "assistant_text": "Berlin",
+      "client_latency_ms": 963.241810000909,
+      "server_timing_ms": {
+        "gateway": 961.755,
+        "adapter": 960.738,
+        "exact": 0.139,
+        "residual": 0.878
+      }
+    },
+    {
+      "case": "france_client_b",
+      "cache": "MISS",
+      "status": 200,
+      "assistant_text": "Paris",
+      "client_latency_ms": 514.0973170018697,
+      "server_timing_ms": {
+        "gateway": 512.064,
+        "adapter": 506.153,
+        "semantic": 5.076,
+        "exact": 0.18,
+        "residual": 0.656
+      }
+    },
+    {
+      "case": "france_sampled",
+      "cache": "BYPASS",
+      "status": 200,
+      "assistant_text": "Paris",
+      "client_latency_ms": 499.1511700027331,
+      "server_timing_ms": {
+        "gateway": 495.865,
+        "adapter": 495.197,
+        "exact": 0.025,
+        "residual": 0.643
+      }
+    }
+  ],
+  "timing_note": "HTTP and Server-Timing boundaries differ; semantic includes worker scheduling/encoding/search; adapter covers upstream I/O and response processing.",
+  "scope_note": "Reviewed phrase families authorize reuse; cosine alone does not. Cached IDs, timestamps and usage are original, not new inference usage."
+}

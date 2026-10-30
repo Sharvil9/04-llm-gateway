@@ -6,6 +6,10 @@ Milestones 1–6 provide an async gateway, verified local Gemma inference, clien
 request quotas, bounded inference admission, exact caching and optional reviewed-
 domain semantic reuse, operator-only operational metrics and reproducible HTTP
 benchmarks. Semantic safety remains finite reviewed-policy enforcement.
+Milestone 7 independently tested a bounded unseen-wording candidate; final
+coverage was 0/24 positives. The candidate was not promoted and its runtime
+changes were reverted. The supported architecture and configuration remain
+unchanged; its frozen experiment is reproducible at commit `d9955fa`.
 Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
@@ -257,6 +261,25 @@ response dispositions are mutually exclusive. `Server-Timing: semantic` measures
 worker submission/encoding/retrieval, separate from adapter elapsed. No public
 metrics access, persistence, thread safety, cross-worker/distributed consistency
 or model-generation throughput claim.
+
+## Independent generalization decision (milestone 7)
+
+Final data was committed before candidate development; the candidate was committed
+before final inspection/scoring. Fixed L3/0.75, two canonical source entries only,
+no query-source expansion or final-driven tuning. Full authenticated production
+ASGI decisions were compared against reviewed membership. Genuine Gemma source
+answers were separately replayed with a factual city/format oracle.
+
+Candidate development: 12/14 valid reuses, 0/22 negative hits. Independent final:
+0/24 valid reuses, 0/48 false hits, all 72 BYPASS before embedding. Precision and
+final replay suitability are undefined/unobserved with no hits. The finite grammar
+failed useful independent coverage; zero negatives alone cannot authorize release.
+Its runtime/configuration changes were reverted. All existing reviewed-phrase
+restrictions, process-local concurrency and cache partitioning remain the serving
+contract. This project does not claim general unseen equivalence or automatic
+answer-quality assurance. See `evaluation/generalization_protocol.md`, summary,
+review and results; README documents reproducing immutable candidate `d9955fa`.
+Any future equivalence candidate requires newly frozen independent final data.
 
 ## Traffic controls (implemented in milestone 3)
 

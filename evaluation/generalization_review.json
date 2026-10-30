@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "reviewer_role": "Delegated final-case author, separate from development corpus and gate implementation until candidate freeze; not an external second annotator.",
+  "baseline_commit": "7850d8a6452a28ceed877488e6dae2a9a2ac3ebb",
+  "holdout_freeze_commit": "f9686d5b061a09a057220c701fdc2122c4875614",
+  "candidate_freeze_commit": "d9955fa00f345d55b13c1dbf5d8afe2f451e693f",
+  "candidate_manifest_matches_immutable_commit": true,
+  "scored_manifests_match_frozen_candidate": true,
+  "fixed_threshold": 0.75,
+  "threshold_tuned": false,
+  "novelty": {
+    "cases": 72,
+    "equivalents": 24,
+    "hard_or_policy_negatives": 48,
+    "unique_final_user_strings": 64,
+    "intentional_repeated_final_user_strings": 8,
+    "positive_linguistic_patterns": 12,
+    "country_variants_per_pattern": 2,
+    "exact_overlap_with_development": 0,
+    "exact_overlap_with_M05_M06_cases": 0,
+    "exact_overlap_with_reviewed_registry": 0,
+    "repetition_reason": "Eight positive strings receive actual context/header/generation/client changes; distinct wire cases, not independent linguistic forms.",
+    "labels": "All 24 positives request the conventional current national capital with explicit city-name-only output; Paris/Tokyo meet both fact and format. Hard negatives change the referent, temporal scope, task or output requirements. Policy negatives cover fail-closed cache boundaries.",
+    "label_caveats": "Unicode/invisible-character cases are conservative policy exclusions even if humans infer intended meaning; some context/version exclusions share facts but remain ineligible."
+  },
+  "independence_limits": [
+    "Internal delegated authorship, not external review, random sampling or an independently recruited human panel.",
+    "Author knew proposed domain and prior evidence but did not view development corpus or candidate implementation before freezing.",
+    "This reviewer also authored held-out labels; facts/contracts were checked, but no independent second-annotator agreement study occurred.",
+    "Country-paired templates are correlated; finite convenience cases do not establish population safety or universal language coverage.",
+    "Hashes/commits preserve artifacts, not proof of no human label inspection or absence from embedding pretraining."
+  ],
+  "pipeline": {
+    "boundary": "Production ASGI authentication, quota, validation, exact-first cache and semantic path; counted MockTransport backend and actual pinned local ONNX embeddings.",
+    "source_only": "Exactly two canonical client-a entries are snapshot-restored before every final query; no held-out query becomes a cache source or approved wording.",
+    "no_label_injection": "Labels and suitability metadata are evaluator-only. Production receives actual request, headers and authenticated client.",
+    "failure_stage": "All 72 final cases have no parsed/reviewed family, no embedding lookup observation and zero semantic-stage deltas: eligibility rejects them before retrieval.",
+    "positive_failure_reason": "The complete-match grammar supports development combinations but rejects all 12 independent positive patterns through unsupported question/output forms, syntax or punctuation. This is bounded-language coverage failure, not measured embedding, retrieval or compatibility failure.",
+    "negative_evidence_limit": "All 48 negatives also stop at eligibility. Zero hits proves finite abstention on these inputs, not discrimination among inputs reaching retrieval or independent isolation of downstream security controls.",
+    "preserved_controls": "Tenant/model/revision/generation compatibility, TTL, authentication, quotas and successful-send protections remain necessary; regression tests separately exercise those boundaries."
+  },
+  "development_fixture": {
+    "baseline": {
+      "queries": 36,
+      "equivalents": 14,
+      "negatives": 22,
+      "semantic_hits": 0,
+      "true_semantic_hits": 0,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": null,
+      "valid_paraphrase_coverage": 0.0,
+      "equivalent_misses_or_bypasses": 14,
+      "equivalent_bypasses": 14,
+      "negative_semantic_hits": 0,
+      "bypasses": 36,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "BYPASS": 36
+      },
+      "http_statuses": {
+        "200": 36
+      },
+      "fixture_upstream_attempts": 36,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    },
+    "candidate": {
+      "queries": 36,
+      "equivalents": 14,
+      "negatives": 22,
+      "semantic_hits": 12,
+      "true_semantic_hits": 12,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": 1.0,
+      "valid_paraphrase_coverage": 0.8571428571428571,
+      "equivalent_misses_or_bypasses": 2,
+      "equivalent_bypasses": 2,
+      "negative_semantic_hits": 0,
+      "bypasses": 24,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 12,
+        "BYPASS": 24
+      },
+      "http_statuses": {
+        "200": 36
+      },
+      "fixture_upstream_attempts": 24,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    }
+  },
+  "development_captured_Gemma": {
+    "baseline": {
+      "queries": 36,
+      "equivalents": 14,
+      "negatives": 22,
+      "semantic_hits": 0,
+      "true_semantic_hits": 0,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": null,
+      "valid_paraphrase_coverage": 0.0,
+      "equivalent_misses_or_bypasses": 14,
+      "equivalent_bypasses": 14,
+      "negative_semantic_hits": 0,
+      "bypasses": 36,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "BYPASS": 36
+      },
+      "http_statuses": {
+        "200": 36
+      },
+      "fixture_upstream_attempts": 36,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    },
+    "candidate": {
+      "queries": 36,
+      "equivalents": 14,
+      "negatives": 22,
+      "semantic_hits": 12,
+      "true_semantic_hits": 12,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": 1.0,
+      "valid_paraphrase_coverage": 0.8571428571428571,
+      "equivalent_misses_or_bypasses": 2,
+      "equivalent_bypasses": 2,
+      "negative_semantic_hits": 0,
+      "bypasses": 24,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "SEMANTIC_HIT": 12,
+        "BYPASS": 24
+      },
+      "http_statuses": {
+        "200": 36
+      },
+      "fixture_upstream_attempts": 24,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    }
+  },
+  "heldout_fixture": {
+    "baseline": {
+      "queries": 72,
+      "equivalents": 24,
+      "negatives": 48,
+      "semantic_hits": 0,
+      "true_semantic_hits": 0,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": null,
+      "valid_paraphrase_coverage": 0.0,
+      "equivalent_misses_or_bypasses": 24,
+      "equivalent_bypasses": 24,
+      "negative_semantic_hits": 0,
+      "bypasses": 72,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "BYPASS": 72
+      },
+      "http_statuses": {
+        "200": 72
+      },
+      "fixture_upstream_attempts": 72,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    },
+    "candidate": {
+      "queries": 72,
+      "equivalents": 24,
+      "negatives": 48,
+      "semantic_hits": 0,
+      "true_semantic_hits": 0,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": null,
+      "valid_paraphrase_coverage": 0.0,
+      "equivalent_misses_or_bypasses": 24,
+      "equivalent_bypasses": 24,
+      "negative_semantic_hits": 0,
+      "bypasses": 72,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "BYPASS": 72
+      },
+      "http_statuses": {
+        "200": 72
+      },
+      "fixture_upstream_attempts": 72,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    }
+  },
+  "heldout_captured_Gemma": {
+    "baseline": {
+      "queries": 72,
+      "equivalents": 24,
+      "negatives": 48,
+      "semantic_hits": 0,
+      "true_semantic_hits": 0,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": null,
+      "valid_paraphrase_coverage": 0.0,
+      "equivalent_misses_or_bypasses": 24,
+      "equivalent_bypasses": 24,
+      "negative_semantic_hits": 0,
+      "bypasses": 72,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "BYPASS": 72
+      },
+      "http_statuses": {
+        "200": 72
+      },
+      "fixture_upstream_attempts": 72,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    },
+    "candidate": {
+      "queries": 72,
+      "equivalents": 24,
+      "negatives": 48,
+      "semantic_hits": 0,
+      "true_semantic_hits": 0,
+      "false_semantic_hits": 0,
+      "semantic_hit_precision": null,
+      "valid_paraphrase_coverage": 0.0,
+      "equivalent_misses_or_bypasses": 24,
+      "equivalent_bypasses": 24,
+      "negative_semantic_hits": 0,
+      "bypasses": 72,
+      "http_rejections": 0,
+      "cache_dispositions": {
+        "BYPASS": 72
+      },
+      "http_statuses": {
+        "200": 72
+      },
+      "fixture_upstream_attempts": 72,
+      "unsuitable_semantic_answers": 0,
+      "all_semantic_answers_suitable": true,
+      "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+      "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+    }
+  },
+  "real_model_review": {
+    "identity": {
+      "backend_version": "0.40.11",
+      "model": "gemma3:1b",
+      "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+      "context_length": 2048,
+      "hardware": "CPU-only Linux, 8 GiB, two-core cgroup quota"
+    },
+    "fresh_canonical_source_calls": 2,
+    "live_requests": 6,
+    "independently_counted_live_window_chat_POSTs": 4,
+    "live_window_UTC": "2026-10-30 09:49:30 through 09:49:33",
+    "log_POSTs_at_review_including_subsequent_regression_probe": 9,
+    "source_answers": {
+      "france-capital": "Paris",
+      "japan-capital": "Tokyo"
+    },
+    "live_semantic_replays": 2,
+    "suitable_live_semantic_replays": 2,
+    "development_captured_response_replays": 12,
+    "suitable_development_captured_replays": 12,
+    "suitability_basis": "Checked factual city and city-only contract; exact-case Paris/Tokyo after surrounding whitespace trim, not byte preservation alone.",
+    "live_negative_and_isolation": "Germany returned Berlin with BYPASS; client-b France request was a cold MISS, not cross-tenant reuse.",
+    "captured_replay_scope": "Full development/final scoring seeds genuine captured response JSON in the production path; no fresh model generation occurs during these ASGI runs. Cold noncanonical responses are deterministic fixtures, not model-answer-quality evidence.",
+    "heldout_semantic_replays": 0,
+    "heldout_suitability_observed": false,
+    "heldout_precision": null,
+    "vacuous_boolean_warning": "Raw all_semantic_answers_suitable=true at zero hits is vacuous; neither 100% suitability nor 100% precision was measured.",
+    "scope_limit": "Two static facts plus development-language replay success do not validate independent unseen-language generalization or broad model-answer quality."
+  },
+  "verdict": {
+    "independent_useful_generalization_demonstrated": false,
+    "evidence": "Candidate development 12/14 equivalents with 0/22 negative hits; final baseline and candidate both 0/24 equivalents and 0/48 false semantic hits. Final precision has a zero denominator and is undefined.",
+    "decision": "Retain reviewed-phrase production policy; do not promote the candidate. Never tune from the consumed final cases and continue calling the same corpus independently held out.",
+    "release_scope": "Failed candidate/evaluator remain reproducible from immutable experiment commit; production code is restored to reviewed-phrase baseline."
+  },
+  "artifact_sha256": {
+    "evaluation/generalization_holdout.json": "ad05be1634d5a890e62a74eceedcff4e1c6b2cc5ec218fcff1230077f5684845",
+    "evaluation/generalization_dev.json": "8e62f90e5f364d6ad2ce7f8fe403eada633d7a333ce506ed31fe0b26bf3bd608",
+    "evaluation/generalization_candidate_freeze.json": "de2e38a099534a75b7296dfa3618b29c740cb07e4b7b7709645b75da5f5a6d64",
+    "evaluation/generalization_holdout_results.json": "98061b7ec3e07f076b970d05285fea0d16c3ba151a78f7a0f1b303e9cf96d2f1",
+    "evaluation/generalization_holdout_gemma_results.json": "91615894c6e9629705c103a1a0c7ba34fe44d130f6ff672afe0b8b162254f17b",
+    "evaluation/generalization_dev_gemma_results.json": "d58bfb582f929e7495f6747c7fe0801becbf2e9a5b6fa3962fe29b195e4b375c",
+    "evaluation/generalization_gemma_sources.json": "1c17cd98c47f628c7ea7da0b69879c974ce7cff4fb744a421dcc830ed30d5e75"
+  }
+}

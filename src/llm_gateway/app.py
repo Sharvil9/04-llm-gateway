@@ -429,7 +429,7 @@ def create_app(
         request.state.cache_status = "BYPASS" if key is None else "MISS"
         cached = cache.get(key) if key is not None else None
         request.state.exact_ms = (time.perf_counter() - exact_started) * 1000
-        if cached is not None and cache.response_suitable(payload, cached):
+        if cached is not None:
             request.state.cache_status = "HIT"
             return Response(content=cached, media_type="application/json")
 
@@ -480,7 +480,6 @@ def create_app(
                     and cache_policy.allowed
                     and result.choices[0].finish_reason == "stop"
                     and result.choices[0].message.content.strip()
-                    and cache.response_suitable(payload, result)
                     and not request.scope["state"].get("client_disconnected", False)
                     and not app.state.http_client.cookies
                 ):

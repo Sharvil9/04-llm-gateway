@@ -1,0 +1,2476 @@
+{
+  "dataset": "evaluation/generalization_dev.json",
+  "dataset_sha256": "8e62f90e5f364d6ad2ce7f8fe403eada633d7a333ce506ed31fe0b26bf3bd608",
+  "heldout": false,
+  "fixed_threshold": 0.75,
+  "threshold_tuned": false,
+  "source_manifest": {
+    "devtools/generalization_eval.py": "3f2336e97aa113d9903f324621951b8cb1f1238bf65684ae486dcd8b0930ff00",
+    "uv.lock": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390",
+    "config/ollama.toml": "9b930a5ce16a0e7cf3a4d02529d94113e3c88611fe78f8bbe72f6c9b5010fa85",
+    "devtools/semantic_probe.py": "7993db1b16f863916ce17a0c67fa5f24a149c51244f16fa7311aaaee622d290e",
+    "src/llm_gateway/__init__.py": "717b78cbb6791ca1c8e730ce7fa61f79918e208aaa7a5fc91c0e82da63c28828",
+    "src/llm_gateway/app.py": "7acea247d5cdc78a2fe2fb89101f2fa62988b4d18828d80eacdf6df0b5993013",
+    "src/llm_gateway/backend.py": "e15217b9191967879ea9c2bc07346621624761f660796153b41c2dad5e0e331d",
+    "src/llm_gateway/cache.py": "157c952cc53308d929f057dd0abb618b7c1598651f767cd702001e8563a33105",
+    "src/llm_gateway/config.py": "c7326a074cd364a586a1578aa377a181296add5d9544301f2fa15f861a382b06",
+    "src/llm_gateway/eligibility.py": "69fcbb029465e43afdd7622641950a6e979e57e9574575a2191f73dd8261167a",
+    "src/llm_gateway/embeddings.py": "48ec89a7a3f474b8490c7c8c6f3eceaf3c9496c912fc5221ede45f849dd29e05",
+    "src/llm_gateway/metrics.py": "f9daabbd5575b265370966a417a21157cdc2809b3cdd000f06f3e4abb41e5536",
+    "src/llm_gateway/schemas.py": "8c009bdaacea952b8c6487a837eeabb02815c90286a00b973fa15f015ca83c01",
+    "src/llm_gateway/semantic.py": "54a293bf238f356aa35b12c4bf4d8c2f1ec628066d0e586a11812c7674f2d178",
+    "src/llm_gateway/traffic.py": "a18c31c05ce67b772f01c091f5a2f55f49753c2cf0ec844f1b80bfd47c536be9",
+    "devtools/generalization_live.py": "5f37b277821cfc628e6d72d01814e0a0f929ed0ce9bf9d13c88fdafd7f64d2ee"
+  },
+  "started_at_utc": "2026-10-30T09:50:49.726237+00:00",
+  "finished_at_utc": "2026-10-30T09:50:49.938015+00:00",
+  "hardware": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.12.14"
+  },
+  "transport": "production ASGI boundary; counted MockTransport backend",
+  "actual_local_embeddings": true,
+  "embedding_fingerprint": "embedding-v1:05d0bc5e51790e091ee51fce277d198a843efdda5b0dbb4cc5823f53f9a60508",
+  "query_source_expansion": false,
+  "source_vectors_per_case": 2,
+  "source_reset": "Restore only original canonical immutable entries before each case",
+  "fresh_model_inference_during_scoring": false,
+  "genuine_model_source_replay": true,
+  "genuine_source_sha256": "1c17cd98c47f628c7ea7da0b69879c974ce7cff4fb744a421dcc830ed30d5e75",
+  "genuine_source_evidence": {
+    "real_model_inference": true,
+    "transport": "loopback_http",
+    "model_identity": {
+      "backend_version": "0.40.11",
+      "model": "gemma3:1b",
+      "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+      "context_length": 2048,
+      "hardware": "CPU-only Linux, 8 GiB, two-core cgroup quota"
+    },
+    "actual_upstream_calls": 2,
+    "call_count_source": "dedicated_quiet_ollama_gin_log",
+    "live_probe_total_upstream_calls": 4,
+    "live_probe_requests": 6,
+    "sources": {
+      "france-capital": {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of France? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "response": {
+          "id": "chatcmpl-421",
+          "object": "chat.completion",
+          "created": 1793353770,
+          "model": "gemma",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Paris"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 23,
+            "completion_tokens": 2,
+            "total_tokens": 25
+          }
+        }
+      },
+      "japan-capital": {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of Japan? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "response": {
+          "id": "chatcmpl-336",
+          "object": "chat.completion",
+          "created": 1793353771,
+          "model": "gemma",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Tokyo"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 23,
+            "completion_tokens": 2,
+            "total_tokens": 25
+          }
+        }
+      }
+    },
+    "live_probe_rows": [
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of France? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "MISS",
+        "status": 200,
+        "assistant_text": "Paris",
+        "expected_city": "Paris",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 3327.044,
+          "adapter": 3316.916,
+          "semantic": 3.988,
+          "exact": 1.02,
+          "residual": 5.12
+        },
+        "response_sha256": "fbd0d8e9495b7784049c1877e2e7e78e325629d957a11f9f262ca37325825f5f"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of Japan? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "MISS",
+        "status": 200,
+        "assistant_text": "Tokyo",
+        "expected_city": "Tokyo",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 962.349,
+          "adapter": 958.087,
+          "semantic": 3.124,
+          "exact": 0.224,
+          "residual": 0.915
+        },
+        "response_sha256": "688749366811a33af29388aaf8bde9741e289fcdd40b072fd521529b4154cc18"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "Please state the capital city of France. Return just the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "SEMANTIC_HIT",
+        "status": 200,
+        "assistant_text": "Paris",
+        "expected_city": "Paris",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 8.545,
+          "semantic": 7.619,
+          "exact": 0.236,
+          "residual": 0.69
+        },
+        "response_sha256": "fbd0d8e9495b7784049c1877e2e7e78e325629d957a11f9f262ca37325825f5f"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "Please state the capital city of Japan. Return just the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "SEMANTIC_HIT",
+        "status": 200,
+        "assistant_text": "Tokyo",
+        "expected_city": "Tokyo",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 4.104,
+          "semantic": 3.307,
+          "exact": 0.202,
+          "residual": 0.595
+        },
+        "response_sha256": "688749366811a33af29388aaf8bde9741e289fcdd40b072fd521529b4154cc18"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of Germany? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "BYPASS",
+        "status": 200,
+        "assistant_text": "Berlin",
+        "expected_city": "Berlin",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 971.802,
+          "adapter": 971.08,
+          "exact": 0.075,
+          "residual": 0.647
+        },
+        "response_sha256": "66eeaabd6329262f9af4c5225c8852f168d3b3bf4716d3ba50a67b2e6a022768"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of France? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-b",
+        "cache": "MISS",
+        "status": 200,
+        "assistant_text": "Paris",
+        "expected_city": "Paris",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 438.717,
+          "adapter": 433.966,
+          "semantic": 3.78,
+          "exact": 0.192,
+          "residual": 0.779
+        },
+        "response_sha256": "24829527a738029a791bd5d321e3396b2cca0a70820296abed1ac404bdb2dc9b"
+      }
+    ],
+    "answer_oracle": "Exact city name; trim surrounding whitespace only",
+    "limitations": "Two static facts; no general answer-quality or language-equivalence guarantee."
+  },
+  "noncanonical_inference": "No-store deterministic fixture; cold answers are not model-quality evidence",
+  "suitability_scope": "Cached equivalent answers only: exact Paris/Tokyo after surrounding whitespace trim",
+  "phases": {
+    "baseline": {
+      "policy": "reviewed-phrase-baseline",
+      "configuration": {
+        "backends": {
+          "local": {
+            "base_url": "http://127.0.0.1:11434/v1",
+            "api_key_env": null,
+            "revision": "ollama-0.40.11-ctx2048-template-default-v1"
+          }
+        },
+        "models": {
+          "gemma": {
+            "backend": "local",
+            "model": "gemma3:1b",
+            "revision": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c"
+          }
+        },
+        "request_timeout_seconds": 60.0,
+        "max_connections": 4,
+        "max_response_bytes": 262144,
+        "max_in_flight": 1,
+        "rate_limit": {
+          "burst": 10000,
+          "requests_per_second": 10000.0
+        },
+        "client_rate_limits": {},
+        "exact_cache": {
+          "enabled": true,
+          "ttl_seconds": 3600.0,
+          "max_entries": 16,
+          "max_bytes": 1048576,
+          "approved_prompts": [],
+          "namespace": "m07-generalization-evaluation-v1"
+        },
+        "semantic_cache": {
+          "enabled": true,
+          "model_dir": "/workspace/04-llm-gateway/artifacts/embeddings/l3",
+          "threshold": 0.75,
+          "timeout_seconds": 0.25,
+          "max_entries": 16,
+          "families": [
+            {
+              "id": "france-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of France? Answer with only the city name.",
+                "Name France's capital city. Return only its name.",
+                "Which city is the capital of France? Give just the city name.",
+                "Tell me the name of France's capital, with nothing else.",
+                "Identify the capital city of France; reply with the city name alone.",
+                "France has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as France's capital."
+              ]
+            },
+            {
+              "id": "japan-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of Japan? Answer with only the city name.",
+                "Name Japan's capital city. Return only its name.",
+                "Which city is the capital of Japan? Give just the city name.",
+                "Tell me the name of Japan's capital, with nothing else.",
+                "Identify the capital city of Japan; reply with the city name alone.",
+                "Japan has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as Japan's capital."
+              ]
+            },
+            {
+              "id": "python3-list-tuple",
+              "domain": "public-static-v1",
+              "answer_contract": "two-short-bullets-mutability-and-literal-syntax-v1",
+              "prompts": [
+                "In Python 3, give exactly two short bullet points comparing lists and tuples: mutability and literal syntax.",
+                "Compare Python 3 lists with tuples in two concise bullets, one about mutability and one about literal syntax.",
+                "For Python 3, briefly contrast lists and tuples using exactly two bullets covering mutability and how their literals are written.",
+                "Give two short list-versus-tuple bullet points for Python 3: whether each can change, then its literal notation.",
+                "Using exactly two brief bullets, explain how Python 3 lists and tuples differ in mutability and literal notation.",
+                "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+                "Describe Python 3 list/tuple differences in two concise bullet points: mutability first and literal-writing syntax second."
+              ]
+            }
+          ],
+          "capital_entities": []
+        },
+        "log_requests": false
+      },
+      "summary": {
+        "queries": 36,
+        "equivalents": 14,
+        "negatives": 22,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 14,
+        "equivalent_bypasses": 14,
+        "negative_semantic_hits": 0,
+        "bypasses": 36,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 36
+        },
+        "http_statuses": {
+          "200": 36
+        },
+        "fixture_upstream_attempts": 36,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "seed_calls": 2,
+      "total_fixture_backend_calls": 38,
+      "total_gateway_upstream_attempts": 38,
+      "seed_sources": [
+        {
+          "family": "france-capital",
+          "response": {
+            "id": "chatcmpl-421",
+            "object": "chat.completion",
+            "created": 1793353770,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Paris"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        },
+        {
+          "family": "japan-capital",
+          "response": {
+            "id": "chatcmpl-336",
+            "object": "chat.completion",
+            "created": 1793353771,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Tokyo"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        }
+      ],
+      "case_results": [
+        {
+          "id": "dev-01",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2422250001691282,
+          "server_timing": "gateway;dur=0.882, adapter;dur=0.554, exact;dur=0.018, residual;dur=0.310",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-02",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.401199999236269,
+          "server_timing": "gateway;dur=0.840, adapter;dur=0.489, exact;dur=0.017, residual;dur=0.334",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-03",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.1547059986914974,
+          "server_timing": "gateway;dur=1.794, adapter;dur=1.342, exact;dur=0.022, residual;dur=0.430",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-04",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.522447000956163,
+          "server_timing": "gateway;dur=2.042, adapter;dur=1.092, exact;dur=0.020, residual;dur=0.930",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-05",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.484549000451807,
+          "server_timing": "gateway;dur=0.865, adapter;dur=0.384, exact;dur=0.019, residual;dur=0.463",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-06",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3729660022363532,
+          "server_timing": "gateway;dur=0.971, adapter;dur=0.311, exact;dur=0.023, residual;dur=0.637",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-07",
+          "kind": "equivalent",
+          "category": "valid-outside-grammar",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7820620014390443,
+          "server_timing": "gateway;dur=0.545, adapter;dur=0.276, exact;dur=0.016, residual;dur=0.253",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-08",
+          "kind": "policy_exclusion",
+          "category": "no-store",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8969189986819401,
+          "server_timing": "gateway;dur=1.370, adapter;dur=0.777, exact;dur=0.013, residual;dur=0.581",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-09",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0284550007781945,
+          "server_timing": "gateway;dur=0.555, adapter;dur=0.274, exact;dur=0.016, residual;dur=0.264",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-10",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.973605998500716,
+          "server_timing": "gateway;dur=1.463, adapter;dur=0.614, exact;dur=0.019, residual;dur=0.830",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-11",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2779230019077659,
+          "server_timing": "gateway;dur=0.915, adapter;dur=0.589, exact;dur=0.016, residual;dur=0.310",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-12",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1625549996097106,
+          "server_timing": "gateway;dur=0.697, adapter;dur=0.346, exact;dur=0.017, residual;dur=0.335",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-13",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1769730008381885,
+          "server_timing": "gateway;dur=0.766, adapter;dur=0.461, exact;dur=0.016, residual;dur=0.289",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-14",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.982293000764912,
+          "server_timing": "gateway;dur=1.191, adapter;dur=0.295, exact;dur=0.019, residual;dur=0.877",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-15",
+          "kind": "equivalent",
+          "category": "valid-outside-grammar",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5473449966521002,
+          "server_timing": "gateway;dur=0.795, adapter;dur=0.385, exact;dur=0.020, residual;dur=0.391",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-16",
+          "kind": "policy_exclusion",
+          "category": "no-store",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0173840018978808,
+          "server_timing": "gateway;dur=0.670, adapter;dur=0.261, exact;dur=0.012, residual;dur=0.396",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-17",
+          "kind": "policy_exclusion",
+          "category": "changed-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0068060000776313,
+          "server_timing": "gateway;dur=0.565, adapter;dur=0.309, exact;dur=0.015, residual;dur=0.240",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-18",
+          "kind": "policy_exclusion",
+          "category": "unicode-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1727990022336598,
+          "server_timing": "gateway;dur=0.831, adapter;dur=0.295, exact;dur=0.017, residual;dur=0.519",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-19",
+          "kind": "policy_exclusion",
+          "category": "appended-instruction",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9379370021633804,
+          "server_timing": "gateway;dur=0.620, adapter;dur=0.269, exact;dur=0.016, residual;dur=0.334",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-20",
+          "kind": "policy_exclusion",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8861140013323165,
+          "server_timing": "gateway;dur=0.583, adapter;dur=0.277, exact;dur=0.016, residual;dur=0.289",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-21",
+          "kind": "policy_exclusion",
+          "category": "historical",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9493079996900633,
+          "server_timing": "gateway;dur=0.641, adapter;dur=0.355, exact;dur=0.014, residual;dur=0.271",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-22",
+          "kind": "policy_exclusion",
+          "category": "number-date",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.102452999475645,
+          "server_timing": "gateway;dur=0.738, adapter;dur=0.296, exact;dur=0.022, residual;dur=0.420",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-23",
+          "kind": "policy_exclusion",
+          "category": "number-output",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0955680008919444,
+          "server_timing": "gateway;dur=0.643, adapter;dur=0.271, exact;dur=0.017, residual;dur=0.355",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-24",
+          "kind": "policy_exclusion",
+          "category": "format",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8954750010161661,
+          "server_timing": "gateway;dur=0.533, adapter;dur=0.267, exact;dur=0.016, residual;dur=0.249",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-25",
+          "kind": "policy_exclusion",
+          "category": "extra-output",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5122420008992776,
+          "server_timing": "gateway;dur=1.151, adapter;dur=0.508, exact;dur=0.022, residual;dur=0.622",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-26",
+          "kind": "policy_exclusion",
+          "category": "json",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3041359998169355,
+          "server_timing": "gateway;dur=0.963, adapter;dur=0.489, exact;dur=0.097, residual;dur=0.377",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-27",
+          "kind": "policy_exclusion",
+          "category": "control",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4652210011263378,
+          "server_timing": "gateway;dur=0.975, adapter;dur=0.387, exact;dur=0.018, residual;dur=0.570",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-28",
+          "kind": "policy_exclusion",
+          "category": "additional-clause",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2279370021133218,
+          "server_timing": "gateway;dur=0.656, adapter;dur=0.311, exact;dur=0.019, residual;dur=0.326",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-29",
+          "kind": "policy_exclusion",
+          "category": "personal",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.254435999726411,
+          "server_timing": "gateway;dur=0.747, adapter;dur=0.295, exact;dur=0.018, residual;dur=0.434",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-30",
+          "kind": "policy_exclusion",
+          "category": "freshness",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1679000017466024,
+          "server_timing": "gateway;dur=0.704, adapter;dur=0.392, exact;dur=0.017, residual;dur=0.294",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-31",
+          "kind": "policy_exclusion",
+          "category": "version",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.384919996780809,
+          "server_timing": "gateway;dur=0.633, adapter;dur=0.319, exact;dur=0.016, residual;dur=0.298",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-32",
+          "kind": "policy_exclusion",
+          "category": "version-python",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2687629969150294,
+          "server_timing": "gateway;dur=0.896, adapter;dur=0.309, exact;dur=0.018, residual;dur=0.569",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-33",
+          "kind": "policy_exclusion",
+          "category": "sampling",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.9377749995328486,
+          "server_timing": "gateway;dur=1.211, adapter;dur=0.607, exact;dur=0.020, residual;dur=0.585",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-34",
+          "kind": "policy_exclusion",
+          "category": "missing-seed",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.533123999251984,
+          "server_timing": "gateway;dur=0.669, adapter;dur=0.301, exact;dur=0.018, residual;dur=0.350",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-35",
+          "kind": "policy_exclusion",
+          "category": "context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2883490016974974,
+          "server_timing": "gateway;dur=0.933, adapter;dur=0.326, exact;dur=0.013, residual;dur=0.594",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-36",
+          "kind": "policy_exclusion",
+          "category": "cookie",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8878340015362483,
+          "server_timing": "gateway;dur=0.810, adapter;dur=0.482, exact;dur=0.012, residual;dur=0.316",
+          "seed_candidate_entries": 2
+        }
+      ]
+    },
+    "candidate": {
+      "policy": "capital-grammar-candidate",
+      "configuration": {
+        "backends": {
+          "local": {
+            "base_url": "http://127.0.0.1:11434/v1",
+            "api_key_env": null,
+            "revision": "ollama-0.40.11-ctx2048-template-default-v1"
+          }
+        },
+        "models": {
+          "gemma": {
+            "backend": "local",
+            "model": "gemma3:1b",
+            "revision": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c"
+          }
+        },
+        "request_timeout_seconds": 60.0,
+        "max_connections": 4,
+        "max_response_bytes": 262144,
+        "max_in_flight": 1,
+        "rate_limit": {
+          "burst": 10000,
+          "requests_per_second": 10000.0
+        },
+        "client_rate_limits": {},
+        "exact_cache": {
+          "enabled": true,
+          "ttl_seconds": 3600.0,
+          "max_entries": 16,
+          "max_bytes": 1048576,
+          "approved_prompts": [],
+          "namespace": "m07-generalization-evaluation-v1"
+        },
+        "semantic_cache": {
+          "enabled": true,
+          "model_dir": "/workspace/04-llm-gateway/artifacts/embeddings/l3",
+          "threshold": 0.75,
+          "timeout_seconds": 0.25,
+          "max_entries": 16,
+          "families": [
+            {
+              "id": "france-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of France? Answer with only the city name.",
+                "Name France's capital city. Return only its name.",
+                "Which city is the capital of France? Give just the city name.",
+                "Tell me the name of France's capital, with nothing else.",
+                "Identify the capital city of France; reply with the city name alone.",
+                "France has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as France's capital."
+              ]
+            },
+            {
+              "id": "japan-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of Japan? Answer with only the city name.",
+                "Name Japan's capital city. Return only its name.",
+                "Which city is the capital of Japan? Give just the city name.",
+                "Tell me the name of Japan's capital, with nothing else.",
+                "Identify the capital city of Japan; reply with the city name alone.",
+                "Japan has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as Japan's capital."
+              ]
+            },
+            {
+              "id": "python3-list-tuple",
+              "domain": "public-static-v1",
+              "answer_contract": "two-short-bullets-mutability-and-literal-syntax-v1",
+              "prompts": [
+                "In Python 3, give exactly two short bullet points comparing lists and tuples: mutability and literal syntax.",
+                "Compare Python 3 lists with tuples in two concise bullets, one about mutability and one about literal syntax.",
+                "For Python 3, briefly contrast lists and tuples using exactly two bullets covering mutability and how their literals are written.",
+                "Give two short list-versus-tuple bullet points for Python 3: whether each can change, then its literal notation.",
+                "Using exactly two brief bullets, explain how Python 3 lists and tuples differ in mutability and literal notation.",
+                "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+                "Describe Python 3 list/tuple differences in two concise bullet points: mutability first and literal-writing syntax second."
+              ]
+            }
+          ],
+          "capital_entities": [
+            "France",
+            "Japan"
+          ]
+        },
+        "log_requests": false
+      },
+      "summary": {
+        "queries": 36,
+        "equivalents": 14,
+        "negatives": 22,
+        "semantic_hits": 12,
+        "true_semantic_hits": 12,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": 1.0,
+        "valid_paraphrase_coverage": 0.8571428571428571,
+        "equivalent_misses_or_bypasses": 2,
+        "equivalent_bypasses": 2,
+        "negative_semantic_hits": 0,
+        "bypasses": 24,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "SEMANTIC_HIT": 12,
+          "BYPASS": 24
+        },
+        "http_statuses": {
+          "200": 36
+        },
+        "fixture_upstream_attempts": 24,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "seed_calls": 2,
+      "total_fixture_backend_calls": 26,
+      "total_gateway_upstream_attempts": 26,
+      "seed_sources": [
+        {
+          "family": "france-capital",
+          "response": {
+            "id": "chatcmpl-421",
+            "object": "chat.completion",
+            "created": 1793353770,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Paris"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        },
+        {
+          "family": "japan-capital",
+          "response": {
+            "id": "chatcmpl-336",
+            "object": "chat.completion",
+            "created": 1793353771,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Tokyo"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        }
+      ],
+      "case_results": [
+        {
+          "id": "dev-01",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.812080442905426,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "france-capital",
+          "response_suitable": true,
+          "assistant_text": "Paris",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 5.468494997330708,
+          "server_timing": "gateway;dur=4.302, semantic;dur=3.157, exact;dur=0.413, residual;dur=0.731",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-02",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8674598932266235,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "france-capital",
+          "response_suitable": true,
+          "assistant_text": "Paris",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.8421270000981167,
+          "server_timing": "gateway;dur=3.415, semantic;dur=2.586, exact;dur=0.117, residual;dur=0.712",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-03",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.9208755493164062,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "france-capital",
+          "response_suitable": true,
+          "assistant_text": "Paris",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 4.26743199932389,
+          "server_timing": "gateway;dur=3.640, semantic;dur=2.759, exact;dur=0.273, residual;dur=0.608",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-04",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8678967356681824,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "france-capital",
+          "response_suitable": true,
+          "assistant_text": "Paris",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.480154999124352,
+          "server_timing": "gateway;dur=3.013, semantic;dur=2.131, exact;dur=0.499, residual;dur=0.383",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-05",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8564180135726929,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "france-capital",
+          "response_suitable": true,
+          "assistant_text": "Paris",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.828663000400411,
+          "server_timing": "gateway;dur=2.303, semantic;dur=1.739, exact;dur=0.114, residual;dur=0.449",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-06",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8456240892410278,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "france-capital",
+          "response_suitable": true,
+          "assistant_text": "Paris",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.2572210002399515,
+          "server_timing": "gateway;dur=2.727, semantic;dur=2.276, exact;dur=0.102, residual;dur=0.349",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-07",
+          "kind": "equivalent",
+          "category": "valid-outside-grammar",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3683629986189771,
+          "server_timing": "gateway;dur=0.966, adapter;dur=0.430, exact;dur=0.096, residual;dur=0.440",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-08",
+          "kind": "policy_exclusion",
+          "category": "no-store",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.274286998726893,
+          "server_timing": "gateway;dur=1.426, adapter;dur=1.084, exact;dur=0.012, residual;dur=0.330",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-09",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8203132152557373,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "japan-capital",
+          "response_suitable": true,
+          "assistant_text": "Tokyo",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.2590589980827644,
+          "server_timing": "gateway;dur=2.616, semantic;dur=1.888, exact;dur=0.134, residual;dur=0.594",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-10",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8744757175445557,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "japan-capital",
+          "response_suitable": true,
+          "assistant_text": "Tokyo",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.2592889983789064,
+          "server_timing": "gateway;dur=2.832, semantic;dur=2.332, exact;dur=0.119, residual;dur=0.381",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-11",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.9261965751647949,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "japan-capital",
+          "response_suitable": true,
+          "assistant_text": "Tokyo",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.989844997500768,
+          "server_timing": "gateway;dur=2.583, semantic;dur=2.008, exact;dur=0.158, residual;dur=0.418",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-12",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8811625242233276,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "japan-capital",
+          "response_suitable": true,
+          "assistant_text": "Tokyo",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.201334002369549,
+          "server_timing": "gateway;dur=2.804, semantic;dur=1.991, exact;dur=0.221, residual;dur=0.592",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-13",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8504960536956787,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "japan-capital",
+          "response_suitable": true,
+          "assistant_text": "Tokyo",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.2846029971551616,
+          "server_timing": "gateway;dur=2.681, semantic;dur=1.981, exact;dur=0.114, residual;dur=0.586",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-14",
+          "kind": "equivalent",
+          "category": "grammar-positive",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "SEMANTIC_HIT",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [
+            {
+              "compatible_candidates": 1,
+              "similarity": 0.8695998191833496,
+              "above_threshold_candidate": true,
+              "worker_busy": false
+            }
+          ],
+          "selected_source_family": "japan-capital",
+          "response_suitable": true,
+          "assistant_text": "Tokyo",
+          "upstream_attempts": 0,
+          "fixture_backend_calls": 0,
+          "semantic_stage_delta": {
+            "hits": 1,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.338112001074478,
+          "server_timing": "gateway;dur=2.941, semantic;dur=2.488, exact;dur=0.117, residual;dur=0.336",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-15",
+          "kind": "equivalent",
+          "category": "valid-outside-grammar",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1799400017480366,
+          "server_timing": "gateway;dur=0.699, adapter;dur=0.305, exact;dur=0.040, residual;dur=0.354",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-16",
+          "kind": "policy_exclusion",
+          "category": "no-store",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": "japan-capital",
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9752299993124325,
+          "server_timing": "gateway;dur=0.615, adapter;dur=0.329, exact;dur=0.012, residual;dur=0.274",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-17",
+          "kind": "policy_exclusion",
+          "category": "changed-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7198259993165266,
+          "server_timing": "gateway;dur=1.273, adapter;dur=0.970, exact;dur=0.033, residual;dur=0.270",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-18",
+          "kind": "policy_exclusion",
+          "category": "unicode-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2926950003020465,
+          "server_timing": "gateway;dur=0.737, adapter;dur=0.359, exact;dur=0.030, residual;dur=0.348",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-19",
+          "kind": "policy_exclusion",
+          "category": "appended-instruction",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.918771002034191,
+          "server_timing": "gateway;dur=0.597, adapter;dur=0.312, exact;dur=0.030, residual;dur=0.255",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-20",
+          "kind": "policy_exclusion",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3098500021442305,
+          "server_timing": "gateway;dur=0.998, adapter;dur=0.312, exact;dur=0.036, residual;dur=0.649",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-21",
+          "kind": "policy_exclusion",
+          "category": "historical",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.9211840008210856,
+          "server_timing": "gateway;dur=0.906, adapter;dur=0.464, exact;dur=0.031, residual;dur=0.411",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-22",
+          "kind": "policy_exclusion",
+          "category": "number-date",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3931739995314274,
+          "server_timing": "gateway;dur=0.932, adapter;dur=0.548, exact;dur=0.033, residual;dur=0.351",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-23",
+          "kind": "policy_exclusion",
+          "category": "number-output",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9542469997541048,
+          "server_timing": "gateway;dur=0.608, adapter;dur=0.319, exact;dur=0.028, residual;dur=0.262",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-24",
+          "kind": "policy_exclusion",
+          "category": "format",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8779150011832826,
+          "server_timing": "gateway;dur=0.571, adapter;dur=0.310, exact;dur=0.028, residual;dur=0.233",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-25",
+          "kind": "policy_exclusion",
+          "category": "extra-output",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8870630010496825,
+          "server_timing": "gateway;dur=0.847, adapter;dur=0.492, exact;dur=0.031, residual;dur=0.325",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-26",
+          "kind": "policy_exclusion",
+          "category": "json",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8010710009548347,
+          "server_timing": "gateway;dur=0.816, adapter;dur=0.339, exact;dur=0.037, residual;dur=0.440",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-27",
+          "kind": "policy_exclusion",
+          "category": "control",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.122579000570113,
+          "server_timing": "gateway;dur=1.664, adapter;dur=0.752, exact;dur=0.025, residual;dur=0.887",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-28",
+          "kind": "policy_exclusion",
+          "category": "additional-clause",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3626269974338356,
+          "server_timing": "gateway;dur=0.802, adapter;dur=0.454, exact;dur=0.033, residual;dur=0.316",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-29",
+          "kind": "policy_exclusion",
+          "category": "personal",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0502340010134503,
+          "server_timing": "gateway;dur=0.622, adapter;dur=0.315, exact;dur=0.033, residual;dur=0.274",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-30",
+          "kind": "policy_exclusion",
+          "category": "freshness",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9638029987399932,
+          "server_timing": "gateway;dur=0.635, adapter;dur=0.313, exact;dur=0.069, residual;dur=0.254",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-31",
+          "kind": "policy_exclusion",
+          "category": "version",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 6.222859999979846,
+          "server_timing": "gateway;dur=3.010, adapter;dur=1.075, exact;dur=0.039, residual;dur=1.895",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-32",
+          "kind": "policy_exclusion",
+          "category": "version-python",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.946071999758715,
+          "server_timing": "gateway;dur=2.379, adapter;dur=1.815, exact;dur=0.035, residual;dur=0.528",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-33",
+          "kind": "policy_exclusion",
+          "category": "sampling",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.149768999312073,
+          "server_timing": "gateway;dur=0.804, adapter;dur=0.322, exact;dur=0.039, residual;dur=0.442",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-34",
+          "kind": "policy_exclusion",
+          "category": "missing-seed",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8744209992291871,
+          "server_timing": "gateway;dur=1.312, adapter;dur=0.698, exact;dur=0.038, residual;dur=0.576",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-35",
+          "kind": "policy_exclusion",
+          "category": "context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7071099973691162,
+          "server_timing": "gateway;dur=1.040, adapter;dur=0.432, exact;dur=0.014, residual;dur=0.594",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "dev-36",
+          "kind": "policy_exclusion",
+          "category": "cookie",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": "france-capital",
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5127460028452333,
+          "server_timing": "gateway;dur=0.929, adapter;dur=0.311, exact;dur=0.012, residual;dur=0.606",
+          "seed_candidate_entries": 2
+        }
+      ]
+    }
+  }
+}

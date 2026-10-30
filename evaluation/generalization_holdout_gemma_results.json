@@ -1,0 +1,4119 @@
+{
+  "dataset": "evaluation/generalization_holdout.json",
+  "dataset_sha256": "ad05be1634d5a890e62a74eceedcff4e1c6b2cc5ec218fcff1230077f5684845",
+  "heldout": true,
+  "fixed_threshold": 0.75,
+  "threshold_tuned": false,
+  "source_manifest": {
+    "devtools/generalization_eval.py": "3f2336e97aa113d9903f324621951b8cb1f1238bf65684ae486dcd8b0930ff00",
+    "uv.lock": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390",
+    "config/ollama.toml": "9b930a5ce16a0e7cf3a4d02529d94113e3c88611fe78f8bbe72f6c9b5010fa85",
+    "devtools/semantic_probe.py": "7993db1b16f863916ce17a0c67fa5f24a149c51244f16fa7311aaaee622d290e",
+    "src/llm_gateway/__init__.py": "717b78cbb6791ca1c8e730ce7fa61f79918e208aaa7a5fc91c0e82da63c28828",
+    "src/llm_gateway/app.py": "7acea247d5cdc78a2fe2fb89101f2fa62988b4d18828d80eacdf6df0b5993013",
+    "src/llm_gateway/backend.py": "e15217b9191967879ea9c2bc07346621624761f660796153b41c2dad5e0e331d",
+    "src/llm_gateway/cache.py": "157c952cc53308d929f057dd0abb618b7c1598651f767cd702001e8563a33105",
+    "src/llm_gateway/config.py": "c7326a074cd364a586a1578aa377a181296add5d9544301f2fa15f861a382b06",
+    "src/llm_gateway/eligibility.py": "69fcbb029465e43afdd7622641950a6e979e57e9574575a2191f73dd8261167a",
+    "src/llm_gateway/embeddings.py": "48ec89a7a3f474b8490c7c8c6f3eceaf3c9496c912fc5221ede45f849dd29e05",
+    "src/llm_gateway/metrics.py": "f9daabbd5575b265370966a417a21157cdc2809b3cdd000f06f3e4abb41e5536",
+    "src/llm_gateway/schemas.py": "8c009bdaacea952b8c6487a837eeabb02815c90286a00b973fa15f015ca83c01",
+    "src/llm_gateway/semantic.py": "54a293bf238f356aa35b12c4bf4d8c2f1ec628066d0e586a11812c7674f2d178",
+    "src/llm_gateway/traffic.py": "a18c31c05ce67b772f01c091f5a2f55f49753c2cf0ec844f1b80bfd47c536be9",
+    "devtools/generalization_live.py": "5f37b277821cfc628e6d72d01814e0a0f929ed0ce9bf9d13c88fdafd7f64d2ee"
+  },
+  "started_at_utc": "2026-10-30T09:50:10.016909+00:00",
+  "finished_at_utc": "2026-10-30T09:50:10.309805+00:00",
+  "hardware": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.12.14"
+  },
+  "transport": "production ASGI boundary; counted MockTransport backend",
+  "actual_local_embeddings": true,
+  "embedding_fingerprint": "embedding-v1:05d0bc5e51790e091ee51fce277d198a843efdda5b0dbb4cc5823f53f9a60508",
+  "query_source_expansion": false,
+  "source_vectors_per_case": 2,
+  "source_reset": "Restore only original canonical immutable entries before each case",
+  "fresh_model_inference_during_scoring": false,
+  "genuine_model_source_replay": true,
+  "genuine_source_sha256": "1c17cd98c47f628c7ea7da0b69879c974ce7cff4fb744a421dcc830ed30d5e75",
+  "genuine_source_evidence": {
+    "real_model_inference": true,
+    "transport": "loopback_http",
+    "model_identity": {
+      "backend_version": "0.40.11",
+      "model": "gemma3:1b",
+      "model_digest": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+      "context_length": 2048,
+      "hardware": "CPU-only Linux, 8 GiB, two-core cgroup quota"
+    },
+    "actual_upstream_calls": 2,
+    "call_count_source": "dedicated_quiet_ollama_gin_log",
+    "live_probe_total_upstream_calls": 4,
+    "live_probe_requests": 6,
+    "sources": {
+      "france-capital": {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of France? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "response": {
+          "id": "chatcmpl-421",
+          "object": "chat.completion",
+          "created": 1793353770,
+          "model": "gemma",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Paris"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 23,
+            "completion_tokens": 2,
+            "total_tokens": 25
+          }
+        }
+      },
+      "japan-capital": {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of Japan? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "response": {
+          "id": "chatcmpl-336",
+          "object": "chat.completion",
+          "created": 1793353771,
+          "model": "gemma",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "Tokyo"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 23,
+            "completion_tokens": 2,
+            "total_tokens": 25
+          }
+        }
+      }
+    },
+    "live_probe_rows": [
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of France? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "MISS",
+        "status": 200,
+        "assistant_text": "Paris",
+        "expected_city": "Paris",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 3327.044,
+          "adapter": 3316.916,
+          "semantic": 3.988,
+          "exact": 1.02,
+          "residual": 5.12
+        },
+        "response_sha256": "fbd0d8e9495b7784049c1877e2e7e78e325629d957a11f9f262ca37325825f5f"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of Japan? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "MISS",
+        "status": 200,
+        "assistant_text": "Tokyo",
+        "expected_city": "Tokyo",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 962.349,
+          "adapter": 958.087,
+          "semantic": 3.124,
+          "exact": 0.224,
+          "residual": 0.915
+        },
+        "response_sha256": "688749366811a33af29388aaf8bde9741e289fcdd40b072fd521529b4154cc18"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "Please state the capital city of France. Return just the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "SEMANTIC_HIT",
+        "status": 200,
+        "assistant_text": "Paris",
+        "expected_city": "Paris",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 8.545,
+          "semantic": 7.619,
+          "exact": 0.236,
+          "residual": 0.69
+        },
+        "response_sha256": "fbd0d8e9495b7784049c1877e2e7e78e325629d957a11f9f262ca37325825f5f"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "Please state the capital city of Japan. Return just the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "SEMANTIC_HIT",
+        "status": 200,
+        "assistant_text": "Tokyo",
+        "expected_city": "Tokyo",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 4.104,
+          "semantic": 3.307,
+          "exact": 0.202,
+          "residual": 0.595
+        },
+        "response_sha256": "688749366811a33af29388aaf8bde9741e289fcdd40b072fd521529b4154cc18"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of Germany? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-a",
+        "cache": "BYPASS",
+        "status": 200,
+        "assistant_text": "Berlin",
+        "expected_city": "Berlin",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 971.802,
+          "adapter": 971.08,
+          "exact": 0.075,
+          "residual": 0.647
+        },
+        "response_sha256": "66eeaabd6329262f9af4c5225c8852f168d3b3bf4716d3ba50a67b2e6a022768"
+      },
+      {
+        "request": {
+          "model": "gemma",
+          "messages": [
+            {
+              "role": "user",
+              "content": "What is the capital of France? Answer with only the city name."
+            }
+          ],
+          "temperature": 0.0,
+          "top_p": 1.0,
+          "seed": 42,
+          "max_tokens": 32,
+          "stream": false
+        },
+        "client": "client-b",
+        "cache": "MISS",
+        "status": 200,
+        "assistant_text": "Paris",
+        "expected_city": "Paris",
+        "answer_suitable": true,
+        "server_timing_ms": {
+          "gateway": 438.717,
+          "adapter": 433.966,
+          "semantic": 3.78,
+          "exact": 0.192,
+          "residual": 0.779
+        },
+        "response_sha256": "24829527a738029a791bd5d321e3396b2cca0a70820296abed1ac404bdb2dc9b"
+      }
+    ],
+    "answer_oracle": "Exact city name; trim surrounding whitespace only",
+    "limitations": "Two static facts; no general answer-quality or language-equivalence guarantee."
+  },
+  "noncanonical_inference": "No-store deterministic fixture; cold answers are not model-quality evidence",
+  "suitability_scope": "Cached equivalent answers only: exact Paris/Tokyo after surrounding whitespace trim",
+  "phases": {
+    "baseline": {
+      "policy": "reviewed-phrase-baseline",
+      "configuration": {
+        "backends": {
+          "local": {
+            "base_url": "http://127.0.0.1:11434/v1",
+            "api_key_env": null,
+            "revision": "ollama-0.40.11-ctx2048-template-default-v1"
+          }
+        },
+        "models": {
+          "gemma": {
+            "backend": "local",
+            "model": "gemma3:1b",
+            "revision": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c"
+          }
+        },
+        "request_timeout_seconds": 60.0,
+        "max_connections": 4,
+        "max_response_bytes": 262144,
+        "max_in_flight": 1,
+        "rate_limit": {
+          "burst": 10000,
+          "requests_per_second": 10000.0
+        },
+        "client_rate_limits": {},
+        "exact_cache": {
+          "enabled": true,
+          "ttl_seconds": 3600.0,
+          "max_entries": 16,
+          "max_bytes": 1048576,
+          "approved_prompts": [],
+          "namespace": "m07-generalization-evaluation-v1"
+        },
+        "semantic_cache": {
+          "enabled": true,
+          "model_dir": "/workspace/04-llm-gateway/artifacts/embeddings/l3",
+          "threshold": 0.75,
+          "timeout_seconds": 0.25,
+          "max_entries": 16,
+          "families": [
+            {
+              "id": "france-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of France? Answer with only the city name.",
+                "Name France's capital city. Return only its name.",
+                "Which city is the capital of France? Give just the city name.",
+                "Tell me the name of France's capital, with nothing else.",
+                "Identify the capital city of France; reply with the city name alone.",
+                "France has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as France's capital."
+              ]
+            },
+            {
+              "id": "japan-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of Japan? Answer with only the city name.",
+                "Name Japan's capital city. Return only its name.",
+                "Which city is the capital of Japan? Give just the city name.",
+                "Tell me the name of Japan's capital, with nothing else.",
+                "Identify the capital city of Japan; reply with the city name alone.",
+                "Japan has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as Japan's capital."
+              ]
+            },
+            {
+              "id": "python3-list-tuple",
+              "domain": "public-static-v1",
+              "answer_contract": "two-short-bullets-mutability-and-literal-syntax-v1",
+              "prompts": [
+                "In Python 3, give exactly two short bullet points comparing lists and tuples: mutability and literal syntax.",
+                "Compare Python 3 lists with tuples in two concise bullets, one about mutability and one about literal syntax.",
+                "For Python 3, briefly contrast lists and tuples using exactly two bullets covering mutability and how their literals are written.",
+                "Give two short list-versus-tuple bullet points for Python 3: whether each can change, then its literal notation.",
+                "Using exactly two brief bullets, explain how Python 3 lists and tuples differ in mutability and literal notation.",
+                "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+                "Describe Python 3 list/tuple differences in two concise bullet points: mutability first and literal-writing syntax second."
+              ]
+            }
+          ],
+          "capital_entities": []
+        },
+        "log_requests": false
+      },
+      "summary": {
+        "queries": 72,
+        "equivalents": 24,
+        "negatives": 48,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 24,
+        "equivalent_bypasses": 24,
+        "negative_semantic_hits": 0,
+        "bypasses": 72,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 72
+        },
+        "http_statuses": {
+          "200": 72
+        },
+        "fixture_upstream_attempts": 72,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "seed_calls": 2,
+      "total_fixture_backend_calls": 74,
+      "total_gateway_upstream_attempts": 74,
+      "seed_sources": [
+        {
+          "family": "france-capital",
+          "response": {
+            "id": "chatcmpl-421",
+            "object": "chat.completion",
+            "created": 1793353770,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Paris"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        },
+        {
+          "family": "japan-capital",
+          "response": {
+            "id": "chatcmpl-336",
+            "object": "chat.completion",
+            "created": 1793353771,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Tokyo"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        }
+      ],
+      "case_results": [
+        {
+          "id": "holdout-001",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5244159985741135,
+          "server_timing": "gateway;dur=1.019, adapter;dur=0.665, exact;dur=0.018, residual;dur=0.336",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-002",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8402749992674217,
+          "server_timing": "gateway;dur=1.174, adapter;dur=0.521, exact;dur=0.021, residual;dur=0.632",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-003",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7651769994699862,
+          "server_timing": "gateway;dur=1.276, adapter;dur=0.607, exact;dur=0.017, residual;dur=0.651",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-004",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.9111229994450696,
+          "server_timing": "gateway;dur=1.420, adapter;dur=0.502, exact;dur=0.020, residual;dur=0.899",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-005",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.282954999624053,
+          "server_timing": "gateway;dur=0.920, adapter;dur=0.424, exact;dur=0.197, residual;dur=0.299",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-006",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1694979984895326,
+          "server_timing": "gateway;dur=0.765, adapter;dur=0.306, exact;dur=0.017, residual;dur=0.442",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-007",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2493789981817827,
+          "server_timing": "gateway;dur=0.620, adapter;dur=0.301, exact;dur=0.019, residual;dur=0.300",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-008",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2072000026819296,
+          "server_timing": "gateway;dur=0.733, adapter;dur=0.435, exact;dur=0.014, residual;dur=0.284",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-009",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2993819982511923,
+          "server_timing": "gateway;dur=0.946, adapter;dur=0.645, exact;dur=0.016, residual;dur=0.285",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-010",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.6182639992621262,
+          "server_timing": "gateway;dur=1.023, adapter;dur=0.311, exact;dur=0.019, residual;dur=0.693",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-011",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1862819992529694,
+          "server_timing": "gateway;dur=0.827, adapter;dur=0.536, exact;dur=0.017, residual;dur=0.274",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-012",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3886300002923235,
+          "server_timing": "gateway;dur=0.737, adapter;dur=0.444, exact;dur=0.017, residual;dur=0.276",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-013",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2160280020907521,
+          "server_timing": "gateway;dur=0.857, adapter;dur=0.336, exact;dur=0.017, residual;dur=0.504",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-014",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0374699995736592,
+          "server_timing": "gateway;dur=0.595, adapter;dur=0.278, exact;dur=0.017, residual;dur=0.299",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-015",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.916908000363037,
+          "server_timing": "gateway;dur=0.547, adapter;dur=0.260, exact;dur=0.016, residual;dur=0.271",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-016",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.469827999244444,
+          "server_timing": "gateway;dur=1.107, adapter;dur=0.826, exact;dur=0.014, residual;dur=0.267",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-017",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.669479999691248,
+          "server_timing": "gateway;dur=1.326, adapter;dur=0.750, exact;dur=0.021, residual;dur=0.554",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-018",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.677827000297839,
+          "server_timing": "gateway;dur=2.096, adapter;dur=0.833, exact;dur=0.017, residual;dur=1.247",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-019",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.995226997678401,
+          "server_timing": "gateway;dur=1.354, adapter;dur=0.917, exact;dur=0.017, residual;dur=0.420",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-020",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8493999996280763,
+          "server_timing": "gateway;dur=0.640, adapter;dur=0.311, exact;dur=0.019, residual;dur=0.310",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-021",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0419250029372051,
+          "server_timing": "gateway;dur=0.533, adapter;dur=0.274, exact;dur=0.015, residual;dur=0.244",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-022",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.1109640001668595,
+          "server_timing": "gateway;dur=0.711, adapter;dur=0.300, exact;dur=0.018, residual;dur=0.393",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-023",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3224359972809907,
+          "server_timing": "gateway;dur=0.849, adapter;dur=0.376, exact;dur=0.016, residual;dur=0.457",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-024",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.762748997862218,
+          "server_timing": "gateway;dur=0.902, adapter;dur=0.434, exact;dur=0.018, residual;dur=0.451",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-025",
+          "kind": "must_not_reuse",
+          "category": "entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.6646539990906604,
+          "server_timing": "gateway;dur=2.183, adapter;dur=1.464, exact;dur=0.021, residual;dur=0.699",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-026",
+          "kind": "must_not_reuse",
+          "category": "entity-near-name",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4839079994999338,
+          "server_timing": "gateway;dur=0.731, adapter;dur=0.382, exact;dur=0.018, residual;dur=0.330",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-027",
+          "kind": "must_not_reuse",
+          "category": "entity-near-name",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5532610013906378,
+          "server_timing": "gateway;dur=0.817, adapter;dur=0.512, exact;dur=0.018, residual;dur=0.288",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-028",
+          "kind": "must_not_reuse",
+          "category": "entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.244518000021344,
+          "server_timing": "gateway;dur=0.787, adapter;dur=0.436, exact;dur=0.018, residual;dur=0.333",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-029",
+          "kind": "must_not_reuse",
+          "category": "entity-qualifier",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.1424639999167994,
+          "server_timing": "gateway;dur=0.899, adapter;dur=0.308, exact;dur=0.018, residual;dur=0.573",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-030",
+          "kind": "must_not_reuse",
+          "category": "historical-date",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0567889985395595,
+          "server_timing": "gateway;dur=0.702, adapter;dur=0.413, exact;dur=0.016, residual;dur=0.274",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-031",
+          "kind": "must_not_reuse",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3503459995263256,
+          "server_timing": "gateway;dur=0.787, adapter;dur=0.454, exact;dur=0.018, residual;dur=0.315",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-032",
+          "kind": "must_not_reuse",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8387780000921339,
+          "server_timing": "gateway;dur=1.287, adapter;dur=0.451, exact;dur=0.016, residual;dur=0.819",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-033",
+          "kind": "must_not_reuse",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.8656789982051123,
+          "server_timing": "gateway;dur=1.808, adapter;dur=0.484, exact;dur=0.020, residual;dur=1.303",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-034",
+          "kind": "must_not_reuse",
+          "category": "negation-and-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.209466001659166,
+          "server_timing": "gateway;dur=1.746, adapter;dur=1.160, exact;dur=0.016, residual;dur=0.569",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-035",
+          "kind": "must_not_reuse",
+          "category": "number-and-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2294799998926464,
+          "server_timing": "gateway;dur=0.868, adapter;dur=0.477, exact;dur=0.018, residual;dur=0.373",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-036",
+          "kind": "must_not_reuse",
+          "category": "number",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4775019990338478,
+          "server_timing": "gateway;dur=1.015, adapter;dur=0.410, exact;dur=0.020, residual;dur=0.585",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-037",
+          "kind": "must_not_reuse",
+          "category": "numerical-output",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0503859994059894,
+          "server_timing": "gateway;dur=0.702, adapter;dur=0.411, exact;dur=0.016, residual;dur=0.275",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-038",
+          "kind": "must_not_reuse",
+          "category": "repetition",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.3027560018817894,
+          "server_timing": "gateway;dur=1.573, adapter;dur=0.885, exact;dur=0.018, residual;dur=0.670",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-039",
+          "kind": "must_not_reuse",
+          "category": "historical-date",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.6481150014442392,
+          "server_timing": "gateway;dur=1.045, adapter;dur=0.399, exact;dur=0.231, residual;dur=0.415",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-040",
+          "kind": "must_not_reuse",
+          "category": "future",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3246919988887385,
+          "server_timing": "gateway;dur=0.871, adapter;dur=0.503, exact;dur=0.017, residual;dur=0.351",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-041",
+          "kind": "must_not_reuse",
+          "category": "freshness",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2883249983133283,
+          "server_timing": "gateway;dur=0.776, adapter;dur=0.468, exact;dur=0.017, residual;dur=0.291",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-042",
+          "kind": "must_not_reuse",
+          "category": "dynamic-qualifier",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.06473400228424,
+          "server_timing": "gateway;dur=0.728, adapter;dur=0.468, exact;dur=0.015, residual;dur=0.245",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-043",
+          "kind": "must_not_reuse",
+          "category": "format-json",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4005650009494275,
+          "server_timing": "gateway;dur=0.602, adapter;dur=0.278, exact;dur=0.018, residual;dur=0.305",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-044",
+          "kind": "must_not_reuse",
+          "category": "format-case",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9890399996947963,
+          "server_timing": "gateway;dur=0.612, adapter;dur=0.273, exact;dur=0.017, residual;dur=0.321",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-045",
+          "kind": "must_not_reuse",
+          "category": "format-language",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.075181000487646,
+          "server_timing": "gateway;dur=0.525, adapter;dur=0.264, exact;dur=0.015, residual;dur=0.245",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-046",
+          "kind": "must_not_reuse",
+          "category": "additional-requirement",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5434359993378166,
+          "server_timing": "gateway;dur=1.171, adapter;dur=0.856, exact;dur=0.016, residual;dur=0.299",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-047",
+          "kind": "must_not_reuse",
+          "category": "instruction-suffix",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.3976240008778404,
+          "server_timing": "gateway;dur=1.510, adapter;dur=0.760, exact;dur=0.022, residual;dur=0.729",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-048",
+          "kind": "must_not_reuse",
+          "category": "instruction-override",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3409839993983041,
+          "server_timing": "gateway;dur=0.890, adapter;dur=0.283, exact;dur=0.017, residual;dur=0.590",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-049",
+          "kind": "must_not_reuse",
+          "category": "quoted-task",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0765100014396012,
+          "server_timing": "gateway;dur=0.731, adapter;dur=0.442, exact;dur=0.016, residual;dur=0.273",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-050",
+          "kind": "must_not_reuse",
+          "category": "quoted-task",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2742709986923728,
+          "server_timing": "gateway;dur=0.755, adapter;dur=0.477, exact;dur=0.016, residual;dur=0.262",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-051",
+          "kind": "must_not_reuse",
+          "category": "personal-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4698040031362325,
+          "server_timing": "gateway;dur=0.977, adapter;dur=0.276, exact;dur=0.017, residual;dur=0.684",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-052",
+          "kind": "must_not_reuse",
+          "category": "personal-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3839679995726328,
+          "server_timing": "gateway;dur=0.959, adapter;dur=0.310, exact;dur=0.019, residual;dur=0.630",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-053",
+          "kind": "must_not_reuse",
+          "category": "context-dependence",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8910069991543423,
+          "server_timing": "gateway;dur=0.520, adapter;dur=0.258, exact;dur=0.015, residual;dur=0.247",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-054",
+          "kind": "must_not_reuse",
+          "category": "fictional-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7426970007363707,
+          "server_timing": "gateway;dur=0.643, adapter;dur=0.296, exact;dur=0.018, residual;dur=0.329",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-055",
+          "kind": "must_not_reuse",
+          "category": "version",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.350295999145601,
+          "server_timing": "gateway;dur=0.807, adapter;dur=0.471, exact;dur=0.019, residual;dur=0.318",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-056",
+          "kind": "must_not_reuse",
+          "category": "version-and-topic",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2501349992817268,
+          "server_timing": "gateway;dur=0.792, adapter;dur=0.423, exact;dur=0.017, residual;dur=0.353",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-057",
+          "kind": "must_not_reuse",
+          "category": "version-and-language",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4933210004528519,
+          "server_timing": "gateway;dur=0.734, adapter;dur=0.384, exact;dur=0.019, residual;dur=0.331",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-058",
+          "kind": "must_not_reuse",
+          "category": "number-and-topic",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0887620010180399,
+          "server_timing": "gateway;dur=0.762, adapter;dur=0.480, exact;dur=0.016, residual;dur=0.266",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-059",
+          "kind": "must_not_reuse",
+          "category": "unicode-confusable",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9897890013235155,
+          "server_timing": "gateway;dur=0.663, adapter;dur=0.399, exact;dur=0.016, residual;dur=0.248",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-060",
+          "kind": "must_not_reuse",
+          "category": "invisible-character",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.489353999204468,
+          "server_timing": "gateway;dur=0.642, adapter;dur=0.337, exact;dur=0.023, residual;dur=0.282",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-061",
+          "kind": "must_not_reuse",
+          "category": "sensitive-suffix",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.961748999543488,
+          "server_timing": "gateway;dur=0.599, adapter;dur=0.267, exact;dur=0.016, residual;dur=0.316",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-062",
+          "kind": "must_not_reuse",
+          "category": "tool-dependent",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0642870001902338,
+          "server_timing": "gateway;dur=0.737, adapter;dur=0.313, exact;dur=0.015, residual;dur=0.409",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-063",
+          "kind": "must_not_reuse",
+          "category": "relative-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0407629997644108,
+          "server_timing": "gateway;dur=0.724, adapter;dur=0.455, exact;dur=0.015, residual;dur=0.253",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-064",
+          "kind": "must_not_reuse",
+          "category": "freshness-and-additional",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.188357000501128,
+          "server_timing": "gateway;dur=0.768, adapter;dur=0.488, exact;dur=0.016, residual;dur=0.264",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-065",
+          "kind": "must_not_reuse",
+          "category": "system-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9148719982476905,
+          "server_timing": "gateway;dur=0.589, adapter;dur=0.271, exact;dur=0.013, residual;dur=0.304",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-066",
+          "kind": "must_not_reuse",
+          "category": "conversation-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8521689996996429,
+          "server_timing": "gateway;dur=0.545, adapter;dur=0.253, exact;dur=0.012, residual;dur=0.280",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-067",
+          "kind": "must_not_reuse",
+          "category": "cookie-boundary",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.798242999939248,
+          "server_timing": "gateway;dur=1.432, adapter;dur=0.352, exact;dur=0.011, residual;dur=1.069",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-068",
+          "kind": "must_not_reuse",
+          "category": "request-no-store",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5134990026126616,
+          "server_timing": "gateway;dur=1.093, adapter;dur=0.773, exact;dur=0.013, residual;dur=0.307",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-069",
+          "kind": "must_not_reuse",
+          "category": "missing-opt-in",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.004375000775326,
+          "server_timing": "gateway;dur=0.661, adapter;dur=0.339, exact;dur=0.008, residual;dur=0.314",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-070",
+          "kind": "must_not_reuse",
+          "category": "nondeterminism",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1126039971713908,
+          "server_timing": "gateway;dur=0.739, adapter;dur=0.338, exact;dur=0.018, residual;dur=0.383",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-071",
+          "kind": "must_not_reuse",
+          "category": "missing-seed",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5721160016255453,
+          "server_timing": "gateway;dur=1.232, adapter;dur=0.687, exact;dur=0.018, residual;dur=0.527",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-072",
+          "kind": "must_not_reuse",
+          "category": "tenant-isolation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7108059983002022,
+          "server_timing": "gateway;dur=1.347, adapter;dur=0.320, exact;dur=0.021, residual;dur=1.007",
+          "seed_candidate_entries": 2
+        }
+      ]
+    },
+    "candidate": {
+      "policy": "capital-grammar-candidate",
+      "configuration": {
+        "backends": {
+          "local": {
+            "base_url": "http://127.0.0.1:11434/v1",
+            "api_key_env": null,
+            "revision": "ollama-0.40.11-ctx2048-template-default-v1"
+          }
+        },
+        "models": {
+          "gemma": {
+            "backend": "local",
+            "model": "gemma3:1b",
+            "revision": "sha256:97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c"
+          }
+        },
+        "request_timeout_seconds": 60.0,
+        "max_connections": 4,
+        "max_response_bytes": 262144,
+        "max_in_flight": 1,
+        "rate_limit": {
+          "burst": 10000,
+          "requests_per_second": 10000.0
+        },
+        "client_rate_limits": {},
+        "exact_cache": {
+          "enabled": true,
+          "ttl_seconds": 3600.0,
+          "max_entries": 16,
+          "max_bytes": 1048576,
+          "approved_prompts": [],
+          "namespace": "m07-generalization-evaluation-v1"
+        },
+        "semantic_cache": {
+          "enabled": true,
+          "model_dir": "/workspace/04-llm-gateway/artifacts/embeddings/l3",
+          "threshold": 0.75,
+          "timeout_seconds": 0.25,
+          "max_entries": 16,
+          "families": [
+            {
+              "id": "france-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of France? Answer with only the city name.",
+                "Name France's capital city. Return only its name.",
+                "Which city is the capital of France? Give just the city name.",
+                "Tell me the name of France's capital, with nothing else.",
+                "Identify the capital city of France; reply with the city name alone.",
+                "France has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as France's capital."
+              ]
+            },
+            {
+              "id": "japan-capital",
+              "domain": "public-static-v1",
+              "answer_contract": "city-name-only-v1",
+              "prompts": [
+                "What is the capital of Japan? Answer with only the city name.",
+                "Name Japan's capital city. Return only its name.",
+                "Which city is the capital of Japan? Give just the city name.",
+                "Tell me the name of Japan's capital, with nothing else.",
+                "Identify the capital city of Japan; reply with the city name alone.",
+                "Japan has which capital? Respond solely with the city's name.",
+                "Give only the name of the city that serves as Japan's capital."
+              ]
+            },
+            {
+              "id": "python3-list-tuple",
+              "domain": "public-static-v1",
+              "answer_contract": "two-short-bullets-mutability-and-literal-syntax-v1",
+              "prompts": [
+                "In Python 3, give exactly two short bullet points comparing lists and tuples: mutability and literal syntax.",
+                "Compare Python 3 lists with tuples in two concise bullets, one about mutability and one about literal syntax.",
+                "For Python 3, briefly contrast lists and tuples using exactly two bullets covering mutability and how their literals are written.",
+                "Give two short list-versus-tuple bullet points for Python 3: whether each can change, then its literal notation.",
+                "Using exactly two brief bullets, explain how Python 3 lists and tuples differ in mutability and literal notation.",
+                "In Python 3, contrast list and tuple mutability plus literal syntax; limit the answer to two short bullets.",
+                "Describe Python 3 list/tuple differences in two concise bullet points: mutability first and literal-writing syntax second."
+              ]
+            }
+          ],
+          "capital_entities": [
+            "France",
+            "Japan"
+          ]
+        },
+        "log_requests": false
+      },
+      "summary": {
+        "queries": 72,
+        "equivalents": 24,
+        "negatives": 48,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 24,
+        "equivalent_bypasses": 24,
+        "negative_semantic_hits": 0,
+        "bypasses": 72,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 72
+        },
+        "http_statuses": {
+          "200": 72
+        },
+        "fixture_upstream_attempts": 72,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "seed_calls": 2,
+      "total_fixture_backend_calls": 74,
+      "total_gateway_upstream_attempts": 74,
+      "seed_sources": [
+        {
+          "family": "france-capital",
+          "response": {
+            "id": "chatcmpl-421",
+            "object": "chat.completion",
+            "created": 1793353770,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Paris"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        },
+        {
+          "family": "japan-capital",
+          "response": {
+            "id": "chatcmpl-336",
+            "object": "chat.completion",
+            "created": 1793353771,
+            "model": "gemma",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Tokyo"
+                },
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 23,
+              "completion_tokens": 2,
+              "total_tokens": 25
+            }
+          },
+          "cache": "MISS"
+        }
+      ],
+      "case_results": [
+        {
+          "id": "holdout-001",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.053410000167787,
+          "server_timing": "gateway;dur=0.589, adapter;dur=0.294, exact;dur=0.029, residual;dur=0.265",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-002",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1098360009782482,
+          "server_timing": "gateway;dur=0.777, adapter;dur=0.303, exact;dur=0.034, residual;dur=0.440",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-003",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0632190023898147,
+          "server_timing": "gateway;dur=0.616, adapter;dur=0.302, exact;dur=0.032, residual;dur=0.282",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-004",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8794009991106577,
+          "server_timing": "gateway;dur=0.518, adapter;dur=0.257, exact;dur=0.026, residual;dur=0.235",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-005",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1511840020830277,
+          "server_timing": "gateway;dur=0.804, adapter;dur=0.303, exact;dur=0.030, residual;dur=0.471",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-006",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2608600009116344,
+          "server_timing": "gateway;dur=0.803, adapter;dur=0.390, exact;dur=0.157, residual;dur=0.256",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-007",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.642523999180412,
+          "server_timing": "gateway;dur=1.161, adapter;dur=0.717, exact;dur=0.029, residual;dur=0.414",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-008",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.384608000284061,
+          "server_timing": "gateway;dur=0.904, adapter;dur=0.416, exact;dur=0.060, residual;dur=0.428",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-009",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.9118019990855828,
+          "server_timing": "gateway;dur=1.054, adapter;dur=0.384, exact;dur=0.100, residual;dur=0.570",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-010",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7368389999319334,
+          "server_timing": "gateway;dur=0.955, adapter;dur=0.462, exact;dur=0.039, residual;dur=0.454",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-011",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.564311001857277,
+          "server_timing": "gateway;dur=0.969, adapter;dur=0.382, exact;dur=0.032, residual;dur=0.555",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-012",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "france-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.0057980000274256,
+          "server_timing": "gateway;dur=1.334, adapter;dur=0.636, exact;dur=0.031, residual;dur=0.666",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-013",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2634060003620107,
+          "server_timing": "gateway;dur=0.911, adapter;dur=0.333, exact;dur=0.034, residual;dur=0.544",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-014",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1980410017713439,
+          "server_timing": "gateway;dur=0.745, adapter;dur=0.392, exact;dur=0.031, residual;dur=0.322",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-015",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.9207389996154234,
+          "server_timing": "gateway;dur=1.028, adapter;dur=0.672, exact;dur=0.049, residual;dur=0.307",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-016",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.4593919988546986,
+          "server_timing": "gateway;dur=1.455, adapter;dur=0.921, exact;dur=0.033, residual;dur=0.501",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-017",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.0944099996995647,
+          "server_timing": "gateway;dur=1.198, adapter;dur=0.471, exact;dur=0.028, residual;dur=0.698",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-018",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8298250033694785,
+          "server_timing": "gateway;dur=1.248, adapter;dur=0.451, exact;dur=0.035, residual;dur=0.762",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-019",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.1117559990670998,
+          "server_timing": "gateway;dur=1.117, adapter;dur=0.658, exact;dur=0.033, residual;dur=0.426",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-020",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5694809990236536,
+          "server_timing": "gateway;dur=0.769, adapter;dur=0.449, exact;dur=0.033, residual;dur=0.287",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-021",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.428725001460407,
+          "server_timing": "gateway;dur=0.917, adapter;dur=0.446, exact;dur=0.030, residual;dur=0.441",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-022",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2658679988817312,
+          "server_timing": "gateway;dur=0.852, adapter;dur=0.394, exact;dur=0.181, residual;dur=0.277",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-023",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.374923998810118,
+          "server_timing": "gateway;dur=0.845, adapter;dur=0.539, exact;dur=0.028, residual;dur=0.278",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-024",
+          "kind": "equivalent",
+          "category": "paraphrase",
+          "expected_family": "japan-capital",
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0526389996812213,
+          "server_timing": "gateway;dur=0.608, adapter;dur=0.277, exact;dur=0.030, residual;dur=0.301",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-025",
+          "kind": "must_not_reuse",
+          "category": "entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0219010000582784,
+          "server_timing": "gateway;dur=0.701, adapter;dur=0.361, exact;dur=0.032, residual;dur=0.308",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-026",
+          "kind": "must_not_reuse",
+          "category": "entity-near-name",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.957168002059916,
+          "server_timing": "gateway;dur=0.595, adapter;dur=0.252, exact;dur=0.031, residual;dur=0.312",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-027",
+          "kind": "must_not_reuse",
+          "category": "entity-near-name",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.222634000441758,
+          "server_timing": "gateway;dur=0.847, adapter;dur=0.361, exact;dur=0.032, residual;dur=0.454",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-028",
+          "kind": "must_not_reuse",
+          "category": "entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2994300013815518,
+          "server_timing": "gateway;dur=0.938, adapter;dur=0.316, exact;dur=0.038, residual;dur=0.584",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-029",
+          "kind": "must_not_reuse",
+          "category": "entity-qualifier",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.5717800015409011,
+          "server_timing": "gateway;dur=0.748, adapter;dur=0.413, exact;dur=0.036, residual;dur=0.299",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-030",
+          "kind": "must_not_reuse",
+          "category": "historical-date",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9585690022504423,
+          "server_timing": "gateway;dur=0.616, adapter;dur=0.301, exact;dur=0.030, residual;dur=0.286",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-031",
+          "kind": "must_not_reuse",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1457569999038242,
+          "server_timing": "gateway;dur=0.580, adapter;dur=0.273, exact;dur=0.030, residual;dur=0.277",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-032",
+          "kind": "must_not_reuse",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.8963930015161168,
+          "server_timing": "gateway;dur=1.530, adapter;dur=1.224, exact;dur=0.028, residual;dur=0.278",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-033",
+          "kind": "must_not_reuse",
+          "category": "negation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0758630014606752,
+          "server_timing": "gateway;dur=0.643, adapter;dur=0.326, exact;dur=0.030, residual;dur=0.287",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-034",
+          "kind": "must_not_reuse",
+          "category": "negation-and-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2716579985863063,
+          "server_timing": "gateway;dur=0.547, adapter;dur=0.256, exact;dur=0.030, residual;dur=0.260",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-035",
+          "kind": "must_not_reuse",
+          "category": "number-and-entity",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.0457949976844247,
+          "server_timing": "gateway;dur=1.457, adapter;dur=0.502, exact;dur=0.034, residual;dur=0.921",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-036",
+          "kind": "must_not_reuse",
+          "category": "number",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9828100010054186,
+          "server_timing": "gateway;dur=0.587, adapter;dur=0.285, exact;dur=0.028, residual;dur=0.274",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-037",
+          "kind": "must_not_reuse",
+          "category": "numerical-output",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2792970010195859,
+          "server_timing": "gateway;dur=0.886, adapter;dur=0.545, exact;dur=0.031, residual;dur=0.310",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-038",
+          "kind": "must_not_reuse",
+          "category": "repetition",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.581079002993647,
+          "server_timing": "gateway;dur=1.921, adapter;dur=1.301, exact;dur=0.274, residual;dur=0.347",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-039",
+          "kind": "must_not_reuse",
+          "category": "historical-date",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.89287800094462,
+          "server_timing": "gateway;dur=1.178, adapter;dur=0.538, exact;dur=0.034, residual;dur=0.606",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-040",
+          "kind": "must_not_reuse",
+          "category": "future",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1766690004151314,
+          "server_timing": "gateway;dur=0.669, adapter;dur=0.341, exact;dur=0.033, residual;dur=0.295",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-041",
+          "kind": "must_not_reuse",
+          "category": "freshness",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 2.2131839978101198,
+          "server_timing": "gateway;dur=1.687, adapter;dur=0.605, exact;dur=0.041, residual;dur=1.041",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-042",
+          "kind": "must_not_reuse",
+          "category": "dynamic-qualifier",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 3.230250997148687,
+          "server_timing": "gateway;dur=2.765, adapter;dur=0.601, exact;dur=0.603, residual;dur=1.561",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-043",
+          "kind": "must_not_reuse",
+          "category": "format-json",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3984640027047135,
+          "server_timing": "gateway;dur=1.040, adapter;dur=0.620, exact;dur=0.028, residual;dur=0.392",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-044",
+          "kind": "must_not_reuse",
+          "category": "format-case",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.7175120010506362,
+          "server_timing": "gateway;dur=0.944, adapter;dur=0.434, exact;dur=0.036, residual;dur=0.474",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-045",
+          "kind": "must_not_reuse",
+          "category": "format-language",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1593550007091835,
+          "server_timing": "gateway;dur=0.619, adapter;dur=0.302, exact;dur=0.030, residual;dur=0.287",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-046",
+          "kind": "must_not_reuse",
+          "category": "additional-requirement",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8749529988563154,
+          "server_timing": "gateway;dur=0.523, adapter;dur=0.260, exact;dur=0.026, residual;dur=0.237",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-047",
+          "kind": "must_not_reuse",
+          "category": "instruction-suffix",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4688199989905115,
+          "server_timing": "gateway;dur=0.723, adapter;dur=0.370, exact;dur=0.033, residual;dur=0.320",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-048",
+          "kind": "must_not_reuse",
+          "category": "instruction-override",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0749040011432953,
+          "server_timing": "gateway;dur=0.728, adapter;dur=0.323, exact;dur=0.032, residual;dur=0.372",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-049",
+          "kind": "must_not_reuse",
+          "category": "quoted-task",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0997969984600786,
+          "server_timing": "gateway;dur=0.724, adapter;dur=0.264, exact;dur=0.034, residual;dur=0.425",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-050",
+          "kind": "must_not_reuse",
+          "category": "quoted-task",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1929259999305941,
+          "server_timing": "gateway;dur=0.683, adapter;dur=0.288, exact;dur=0.034, residual;dur=0.360",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-051",
+          "kind": "must_not_reuse",
+          "category": "personal-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9811099989747163,
+          "server_timing": "gateway;dur=0.540, adapter;dur=0.267, exact;dur=0.029, residual;dur=0.245",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-052",
+          "kind": "must_not_reuse",
+          "category": "personal-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9381500021845568,
+          "server_timing": "gateway;dur=0.582, adapter;dur=0.302, exact;dur=0.028, residual;dur=0.252",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-053",
+          "kind": "must_not_reuse",
+          "category": "context-dependence",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3588770016212948,
+          "server_timing": "gateway;dur=1.019, adapter;dur=0.616, exact;dur=0.029, residual;dur=0.374",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-054",
+          "kind": "must_not_reuse",
+          "category": "fictional-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0750869987532496,
+          "server_timing": "gateway;dur=0.734, adapter;dur=0.295, exact;dur=0.172, residual;dur=0.267",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-055",
+          "kind": "must_not_reuse",
+          "category": "version",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3313710005604662,
+          "server_timing": "gateway;dur=0.562, adapter;dur=0.265, exact;dur=0.029, residual;dur=0.268",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-056",
+          "kind": "must_not_reuse",
+          "category": "version-and-topic",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3061290010227822,
+          "server_timing": "gateway;dur=0.941, adapter;dur=0.412, exact;dur=0.039, residual;dur=0.491",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-057",
+          "kind": "must_not_reuse",
+          "category": "version-and-language",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.2511370005086064,
+          "server_timing": "gateway;dur=0.817, adapter;dur=0.292, exact;dur=0.036, residual;dur=0.488",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-058",
+          "kind": "must_not_reuse",
+          "category": "number-and-topic",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.1176370026078075,
+          "server_timing": "gateway;dur=0.693, adapter;dur=0.329, exact;dur=0.032, residual;dur=0.332",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-059",
+          "kind": "must_not_reuse",
+          "category": "unicode-confusable",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8754279988352209,
+          "server_timing": "gateway;dur=0.550, adapter;dur=0.256, exact;dur=0.020, residual;dur=0.274",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-060",
+          "kind": "must_not_reuse",
+          "category": "invisible-character",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9893550013657659,
+          "server_timing": "gateway;dur=0.515, adapter;dur=0.261, exact;dur=0.019, residual;dur=0.235",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-061",
+          "kind": "must_not_reuse",
+          "category": "sensitive-suffix",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.4196349984558765,
+          "server_timing": "gateway;dur=1.095, adapter;dur=0.534, exact;dur=0.165, residual;dur=0.396",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-062",
+          "kind": "must_not_reuse",
+          "category": "tool-dependent",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9910449989547487,
+          "server_timing": "gateway;dur=0.577, adapter;dur=0.282, exact;dur=0.032, residual;dur=0.263",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-063",
+          "kind": "must_not_reuse",
+          "category": "relative-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0153030016226694,
+          "server_timing": "gateway;dur=0.552, adapter;dur=0.265, exact;dur=0.033, residual;dur=0.254",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-064",
+          "kind": "must_not_reuse",
+          "category": "freshness-and-additional",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3280450002639554,
+          "server_timing": "gateway;dur=0.856, adapter;dur=0.370, exact;dur=0.177, residual;dur=0.309",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-065",
+          "kind": "must_not_reuse",
+          "category": "system-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.9918280011333991,
+          "server_timing": "gateway;dur=0.655, adapter;dur=0.370, exact;dur=0.019, residual;dur=0.266",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-066",
+          "kind": "must_not_reuse",
+          "category": "conversation-context",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.8514930013916455,
+          "server_timing": "gateway;dur=0.542, adapter;dur=0.295, exact;dur=0.012, residual;dur=0.235",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-067",
+          "kind": "must_not_reuse",
+          "category": "cookie-boundary",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3057380019745324,
+          "server_timing": "gateway;dur=0.971, adapter;dur=0.570, exact;dur=0.012, residual;dur=0.389",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-068",
+          "kind": "must_not_reuse",
+          "category": "request-no-store",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 0.915351996809477,
+          "server_timing": "gateway;dur=0.586, adapter;dur=0.282, exact;dur=0.013, residual;dur=0.291",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-069",
+          "kind": "must_not_reuse",
+          "category": "missing-opt-in",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.320737002970418,
+          "server_timing": "gateway;dur=0.600, adapter;dur=0.303, exact;dur=0.009, residual;dur=0.289",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-070",
+          "kind": "must_not_reuse",
+          "category": "nondeterminism",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.0166259999095928,
+          "server_timing": "gateway;dur=0.514, adapter;dur=0.257, exact;dur=0.026, residual;dur=0.232",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-071",
+          "kind": "must_not_reuse",
+          "category": "missing-seed",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.3573169999290258,
+          "server_timing": "gateway;dur=0.737, adapter;dur=0.421, exact;dur=0.027, residual;dur=0.289",
+          "seed_candidate_entries": 2
+        },
+        {
+          "id": "holdout-072",
+          "kind": "must_not_reuse",
+          "category": "tenant-isolation",
+          "expected_family": null,
+          "status": 200,
+          "cache": "BYPASS",
+          "parsed_or_reviewed_family": null,
+          "production_lookup_observation": [],
+          "selected_source_family": null,
+          "response_suitable": null,
+          "assistant_text": "Uncached evaluation fixture",
+          "upstream_attempts": 1,
+          "fixture_backend_calls": 1,
+          "semantic_stage_delta": {
+            "hits": 0,
+            "misses": 0,
+            "busy": 0,
+            "failures": 0
+          },
+          "client_asgi_latency_ms": 1.780778999091126,
+          "server_timing": "gateway;dur=1.324, adapter;dur=0.425, exact;dur=0.031, residual;dur=0.868",
+          "seed_candidate_entries": 2
+        }
+      ]
+    }
+  }
+}

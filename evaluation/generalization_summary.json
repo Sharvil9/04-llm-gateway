@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "verified_date_utc": "2026-10-30T09:53:32.596211+00:00",
+  "baseline_commit": "7850d8a6452a28ceed877488e6dae2a9a2ac3ebb",
+  "holdout_freeze_commit": "f9686d5b061a09a057220c701fdc2122c4875614",
+  "candidate_freeze_commit": "d9955fa00f345d55b13c1dbf5d8afe2f451e693f",
+  "verdict": {
+    "independent_useful_generalization_demonstrated": false,
+    "candidate_promoted": false,
+    "serving_policy": "Original reviewed-phrase policy; candidate runtime reverted",
+    "threshold_tuned": false,
+    "fixed_threshold": 0.75,
+    "final_precision": null,
+    "final_suitability_observed": false
+  },
+  "results": {
+    "development": {
+      "baseline": {
+        "queries": 36,
+        "equivalents": 14,
+        "negatives": 22,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 14,
+        "equivalent_bypasses": 14,
+        "negative_semantic_hits": 0,
+        "bypasses": 36,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 36
+        },
+        "http_statuses": {
+          "200": 36
+        },
+        "fixture_upstream_attempts": 36,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "candidate": {
+        "queries": 36,
+        "equivalents": 14,
+        "negatives": 22,
+        "semantic_hits": 12,
+        "true_semantic_hits": 12,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": 1.0,
+        "valid_paraphrase_coverage": 0.8571428571428571,
+        "equivalent_misses_or_bypasses": 2,
+        "equivalent_bypasses": 2,
+        "negative_semantic_hits": 0,
+        "bypasses": 24,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "SEMANTIC_HIT": 12,
+          "BYPASS": 24
+        },
+        "http_statuses": {
+          "200": 36
+        },
+        "fixture_upstream_attempts": 24,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      }
+    },
+    "heldout": {
+      "baseline": {
+        "queries": 72,
+        "equivalents": 24,
+        "negatives": 48,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 24,
+        "equivalent_bypasses": 24,
+        "negative_semantic_hits": 0,
+        "bypasses": 72,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 72
+        },
+        "http_statuses": {
+          "200": 72
+        },
+        "fixture_upstream_attempts": 72,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "candidate": {
+        "queries": 72,
+        "equivalents": 24,
+        "negatives": 48,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 24,
+        "equivalent_bypasses": 24,
+        "negative_semantic_hits": 0,
+        "bypasses": 72,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 72
+        },
+        "http_statuses": {
+          "200": 72
+        },
+        "fixture_upstream_attempts": 72,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      }
+    },
+    "development_gemma_replay": {
+      "baseline": {
+        "queries": 36,
+        "equivalents": 14,
+        "negatives": 22,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 14,
+        "equivalent_bypasses": 14,
+        "negative_semantic_hits": 0,
+        "bypasses": 36,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 36
+        },
+        "http_statuses": {
+          "200": 36
+        },
+        "fixture_upstream_attempts": 36,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "candidate": {
+        "queries": 36,
+        "equivalents": 14,
+        "negatives": 22,
+        "semantic_hits": 12,
+        "true_semantic_hits": 12,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": 1.0,
+        "valid_paraphrase_coverage": 0.8571428571428571,
+        "equivalent_misses_or_bypasses": 2,
+        "equivalent_bypasses": 2,
+        "negative_semantic_hits": 0,
+        "bypasses": 24,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "SEMANTIC_HIT": 12,
+          "BYPASS": 24
+        },
+        "http_statuses": {
+          "200": 36
+        },
+        "fixture_upstream_attempts": 24,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      }
+    },
+    "heldout_gemma_replay": {
+      "baseline": {
+        "queries": 72,
+        "equivalents": 24,
+        "negatives": 48,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 24,
+        "equivalent_bypasses": 24,
+        "negative_semantic_hits": 0,
+        "bypasses": 72,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 72
+        },
+        "http_statuses": {
+          "200": 72
+        },
+        "fixture_upstream_attempts": 72,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      },
+      "candidate": {
+        "queries": 72,
+        "equivalents": 24,
+        "negatives": 48,
+        "semantic_hits": 0,
+        "true_semantic_hits": 0,
+        "false_semantic_hits": 0,
+        "semantic_hit_precision": null,
+        "valid_paraphrase_coverage": 0.0,
+        "equivalent_misses_or_bypasses": 24,
+        "equivalent_bypasses": 24,
+        "negative_semantic_hits": 0,
+        "bypasses": 72,
+        "http_rejections": 0,
+        "cache_dispositions": {
+          "BYPASS": 72
+        },
+        "http_statuses": {
+          "200": 72
+        },
+        "fixture_upstream_attempts": 72,
+        "unsuitable_semantic_answers": 0,
+        "all_semantic_answers_suitable": true,
+        "precision_denominator": "All SEMANTIC_HIT responses, including policy-negative hits",
+        "coverage_denominator": "All labeled equivalent wire requests, including conservative bypasses"
+      }
+    }
+  },
+  "hardware": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.12.14",
+    "memory_limit_bytes": 8589934592,
+    "cpu_quota": "200000 100000",
+    "gpu": false,
+    "macOS_tested": false
+  },
+  "artifacts_sha256": {
+    "evaluation/generalization_candidate_freeze.json": "de2e38a099534a75b7296dfa3618b29c740cb07e4b7b7709645b75da5f5a6d64",
+    "evaluation/generalization_dev.json": "8e62f90e5f364d6ad2ce7f8fe403eada633d7a333ce506ed31fe0b26bf3bd608",
+    "evaluation/generalization_dev_gemma_results.json": "d58bfb582f929e7495f6747c7fe0801becbf2e9a5b6fa3962fe29b195e4b375c",
+    "evaluation/generalization_dev_results.json": "3ac131ed2606f8faee7f2dd98cbab21eda136ea33bb9fc389ca8f9c60fbace26",
+    "evaluation/generalization_gemma_sources.json": "1c17cd98c47f628c7ea7da0b69879c974ce7cff4fb744a421dcc830ed30d5e75",
+    "evaluation/generalization_holdout.json": "ad05be1634d5a890e62a74eceedcff4e1c6b2cc5ec218fcff1230077f5684845",
+    "evaluation/generalization_holdout_gemma_results.json": "91615894c6e9629705c103a1a0c7ba34fe44d130f6ff672afe0b8b162254f17b",
+    "evaluation/generalization_holdout_results.json": "98061b7ec3e07f076b970d05285fea0d16c3ba151a78f7a0f1b303e9cf96d2f1",
+    "evaluation/generalization_protocol.md": "f5a845c355d3d019a765f6844609b82d77cf05609f48aef4d879da4641dbd022",
+    "evaluation/generalization_release_gemma.json": "89a516434a3262a80309bcd5e159158b31deb2530f634b8d947daeb6903cd89f",
+    "evaluation/generalization_release_reliability.json": "e7f104cdf7403b23f5976a07765701794314b7c5e1256b811275f440fbd1da96",
+    "evaluation/generalization_review.json": "9754c5c7bb8712c97c5cf0a7afd3c65ecb7500471edb2817581a788828fdb6ea"
+  },
+  "tests": {
+    "frozen_candidate_passed": 314,
+    "frozen_candidate_note": "Candidate gate/evaluator tests retained in immutable experiment commit.",
+    "release_passed": 262,
+    "release_duration_seconds": 3.45,
+    "lint": "passed",
+    "format": "passed"
+  },
+  "reproduction": {
+    "candidate_worktree": "git worktree add --detach artifacts/m07-candidate d9955fa00f345d55b13c1dbf5d8afe2f451e693f",
+    "worktree_environment": "ln -s ../../.venv artifacts/m07-candidate/.venv; cd artifacts/m07-candidate; PYTHONPATH=\"$PWD/src\"",
+    "development": ".venv/bin/python -m devtools.generalization_eval --dataset dev --model-dir ../embeddings/l3 --output ../milestone07/reproduced-dev.json",
+    "final_genuine_replay": ".venv/bin/python -m devtools.generalization_eval --dataset holdout --model-dir ../embeddings/l3 --gemma-sources ../../evaluation/generalization_gemma_sources.json --output ../milestone07/reproduced-heldout-gemma.json",
+    "live_genuine_capture": ".venv/bin/python -m devtools.generalization_live --model-dir ../embeddings/l3 --ollama-log ../milestone07/ollama.log --output ../milestone07/reproduced-sources.json"
+  },
+  "limitations": [
+    "Internal independent author, not external study or random sampling.",
+    "Final positives represent 12 patterns paired across countries.",
+    "All final cases bypassed before embedding; zero false hits are abstention.",
+    "No heldout cache reuses means no precision or suitability estimate.",
+    "Raw all_semantic_answers_suitable=true at zero hits is vacuous.",
+    "Captured-source scoring does not perform fresh inference for every query.",
+    "Fresh future generalization candidate needs new independent heldout cases."
+  ],
+  "release_runtime_equals_baseline": true,
+  "reliability": {
+    "quota_requests": 24,
+    "quota_accepted": 5,
+    "quota_429": 19,
+    "quota_upstream_calls": 5,
+    "overload_excess_503": 20,
+    "post_overload_recovery": true,
+    "deadline_probe": {
+      "backend": "deterministic_http_trickle",
+      "real_model_inference": false,
+      "status": 504,
+      "configured_upstream_deadline_ms": 1000,
+      "fixture_chunk_interval_ms": 50,
+      "fixture_chunks_sent": 19,
+      "client_full_response_ms": 1006.956,
+      "gateway_to_response_start_ms": 1005.215,
+      "adapter_roundtrip_ms": 1003.277,
+      "interpretation": "Scope differences include scheduling and transport; not CPU overhead"
+    }
+  }
+}

@@ -510,3 +510,70 @@ functional portfolio prototype is measurable and reproducible, with these limits
 No distributed consistency, streaming, native hard-kill, public-Internet security
 or general semantic/model-performance guarantee is claimed. No Redis, training,
 provider expansion, dashboard or production performance optimization was added.
+
+## 7 — Independent semantic generalization validation (complete; not promoted)
+
+- [x] Diagnose M06 unseen bypasses: literal eligibility rejected all six before
+  embedding/retrieval; four exceeded 0.75, two would additionally miss similarity.
+- [x] Freeze independently authored final wire cases before gate development:
+  `f9686d5`, SHA256 `ad05be1634d5a890e62a74eceedcff4e1c6b2cc5ec218fcff1230077f5684845`.
+  Separate development 14 positives/22 negatives; final 24/48. Zero wording overlap.
+- [x] Implement/test bounded capital grammar with explicit France/Japan approval,
+  strict city-only answer validation and preserved compatibility/security controls.
+  Freeze candidate/harness before final inspection: `d9955fa`; fixed L3/0.75.
+- [x] Score complete production ASGI pipeline, actual ONNX and source-only reset
+  before each case. No final query becomes an approval or retrieval source.
+- [x] Capture genuine Gemma sources and suitable HTTP replays; replay actual source
+  answers through both datasets. Retain independent call counts and exact samples.
+- [x] Apply fail-closed release decision: candidate runtime/config/tests/harness
+  reverted on `main`; preserve immutable experiment, data, results and commands.
+- [x] Re-run release regressions, traffic/deadline probes and actual Gemma semantic
+  integration. Verify frozen-worktree reproduction and document limitations.
+
+Results on 2026-10-30, same Linux CPU-only 8 GiB / two-core quota:
+
+| Pipeline | Valid reuses | Negative hits | Precision |
+|---|---:|---:|---:|
+| Development baseline | 0/14 | 0/22 | undefined |
+| Development candidate | 12/14 | 0/22 | 12/12 |
+| Final baseline | 0/24 | 0/48 | undefined |
+| Final candidate | 0/24 | 0/48 | undefined |
+
+Fixture and genuine-source replay counts agree. Final **72/72 BYPASS** is eligibility
+abstention; no final embedding search occurred. Thus bounded-language coverage
+failed, rather than a measured embedding/compatibility failure. No threshold,
+grammar or approvals were adjusted using final labels. The candidate demonstrates
+development composition only. Reviewed-phrase caching remains the supported policy.
+
+Real candidate HTTP verification: 6 requests, 4 independently counted Ollama POSTs;
+canonical `Paris`/`Tokyo`, 2 suitable unseen development replays, Germany `Berlin`
+BYPASS, tenant-B cold MISS. Ollama 0.40.11, pinned Gemma 3 1B Q4_K_M, context 2048.
+All 12 development captured-source replays met the exact factual city-only oracle.
+Final suitability is unobserved at zero reuses, not 100%. No fresh inference occurs
+in captured-source ASGI runs; cold responses are no-store fixtures. Existing
+release Gemma integration: 8 requests / 5 real calls, 1 exact / 2 semantic hits.
+Release HTTP probes also verified 19 quota 429s / 24 attempts (5 upstream calls),
+20 excess capacity 503s with recovery and zero held permits, and a controlled 504
+at 1006.956 ms external / 1003.277 ms adapter for the 1 s cooperative budget.
+
+Candidate: **314 passing tests**, including 40 gate/security/isolation/TTL/cancellation
+checks and 12 evaluator checks. Release retains its 262 regression tests and
+unchanged validated runtime (262 passed in 3.45 s; lint/format clean). No OOM/max
+memory events; owned services and temporary worktree cleaned up. README records
+exact frozen-worktree commands; actual
+held-out genuine-source reproduction was verified after runtime reversion.
+`evaluation/generalization_summary.json`, `generalization_review.json`, all
+`generalization_*results.json`, protocol, datasets and source responses preserve
+evidence. Earlier all-404 development trial (harness alias mismatch) was fixed
+before freeze and excluded. Candidate was not promoted after coverage failed.
+
+Limits: internally separate authorship, not external validation; final 24 positives
+represent 12 country-paired patterns; 8 repeated strings vary real wire controls.
+Final negatives stop at eligibility, so regression tests supply downstream control
+evidence. Consumed final data cannot be reused as a new independent holdout.
+Finite tests cannot prove universal safety. MacBook/Metal remains unverified.
+
+Next priorities: independent-load/repeated benchmarking, target macOS validation,
+and final release-readiness checks. General unseen equivalence is outside the
+supported release scope; future investigation needs a new independent final set.
+No new services, providers, training, infrastructure or performance tuning.
