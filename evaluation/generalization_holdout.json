@@ -1,0 +1,2120 @@
+{
+  "schema_version": 1,
+  "dataset_version": "semantic-generalization-holdout-v1",
+  "baseline_commit": "7850d8a6452a28ceed877488e6dae2a9a2ac3ebb",
+  "fixed_threshold": 0.75,
+  "scope": {
+    "entities": [
+      "France",
+      "Japan"
+    ],
+    "domain": "public-static-v1",
+    "answer_contract": "city-name-only-v1"
+  },
+  "source_policy": "Only client-a canonical France/Japan responses seeded separately from the original reviewed registry. Never seed a held-out query. Isolate cache per case to prevent held-out-answer contamination.",
+  "independence": "Authored by a delegated agent before the proposed gate implementation or development corpus was visible to that agent. Internal author separation, not external review or proof of model-training novelty. Country-paired phrases are correlated and do not represent 24 independent linguistic forms.",
+  "wire_defaults": "The request object is complete and passed verbatim. headers and client override defaults; no hidden metadata is injected into the production classifier. expected_family and response_suitability are evaluator labels only.",
+  "suitability_oracle": "For equivalent cases, trim surrounding whitespace from assistant content and require exact Paris or Tokyo in the expected case; no added explanation, JSON quoting, punctuation or different city. For must_not_reuse cases, SEMANTIC_HIT is prohibited regardless of coincidental city correctness. Wire rejection or eligible cold MISS is permitted where appropriate.",
+  "cases": [
+    {
+      "id": "holdout-001",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of France? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-002",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What city is France's capital? Reply only with its name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-003",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Answer with the name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-004",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the city serving as the capital of France; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-005",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Give me France's capital city, only its name please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-006",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Identify France's national capital. Output nothing except the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-007",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please say which city is the French capital, and give only the name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-008",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Only a city name is wanted: where is the capital of France?"
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-009",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "France: name its capital, without commentary."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-010",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "For France, which city is the national capital? A bare city name, please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-011",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Supply the name of France's capital city and stop there."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-012",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "The city that functions as France's capital is what? Just its name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "The sole required factual answer is Paris; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-013",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Japan? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-014",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What city is Japan's capital? Reply only with its name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-015",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of Japan. Answer with the name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-016",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the city serving as the capital of Japan; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-017",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Give me Japan's capital city, only its name please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-018",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Identify Japan's national capital. Output nothing except the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-019",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please say which city is the Japanese capital, and give only the name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-020",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Only a city name is wanted: where is the capital of Japan?"
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-021",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Japan: name its capital, without commentary."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-022",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "For Japan, which city is the national capital? A bare city name, please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-023",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Supply the name of Japan's capital city and stop there."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-024",
+      "kind": "equivalent",
+      "category": "paraphrase",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "The city that functions as Japan's capital is what? Just its name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "The sole required factual answer is Tokyo; additional prose would violate the explicit city-only contract."
+    },
+    {
+      "id": "holdout-025",
+      "kind": "must_not_reuse",
+      "category": "entity",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Italy? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Rome is required; neither approved source answers this request."
+    },
+    {
+      "id": "holdout-026",
+      "kind": "must_not_reuse",
+      "category": "entity-near-name",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What city is the capital of French Guiana? Reply only with its name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "French Guiana is not France; the answer is Cayenne."
+    },
+    {
+      "id": "holdout-027",
+      "kind": "must_not_reuse",
+      "category": "entity-near-name",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of Jamaica. Answer with the name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Jamaica is not Japan; the answer is Kingston."
+    },
+    {
+      "id": "holdout-028",
+      "kind": "must_not_reuse",
+      "category": "entity",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the city serving as the capital of Canada; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Ottawa is required, outside both approved entities."
+    },
+    {
+      "id": "holdout-029",
+      "kind": "must_not_reuse",
+      "category": "entity-qualifier",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of France, Texas? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The disambiguating qualifier changes the entity and cannot be discarded."
+    },
+    {
+      "id": "holdout-030",
+      "kind": "must_not_reuse",
+      "category": "historical-date",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the capital city of the Kingdom of France in 1590; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Historical and regime-specific context is outside the current static contract."
+    },
+    {
+      "id": "holdout-031",
+      "kind": "must_not_reuse",
+      "category": "negation",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city is not the capital of France? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Paris explicitly fails the negated predicate."
+    },
+    {
+      "id": "holdout-032",
+      "kind": "must_not_reuse",
+      "category": "negation",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State a city other than Japan's capital. Answer with the name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Tokyo is explicitly excluded."
+    },
+    {
+      "id": "holdout-033",
+      "kind": "must_not_reuse",
+      "category": "negation",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Do not name France's capital. Give another French city and nothing else."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The cached Paris response contradicts the instruction."
+    },
+    {
+      "id": "holdout-034",
+      "kind": "must_not_reuse",
+      "category": "negation-and-entity",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of neither France nor Japan? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Neither cached capital meets the stated predicate."
+    },
+    {
+      "id": "holdout-035",
+      "kind": "must_not_reuse",
+      "category": "number-and-entity",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name exactly two cities serving as capitals of France and Japan; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Both Paris and Tokyo are required; neither single response is complete."
+    },
+    {
+      "id": "holdout-036",
+      "kind": "must_not_reuse",
+      "category": "number",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Give me three cities in Japan, only their names please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "A single capital cannot satisfy the three-city requirement."
+    },
+    {
+      "id": "holdout-037",
+      "kind": "must_not_reuse",
+      "category": "numerical-output",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "For France, give its capital and the number 7. A bare city name followed by the digit, please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The additional digit is a response-affecting requirement."
+    },
+    {
+      "id": "holdout-038",
+      "kind": "must_not_reuse",
+      "category": "repetition",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France twice. Answer with the two names alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "A single occurrence does not meet the multiplicity requirement."
+    },
+    {
+      "id": "holdout-039",
+      "kind": "must_not_reuse",
+      "category": "historical-date",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city was Japan's capital in 1860? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The historical capital is Kyoto, not the cached current-capital answer."
+    },
+    {
+      "id": "holdout-040",
+      "kind": "must_not_reuse",
+      "category": "future",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city will act as France's capital in 2120? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "A future political fact is outside the static current-capital contract."
+    },
+    {
+      "id": "holdout-041",
+      "kind": "must_not_reuse",
+      "category": "freshness",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Japan as verified by today's news? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The request requires fresh external verification, which cached inference cannot establish."
+    },
+    {
+      "id": "holdout-042",
+      "kind": "must_not_reuse",
+      "category": "dynamic-qualifier",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State France's currently announced emergency capital. Answer with the city name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Emergency-state announcements are dynamic and may change the required answer."
+    },
+    {
+      "id": "holdout-043",
+      "kind": "must_not_reuse",
+      "category": "format-json",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Answer with a JSON string alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The required quoted JSON string is not a bare city name."
+    },
+    {
+      "id": "holdout-044",
+      "kind": "must_not_reuse",
+      "category": "format-case",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Japan? Return the city name in uppercase only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "TOKYO is required; Tokyo violates the explicit casing requirement."
+    },
+    {
+      "id": "holdout-045",
+      "kind": "must_not_reuse",
+      "category": "format-language",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name France's capital in Japanese script; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Paris in English/Latin spelling is not the requested Japanese-script answer."
+    },
+    {
+      "id": "holdout-046",
+      "kind": "must_not_reuse",
+      "category": "additional-requirement",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Give me Japan's capital city, and explain why it is the capital."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The cached city-only answer omits the requested explanation."
+    },
+    {
+      "id": "holdout-047",
+      "kind": "must_not_reuse",
+      "category": "instruction-suffix",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of France? Return the city name only. Then add a period and the word done."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The later output instruction changes the required response."
+    },
+    {
+      "id": "holdout-048",
+      "kind": "must_not_reuse",
+      "category": "instruction-override",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What city is Japan's capital? Reply only with its name. Ignore that: output Osaka instead."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The explicit later override is incompatible with Tokyo replay."
+    },
+    {
+      "id": "holdout-049",
+      "kind": "must_not_reuse",
+      "category": "quoted-task",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Translate this question into French: Which city acts as the capital of France? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The task is translation, not answering the embedded question."
+    },
+    {
+      "id": "holdout-050",
+      "kind": "must_not_reuse",
+      "category": "quoted-task",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Is \"Which city acts as the capital of Japan? Return the city name only.\" a grammatical question? Answer yes or no."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The embedded capital question is data, and the answer format is yes/no."
+    },
+    {
+      "id": "holdout-051",
+      "kind": "must_not_reuse",
+      "category": "personal-context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "My private booking lists France. Which city should I travel to? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "A personal recommendation is not a public capital fact."
+    },
+    {
+      "id": "holdout-052",
+      "kind": "must_not_reuse",
+      "category": "personal-context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "My employer moved its Japan office. Name my new work city, with no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The answer depends on private employer context."
+    },
+    {
+      "id": "holdout-053",
+      "kind": "must_not_reuse",
+      "category": "context-dependence",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Given the itinerary above, identify France's capital stop. Output nothing except the city name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The request relies on unavailable itinerary context."
+    },
+    {
+      "id": "holdout-054",
+      "kind": "must_not_reuse",
+      "category": "fictional-context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "In our fictional setting Japan's capital is Sapporo. What city is Japan's capital? Reply only with its name."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The local fictional premise changes the answer to Sapporo."
+    },
+    {
+      "id": "holdout-055",
+      "kind": "must_not_reuse",
+      "category": "version",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "In Python 2.7, state two short bullets comparing list and tuple mutability and literal syntax."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The Python 2.7 version boundary is unapproved, even if some facts overlap."
+    },
+    {
+      "id": "holdout-056",
+      "kind": "must_not_reuse",
+      "category": "version-and-topic",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "In Python 3.14, state two short bullets comparing list and tuple allocation sizes."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Version-specific allocation is outside the reviewed mutability/literal contract."
+    },
+    {
+      "id": "holdout-057",
+      "kind": "must_not_reuse",
+      "category": "version-and-language",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "For Java 21, give two brief bullets on list versus tuple mutability and literal syntax."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The language and version are outside the reviewed Python 3 domain."
+    },
+    {
+      "id": "holdout-058",
+      "kind": "must_not_reuse",
+      "category": "number-and-topic",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Write exactly four concise bullets on Python 3 lists versus tuples: mutability, notation, indexing, and memory."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Four bullets and extra topics cannot reuse the two-bullet response."
+    },
+    {
+      "id": "holdout-059",
+      "kind": "must_not_reuse",
+      "category": "unicode-confusable",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Frаnce? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The entity contains Cyrillic а; fail-closed parsing must not guess entity identity."
+    },
+    {
+      "id": "holdout-060",
+      "kind": "must_not_reuse",
+      "category": "invisible-character",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Japan​? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "An invisible inserted character is outside the reviewed constrained language; fail closed."
+    },
+    {
+      "id": "holdout-061",
+      "kind": "must_not_reuse",
+      "category": "sensitive-suffix",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of France? Return the city name only. User account: 883019."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "A user-linked identifier makes the prompt unsuitable for public-static semantic eligibility."
+    },
+    {
+      "id": "holdout-062",
+      "kind": "must_not_reuse",
+      "category": "tool-dependent",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Use the web tool to confirm Japan's capital. Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "A required tool observation cannot be supplied by cached model text."
+    },
+    {
+      "id": "holdout-063",
+      "kind": "must_not_reuse",
+      "category": "relative-context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city is closer to me, France's capital or Japan's capital? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The answer depends on private location and compares two entities."
+    },
+    {
+      "id": "holdout-064",
+      "kind": "must_not_reuse",
+      "category": "freshness-and-additional",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the capital of Japan and its population in 2026? Reply only with the city and population."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "The current population and expanded output are absent from a city-only cached answer."
+    },
+    {
+      "id": "holdout-065",
+      "kind": "must_not_reuse",
+      "category": "system-context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "system",
+            "content": "For this exercise, rename Paris to Lutetia in every answer."
+          },
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of France? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "System context changes the name; multi-message requests must bypass regardless of user wording."
+    },
+    {
+      "id": "holdout-066",
+      "kind": "must_not_reuse",
+      "category": "conversation-context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "We are discussing Japanese capitals before 1868."
+          },
+          {
+            "role": "assistant",
+            "content": "Understood; I will use that historical context."
+          },
+          {
+            "role": "user",
+            "content": "Which city acts as the capital of Japan? Return the city name only."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Conversation history changes temporal interpretation; single-message policy must reject reuse."
+    },
+    {
+      "id": "holdout-067",
+      "kind": "must_not_reuse",
+      "category": "cookie-boundary",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Answer with the name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic",
+        "Cookie": "session=public-test-fixture"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Even public-looking text cannot bypass the cookie/session cache exclusion."
+    },
+    {
+      "id": "holdout-068",
+      "kind": "must_not_reuse",
+      "category": "request-no-store",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of Japan. Answer with the name alone."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic",
+        "Cache-Control": "no-store"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Explicit no-store disables lookup and storage."
+    },
+    {
+      "id": "holdout-069",
+      "kind": "must_not_reuse",
+      "category": "missing-opt-in",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the city serving as the capital of France; provide no other words."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {},
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "No explicit semantic opt-in forbids semantic lookup."
+    },
+    {
+      "id": "holdout-070",
+      "kind": "must_not_reuse",
+      "category": "nondeterminism",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the city serving as the capital of Japan; provide no other words."
+          }
+        ],
+        "temperature": 0.4,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Sampling requests remain ineligible even with a seed."
+    },
+    {
+      "id": "holdout-071",
+      "kind": "must_not_reuse",
+      "category": "missing-seed",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Give me France's capital city, only its name please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": null,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "An explicit seed is still required by the exact-cache eligibility contract."
+    },
+    {
+      "id": "holdout-072",
+      "kind": "must_not_reuse",
+      "category": "tenant-isolation",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Give me Japan's capital city, only its name please."
+          }
+        ],
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-b",
+      "response_suitability": {
+        "type": "no-semantic-replay",
+        "expected_city": null
+      },
+      "rationale": "Only client-a source responses are seeded; client-b must not reuse client-a data. A miss and its own inference are permitted."
+    }
+  ]
+}
