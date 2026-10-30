@@ -5,7 +5,7 @@ import re
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
 import httpx
@@ -93,6 +93,10 @@ class SemanticCacheConfig(StrictModel):
     timeout_seconds: Annotated[float, Field(ge=0.01, le=5.0)] = 0.25
     max_entries: Annotated[int, Field(ge=1, le=128)] = 128
     families: Annotated[list[SemanticFamily], Field(max_length=16)] = Field(default_factory=list)
+    # Explicit public-domain approval; empty preserves reviewed-phrase behavior.
+    capital_entities: Annotated[list[Literal["France", "Japan"]], Field(max_length=2)] = Field(
+        default_factory=list
+    )
 
     @model_validator(mode="after")
     def unambiguous_approval(self) -> "SemanticCacheConfig":
@@ -100,6 +104,8 @@ class SemanticCacheConfig(StrictModel):
         prompts = [prompt for family in self.families for prompt in family.prompts]
         if len(set(ids)) != len(ids) or len(set(prompts)) != len(prompts):
             raise ValueError("semantic families and prompt membership must be unique")
+        if len(set(self.capital_entities)) != len(self.capital_entities):
+            raise ValueError("capital entity approval must be unique")
         if self.enabled and not self.families:
             raise ValueError("semantic reuse requires reviewed equivalence families")
         return self

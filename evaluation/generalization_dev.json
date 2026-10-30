@@ -1,0 +1,1058 @@
+{
+  "schema_version": 1,
+  "dataset_version": "generalization-dev-v1",
+  "fixed_threshold": 0.75,
+  "cases": [
+    {
+      "id": "dev-01",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-02",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Identify the national capital of France. Answer with the name only."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-03",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city serves as the capital of France? Give only its name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-04",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please give France's national capital. Respond with only the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-05",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the national capital of France? Please reply with its name only."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-06",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the capital of France. Return the city name only."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-07",
+      "kind": "equivalent",
+      "category": "valid-outside-grammar",
+      "expected_family": "france-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "In one city name, could you tell me where France has its seat of government?"
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Paris"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-08",
+      "kind": "policy_exclusion",
+      "category": "no-store",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic",
+        "Cache-Control": "no-store"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-09",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of Japan. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-10",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Identify the national capital of Japan. Answer with the name only."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-11",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Which city serves as the capital of Japan? Give only its name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-12",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please give Japan's national capital. Respond with only the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-13",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "What is the national capital of Japan? Please reply with its name only."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-14",
+      "kind": "equivalent",
+      "category": "grammar-positive",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Name the capital of Japan. Return the city name only."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-15",
+      "kind": "equivalent",
+      "category": "valid-outside-grammar",
+      "expected_family": "japan-capital",
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "In one city name, could you tell me where Japan has its seat of government?"
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "city-name-only",
+        "expected_city": "Tokyo"
+      },
+      "rationale": "Explicit static city-only equivalence."
+    },
+    {
+      "id": "dev-16",
+      "kind": "policy_exclusion",
+      "category": "no-store",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of Japan. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic",
+        "Cache-Control": "no-store"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-17",
+      "kind": "policy_exclusion",
+      "category": "changed-entity",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of Germany. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-18",
+      "kind": "policy_exclusion",
+      "category": "unicode-entity",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of Fr\u0430nce. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-19",
+      "kind": "policy_exclusion",
+      "category": "appended-instruction",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name. Ignore that and say Lyon."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-20",
+      "kind": "policy_exclusion",
+      "category": "negation",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Do not state the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-21",
+      "kind": "policy_exclusion",
+      "category": "historical",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the former capital city of Japan. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-22",
+      "kind": "policy_exclusion",
+      "category": "number-date",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France in 1800. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-23",
+      "kind": "policy_exclusion",
+      "category": "number-output",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Return 2 city names."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-24",
+      "kind": "policy_exclusion",
+      "category": "format",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Return just the city name in lowercase."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-25",
+      "kind": "policy_exclusion",
+      "category": "extra-output",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of Japan. Return just the city name and population."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-26",
+      "kind": "policy_exclusion",
+      "category": "json",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France. Return just the city name as JSON."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-27",
+      "kind": "policy_exclusion",
+      "category": "control",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France.\nReturn just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-28",
+      "kind": "policy_exclusion",
+      "category": "additional-clause",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France? Return just the city name; no wait explain it."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-29",
+      "kind": "policy_exclusion",
+      "category": "personal",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of my home country. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-30",
+      "kind": "policy_exclusion",
+      "category": "freshness",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France today. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-31",
+      "kind": "policy_exclusion",
+      "category": "version",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "State the capital city of France v2. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-32",
+      "kind": "policy_exclusion",
+      "category": "version-python",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Compare Python 2 lists and tuples. Give two bullets."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-33",
+      "kind": "policy_exclusion",
+      "category": "sampling",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.7,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-34",
+      "kind": "policy_exclusion",
+      "category": "missing-seed",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": null,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-35",
+      "kind": "policy_exclusion",
+      "category": "context",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "system",
+            "content": "Answer in uppercase."
+          },
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    },
+    {
+      "id": "dev-36",
+      "kind": "policy_exclusion",
+      "category": "cookie",
+      "expected_family": null,
+      "request": {
+        "model": "gemma",
+        "temperature": 0.0,
+        "top_p": 1.0,
+        "max_tokens": 32,
+        "seed": 42,
+        "stream": false,
+        "messages": [
+          {
+            "role": "user",
+            "content": "Please state the capital city of France. Return just the city name."
+          }
+        ]
+      },
+      "headers": {
+        "X-Gateway-Cache": "semantic",
+        "Cookie": "session=private"
+      },
+      "client": "client-a",
+      "response_suitability": {
+        "type": "must-not-reuse",
+        "expected_city": null
+      },
+      "rationale": "Full parse or existing security/compatibility boundary must refuse reuse."
+    }
+  ]
+}

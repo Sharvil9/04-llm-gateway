@@ -26,7 +26,15 @@ from devtools.smoke import ROOT, free_port, wait_ready
 from llm_gateway.embeddings import fingerprint_for_model
 
 
-def config_text(backend: str, model_dir: Path, threshold: float, families: dict, real: bool) -> str:
+def config_text(
+    backend: str,
+    model_dir: Path,
+    threshold: float,
+    families: dict,
+    real: bool,
+    *,
+    capital_entities: tuple[str, ...] = (),
+) -> str:
     if real:
         recipe = (ROOT / "config/ollama.toml").read_text()
         parsed = tomllib.loads(recipe)
@@ -47,6 +55,7 @@ def config_text(backend: str, model_dir: Path, threshold: float, families: dict,
         "\n[semantic_cache]\nenabled = true\n"
         f"model_dir = {json.dumps(str(model_dir))}\nthreshold = {threshold}\n"
         "timeout_seconds = 0.25\nmax_entries = 16\n"
+        f"capital_entities = {json.dumps(list(capital_entities))}\n"
     )
     for family in families.values():
         prompts = [family["canonical"]] + sum(family["paraphrases"].values(), [])
@@ -67,7 +76,14 @@ def config_text(backend: str, model_dir: Path, threshold: float, families: dict,
 
 
 @contextmanager
-def servers(model_dir: Path, threshold: float, families: dict, real: bool):
+def servers(
+    model_dir: Path,
+    threshold: float,
+    families: dict,
+    real: bool,
+    *,
+    capital_entities: tuple[str, ...] = (),
+):
     artifacts = ROOT / "artifacts"
     artifacts.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="semantic-probe-", dir=artifacts) as directory:
@@ -77,7 +93,11 @@ def servers(model_dir: Path, threshold: float, families: dict, real: bool):
         backend = f"http://127.0.0.1:{backend_port}"
         gateway = f"http://127.0.0.1:{gateway_port}"
         config = Path(directory) / "gateway.toml"
-        config.write_text(config_text(backend, model_dir, threshold, families, real))
+        config.write_text(
+            config_text(
+                backend, model_dir, threshold, families, real, capital_entities=capital_entities
+            )
+        )
         keys = {name: secrets.token_urlsafe(32) for name in ("client-a", "client-b")}
         environment = os.environ.copy()
         environment.update(GATEWAY_CONFIG=str(config), GATEWAY_CLIENT_KEYS_JSON=json.dumps(keys))

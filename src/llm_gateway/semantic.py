@@ -1,4 +1,4 @@
-"""Closed-vocabulary semantic retrieval; reviewed equivalence authorizes reuse."""
+"""Scoped semantic retrieval; policy authorizes reuse independently of cosine."""
 
 import asyncio
 from dataclasses import asdict, dataclass
@@ -61,7 +61,7 @@ class SemanticCache:
             return None, None
         if candidate is not None:
             cached = self.cache.semantic_get(candidate, partition)
-            if cached is not None:
+            if cached is not None and self.cache.response_suitable(request, cached):
                 self.stats.hits += 1
                 return cached, None
         self.stats.misses += 1
