@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "dataset_version": "semantic-final-audit-v1",
+  "original_dataset_sha256": "80e0ba7b0acaf85afaca2e9bd8fa468c426fe67d50acdfa07541bb98d1a04885",
+  "fixed_threshold": 0.75,
+  "protocol": {
+    "freeze_before_scoring": true,
+    "source_entries": "Only the three original canonical questions; no query-source expansion.",
+    "approval": "Every audit text must be absent from the original approval registry and all original evaluation cases. No audit text is approved by this file.",
+    "selection": "Retain the existing L3 model and threshold 0.75. Do not select or tune anything using this audit.",
+    "guard_expectation": "The production finite-membership guard bypasses every audit phrase, including all genuine equivalents. Raw retrieval is diagnostic and must never authorize serving.",
+    "limitations": "These cases were authored after viewing M05 results, but frozen before scoring their new wording. This is a curated follow-up audit, not an independent external study or a claim of training-data novelty. No model-answer quality is evaluated."
+  },
+  "cases": [
+    {
+      "id": "audit-france-equivalent-1",
+      "text": "Reply with one city and no other text: the seat of France's national government.",
+      "source_family": "france-capital",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "unseen-phrasing",
+      "reason": "For France, the seat of national government is the same city as the capital; Paris alone meets the request."
+    },
+    {
+      "id": "audit-france-equivalent-2",
+      "text": "Supply just the city that is France's capital, with no explanation.",
+      "source_family": "france-capital",
+      "expected_family": "france-capital",
+      "kind": "equivalent",
+      "category": "unseen-phrasing",
+      "reason": "The answer requirement remains only Paris."
+    },
+    {
+      "id": "audit-france-negative-1",
+      "text": "Give only the capital city of Germany.",
+      "source_family": "france-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "Germany requires Berlin rather than Paris."
+    },
+    {
+      "id": "audit-france-negative-2",
+      "text": "Which French city is not the capital? Return one name only.",
+      "source_family": "france-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "negation",
+      "reason": "Paris fails the explicit request for a city that is not the capital."
+    },
+    {
+      "id": "audit-france-negative-3",
+      "text": "Return France's capital as a JSON object with a city field.",
+      "source_family": "france-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "output-format",
+      "reason": "A bare city name does not satisfy the required JSON object."
+    },
+    {
+      "id": "audit-france-negative-4",
+      "text": "Name France's capital and its second-largest city, with no explanation.",
+      "source_family": "france-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "quantity",
+      "reason": "A second city is required; the capital-only cached response is incomplete."
+    },
+    {
+      "id": "audit-japan-equivalent-1",
+      "text": "Output only the Japanese capital city's name.",
+      "source_family": "japan-capital",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "unseen-phrasing",
+      "reason": "The answer requirement remains only Tokyo."
+    },
+    {
+      "id": "audit-japan-equivalent-2",
+      "text": "Without any surrounding words, give the city serving as Japan's capital.",
+      "source_family": "japan-capital",
+      "expected_family": "japan-capital",
+      "kind": "equivalent",
+      "category": "unseen-phrasing",
+      "reason": "The answer requirement remains only Tokyo."
+    },
+    {
+      "id": "audit-japan-negative-1",
+      "text": "Give only the capital city of South Korea.",
+      "source_family": "japan-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entity",
+      "reason": "South Korea requires Seoul rather than Tokyo."
+    },
+    {
+      "id": "audit-japan-negative-2",
+      "text": "Reply with a Japanese city other than its capital, and no explanation.",
+      "source_family": "japan-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "negation",
+      "reason": "Tokyo fails the request for a city other than the capital."
+    },
+    {
+      "id": "audit-japan-negative-3",
+      "text": "Tell me Japan's current prime minister, using only their name.",
+      "source_family": "japan-capital",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "dynamic-person",
+      "reason": "This is a changing person-specific question, not a static city-name question."
+    },
+    {
+      "id": "audit-japan-negative-4",
+      "text": "Print Japan's capital in lowercase letters and nothing else.",
+      "source_family": "japan-capital",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "output-case",
+      "reason": "The original Tokyo response does not meet an explicit lowercase-only requirement."
+    },
+    {
+      "id": "audit-python-equivalent-1",
+      "text": "Write exactly two terse bullets on Python 3 lists versus tuples, first mutability, then literal notation.",
+      "source_family": "python3-list-tuple",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "unseen-phrasing",
+      "reason": "Both requested topics and the two-short-bullet output requirement are unchanged."
+    },
+    {
+      "id": "audit-python-equivalent-2",
+      "text": "Two short bullets only: contrast how Python 3 lists and tuples can change and how their literals are spelled.",
+      "source_family": "python3-list-tuple",
+      "expected_family": "python3-list-tuple",
+      "kind": "equivalent",
+      "category": "unseen-phrasing",
+      "reason": "Both requested topics and the two-short-bullet output requirement are unchanged."
+    },
+    {
+      "id": "audit-python-negative-1",
+      "text": "Give exactly two short bullets comparing Python 2 lists and tuples: mutability and literal notation.",
+      "source_family": "python3-list-tuple",
+      "expected_family": null,
+      "kind": "policy_exclusion",
+      "category": "version-context",
+      "reason": "Python 2 is outside the reviewed Python 3 scope even if some facts coincide."
+    },
+    {
+      "id": "audit-python-negative-2",
+      "text": "Write three terse bullets comparing Python 3 list and tuple mutability, literal syntax, and indexing.",
+      "source_family": "python3-list-tuple",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "quantity-and-extra-topic",
+      "reason": "The three-bullet requirement and indexing topic are absent from the cached two-bullet answer."
+    },
+    {
+      "id": "audit-python-negative-3",
+      "text": "In exactly two short Python 3 bullets, compare dictionaries and sets for mutability and literal syntax.",
+      "source_family": "python3-list-tuple",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "entities",
+      "reason": "Different container types require a different answer."
+    },
+    {
+      "id": "audit-python-negative-4",
+      "text": "Using exactly two brief bullets, claim that Python 3 lists cannot change and tuples can change, then show their literal notation.",
+      "source_family": "python3-list-tuple",
+      "expected_family": null,
+      "kind": "answer_mismatch",
+      "category": "reversed-constraint",
+      "reason": "The requested reversed mutability claims are incompatible with the cached factual comparison."
+    }
+  ]
+}
