@@ -185,6 +185,7 @@ def brief(point: dict) -> dict:
         "http_active_peak",
         "process_ids",
         "recovery",
+        "setup_failures",
         "cgroup_cpu_stat_delta",
         "resources",
         "start_cohort_one_second_bins",
@@ -287,6 +288,7 @@ def run(args) -> dict:
                 "raw_sha256": hashlib.sha256(raw).hexdigest(),
                 "raw_gzip_file": str((output / f"{name}.json.gz").relative_to(ROOT)),
                 "backend": report["backend"],
+                "unavailable_points": report.get("unavailable_points", []),
                 "points": [brief(point) for point in report["results"]],
                 "aggregate": aggregate(report["results"]),
             }

@@ -805,9 +805,9 @@ async def warmup(client, endpoint, key, scenario, payloads, count):
     if warmed["successful"] != count:
         raise RuntimeError("Benchmark warmup failed correctness/status checks")
     expected = "HIT" if scenario == "exact" else "SEMANTIC_HIT" if scenario == "semantic" else None
-    if expected and warmed["cache_dispositions"] != {expected: count}:
-        raise RuntimeError("Warm cache did not meet required cache disposition")
     return {
+        "cache_requirement_met": not expected or warmed["cache_dispositions"] == {expected: count},
+        "phase_records": (seed["raw_records"] if seed else []) + warmed["raw_records"],
         "requests": count + (1 if seed else 0),
         "seed_cache": seed["cache_dispositions"] if seed else None,
         "primed_source_sha256": seed["raw_records"][0]["response_sha256"] if seed else None,
@@ -965,6 +965,7 @@ async def run_suite(args) -> dict:
     )
     assert evidence["heldout_at_selected_thresholds"]["guarded"]["false_hits"] == 0
     threshold, real, results = selection["threshold"], args.ollama_log is not None, []
+    unavailable_points = []
     payloads = payloads_for(families, real)
     (ROOT / "artifacts").mkdir(exist_ok=True)
     with backend_server(args.delay_ms, real) as (backend, backend_pid):
@@ -972,253 +973,302 @@ async def run_suite(args) -> dict:
             args.concurrency, args.scenarios, args.repeats, args.seed, args.randomize_order
         )
         for run_order, (repeat, concurrency, scenario) in enumerate(points):
-            with gateway_server(backend, scenario, concurrency, args, families, threshold) as (
-                gateway,
-                key,
-                operator_key,
-                gateway_pid,
-                config,
-            ):
-                async with httpx.AsyncClient(
-                    trust_env=False,
-                    timeout=70.0 if real else 15.0,
-                    limits=httpx.Limits(max_connections=64, max_keepalive_connections=64),
-                ) as client:
-                    endpoint = (gateway or backend) + "/v1/chat/completions"
-                    if real:
-                        await real_identity(client, backend)
-                    before_warmup_calls = await backend_calls(client, backend, args.ollama_log)
-                    warming = await warmup(
-                        client, endpoint, key or "", scenario, payloads, args.warmup
-                    )
-                    identity = await real_identity(client, backend, loaded=True) if real else None
-                    before = await snapshot(client, gateway, operator_key) if gateway else None
-                    expected_warm_calls = before_warmup_calls + warming["upstream_calls_expected"]
-                    initial_calls = await backend_calls(
-                        client, backend, args.ollama_log, expected_warm_calls
-                    )
-                    if initial_calls != expected_warm_calls:
-                        raise RuntimeError(
-                            "Warmup backend count differs; require a dedicated backend/log"
+            setup_failures = []
+            for setup_attempt in range(3):
+                with gateway_server(backend, scenario, concurrency, args, families, threshold) as (
+                    gateway,
+                    key,
+                    operator_key,
+                    gateway_pid,
+                    config,
+                ):
+                    async with httpx.AsyncClient(
+                        trust_env=False,
+                        timeout=70.0 if real else 15.0,
+                        limits=httpx.Limits(max_connections=64, max_keepalive_connections=64),
+                    ) as client:
+                        endpoint = (gateway or backend) + "/v1/chat/completions"
+                        if real:
+                            await real_identity(client, backend)
+                        before_warmup_calls = await backend_calls(client, backend, args.ollama_log)
+                        warming = await warmup(
+                            client, endpoint, key or "", scenario, payloads, args.warmup
                         )
-                    fixture_before = None
-                    if not real:
-                        reset = await client.post(backend + "/_benchmark/reset_peak")
-                        reset.raise_for_status()
-                        fixture_before = reset.json()
-                        if fixture_before["active"]:
-                            raise RuntimeError("Mock backend not idle before measured window")
-                    owned_pids = {"load_generator": os.getpid()}
-                    if gateway_pid:
-                        owned_pids["gateway"] = gateway_pid
-                    if backend_pid:
-                        owned_pids["mock_backend"] = backend_pid
-                    if args.ollama_pid:
-                        owned_pids["owned_ollama_tree"] = args.ollama_pid
-                    sampler = ProcessSampler(owned_pids, descendants={"owned_ollama_tree"})
-                    resource_started = time.perf_counter()
-                    cgroup_before = cgroup_cpu_stat()
-                    sampler.sample()
-                    stop = asyncio.Event()
-                    sampling = asyncio.create_task(sampler.collect(stop))
-                    try:
-                        measured_started_utc = datetime.now(UTC).isoformat()
-                        measured = await run_load(
+                        identity = (
+                            await real_identity(client, backend, loaded=True) if real else None
+                        )
+                        before = await snapshot(client, gateway, operator_key) if gateway else None
+                        expected_warm_calls = (
+                            before_warmup_calls + warming["upstream_calls_expected"]
+                        )
+                        initial_calls = await backend_calls(
+                            client, backend, args.ollama_log, expected_warm_calls
+                        )
+                        if initial_calls != expected_warm_calls:
+                            raise RuntimeError(
+                                "Warmup backend count differs; require a dedicated backend/log"
+                            )
+                        if not warming["cache_requirement_met"]:
+                            setup_failures.append(
+                                {
+                                    "attempt": setup_attempt + 1,
+                                    "warmup": warming,
+                                    "metrics_after_setup": before,
+                                }
+                            )
+                            print(
+                                json.dumps(
+                                    {
+                                        "setup_failed": run_order + 1,
+                                        "attempt": setup_attempt + 1,
+                                        "scenario": scenario,
+                                        "concurrency": concurrency,
+                                    }
+                                ),
+                                file=sys.stderr,
+                                flush=True,
+                            )
+                            continue
+                        fixture_before = None
+                        if not real:
+                            reset = await client.post(backend + "/_benchmark/reset_peak")
+                            reset.raise_for_status()
+                            fixture_before = reset.json()
+                            if fixture_before["active"]:
+                                raise RuntimeError("Mock backend not idle before measured window")
+                        owned_pids = {"load_generator": os.getpid()}
+                        if gateway_pid:
+                            owned_pids["gateway"] = gateway_pid
+                        if backend_pid:
+                            owned_pids["mock_backend"] = backend_pid
+                        if args.ollama_pid:
+                            owned_pids["owned_ollama_tree"] = args.ollama_pid
+                        sampler = ProcessSampler(owned_pids, descendants={"owned_ollama_tree"})
+                        resource_started = time.perf_counter()
+                        cgroup_before = cgroup_cpu_stat()
+                        sampler.sample()
+                        stop = asyncio.Event()
+                        sampling = asyncio.create_task(sampler.collect(stop))
+                        try:
+                            measured_started_utc = datetime.now(UTC).isoformat()
+                            measured = await run_load(
+                                client,
+                                endpoint,
+                                key or "",
+                                payloads,
+                                make_schedule(scenario, args.requests, args.seed),
+                                concurrency,
+                                arrival_rate=args.arrival_rate,
+                            )
+                            measured_finished_utc = datetime.now(UTC).isoformat()
+                        finally:
+                            stop.set()
+                            await sampling
+                            sampler.sample()
+                        resource_duration = time.perf_counter() - resource_started
+                        cgroup_after = cgroup_cpu_stat()
+                        after = await snapshot(client, gateway, operator_key) if gateway else None
+                        delta = metrics_delta(before, after) if gateway else None
+                        attempts = (
+                            delta["counts"]["upstream_attempts"] if delta else measured["attempted"]
+                        )
+                        forwarded_successes = sum(
+                            row["status"] == 200 and row["cache"] not in {"HIT", "SEMANTIC_HIT"}
+                            for row in measured["raw_records"]
+                        )
+                        actual_calls = (
+                            await backend_calls(
+                                client,
+                                backend,
+                                args.ollama_log,
+                                initial_calls + forwarded_successes,
+                            )
+                            - initial_calls
+                        )
+                        try:
+                            count_evidence = reconcile_upstream_counts(
+                                attempts, actual_calls, forwarded_successes
+                            )
+                        except RuntimeError:
+                            print(
+                                json.dumps(
+                                    {
+                                        "invalid_point": {
+                                            "run_order": run_order,
+                                            "scenario": scenario,
+                                            "concurrency": concurrency,
+                                        },
+                                        "attempts": attempts,
+                                        "observed_calls": actual_calls,
+                                        "forwarded_successes": forwarded_successes,
+                                        "status_counts": measured["status_counts"],
+                                        "transport_failures": measured["transport_failures"],
+                                    }
+                                ),
+                                file=sys.stderr,
+                                flush=True,
+                            )
+                            raise
+                        fixture_after = None
+                        if not real:
+                            fixture_after = (await client.get(backend + "/_benchmark/stats")).json()
+                            if fixture_after["active"]:
+                                raise RuntimeError("Mock backend retained active work after load")
+                            if gateway and fixture_after["peak"] > config["max_in_flight"]:
+                                raise RuntimeError(
+                                    "Observed mock inference peak exceeds admission limit"
+                                )
+                        ingress_evidence = (
+                            reconcile_gateway_counts(
+                                measured["attempted"],
+                                measured["completed"],
+                                delta["counts"]["requests_started"],
+                                delta["counts"]["requests_finished"],
+                            )
+                            if gateway
+                            else None
+                        )
+                        successful_cache_dispositions = Counter(
+                            row["cache"] for row in measured["raw_records"] if row["status"] == 200
+                        )
+                        if (
+                            scenario == "exact"
+                            and successful_cache_dispositions != {"HIT": measured["http_200"]}
+                            and measured["http_200"]
+                        ):
+                            raise RuntimeError("Warm exact workload was not entirely cache hits")
+                        if (
+                            scenario == "semantic"
+                            and concurrency == 1
+                            and successful_cache_dispositions
+                            != {"SEMANTIC_HIT": measured["http_200"]}
+                            and measured["http_200"]
+                        ):
+                            raise RuntimeError(
+                                "Single-worker semantic workload was not entirely semantic hits"
+                            )
+                        hits = sum(
+                            measured["cache_dispositions"].get(name, 0)
+                            for name in ("HIT", "SEMANTIC_HIT")
+                        )
+                        replay_checks = verify_wire_replays(
+                            measured, warming, scenario, concurrency
+                        )
+                        # Probe after all measured snapshots/counts: not part of RPS,
+                        # percentiles, resource window, or measured upstream calls.
+                        recovery = await run_load(
                             client,
                             endpoint,
                             key or "",
                             payloads,
-                            make_schedule(scenario, args.requests, args.seed),
-                            concurrency,
-                            arrival_rate=args.arrival_rate,
+                            ["uncached" if gateway else "direct"],
+                            1,
                         )
-                        measured_finished_utc = datetime.now(UTC).isoformat()
-                    finally:
-                        stop.set()
-                        await sampling
-                        sampler.sample()
-                    resource_duration = time.perf_counter() - resource_started
-                    cgroup_after = cgroup_cpu_stat()
-                    after = await snapshot(client, gateway, operator_key) if gateway else None
-                    delta = metrics_delta(before, after) if gateway else None
-                    attempts = (
-                        delta["counts"]["upstream_attempts"] if delta else measured["attempted"]
-                    )
-                    forwarded_successes = sum(
-                        row["status"] == 200 and row["cache"] not in {"HIT", "SEMANTIC_HIT"}
-                        for row in measured["raw_records"]
-                    )
-                    actual_calls = (
-                        await backend_calls(
-                            client, backend, args.ollama_log, initial_calls + forwarded_successes
+                        recovery_calls = (
+                            await backend_calls(
+                                client,
+                                backend,
+                                args.ollama_log,
+                                initial_calls + actual_calls + recovery["http_200"],
+                            )
+                            - initial_calls
+                            - actual_calls
                         )
-                        - initial_calls
-                    )
-                    try:
-                        count_evidence = reconcile_upstream_counts(
-                            attempts, actual_calls, forwarded_successes
+                        reconcile_upstream_counts(1, recovery_calls, recovery["http_200"])
+                        recovery_metrics = (
+                            await snapshot(client, gateway, operator_key) if gateway else None
                         )
-                    except RuntimeError:
+                        if recovery_metrics and recovery_metrics["gauges"]["inference_in_flight"]:
+                            raise RuntimeError("Post-load recovery leaked inference capacity")
+                        measured.update(
+                            **replay_checks,
+                            scenario=scenario,
+                            repeat_index=repeat,
+                            run_order=run_order,
+                            process_ids=owned_pids,
+                            separate_gateway_process=gateway_pid is None
+                            or gateway_pid != os.getpid(),
+                            cgroup_cpu_stat_before=cgroup_before,
+                            cgroup_cpu_stat_after=cgroup_after,
+                            cgroup_cpu_stat_delta=_subtract(cgroup_before, cgroup_after)
+                            if cgroup_before is not None and cgroup_after is not None
+                            else None,
+                            fixture_stats_before=fixture_before,
+                            fixture_stats_after=fixture_after,
+                            observed_peak_inference_concurrency=fixture_after["peak"]
+                            if fixture_after is not None
+                            else None,
+                            peak_inference_note=(
+                                "Mock fixture window peak; real Ollama execution peak is unobserved"
+                            ),
+                            recovery={
+                                "successful": recovery["successful"],
+                                "status_counts": recovery["status_counts"],
+                                "latency_successful": recovery["latency_successful"],
+                                "independent_upstream_calls": recovery_calls,
+                                "excluded_from_measurement": True,
+                                "inference_in_flight_after": recovery_metrics["gauges"][
+                                    "inference_in_flight"
+                                ]
+                                if recovery_metrics
+                                else None,
+                            },
+                            started_utc=measured_started_utc,
+                            finished_utc=measured_finished_utc,
+                            concurrency=concurrency,
+                            warmup=warming,
+                            setup_failures=setup_failures,
+                            model_identity=identity,
+                            independent_upstream_calls=actual_calls,
+                            ingress_count_evidence=ingress_evidence,
+                            unconfirmed_upstream_attempts=count_evidence[
+                                "unconfirmed_upstream_attempts"
+                            ],
+                            call_count_source="dedicated_ollama_gin_log"
+                            if real
+                            else "mock_fixture_stats",
+                            inference_calls_avoided_by_hits=hits,
+                            cache_avoidance_fraction_of_attempts=(
+                                hits / measured["attempted"] if measured["attempted"] else None
+                            ),
+                            metrics_before=before,
+                            metrics_after=after,
+                            metrics_delta=delta,
+                            resources=sampler.summary(resource_duration),
+                            gateway_config=config,
+                        )
+                        results.append(measured)
                         print(
                             json.dumps(
                                 {
-                                    "invalid_point": {
-                                        "run_order": run_order,
-                                        "scenario": scenario,
-                                        "concurrency": concurrency,
-                                    },
-                                    "attempts": attempts,
-                                    "observed_calls": actual_calls,
-                                    "forwarded_successes": forwarded_successes,
-                                    "status_counts": measured["status_counts"],
-                                    "transport_failures": measured["transport_failures"],
+                                    "point_completed": run_order + 1,
+                                    "scenario": scenario,
+                                    "concurrency": concurrency,
+                                    "repeat_index": repeat,
+                                    "successful_rps": measured["successful_rps"],
+                                    "http_503": measured["http_503"],
                                 }
                             ),
                             file=sys.stderr,
                             flush=True,
                         )
-                        raise
-                    fixture_after = None
-                    if not real:
-                        fixture_after = (await client.get(backend + "/_benchmark/stats")).json()
-                        if fixture_after["active"]:
-                            raise RuntimeError("Mock backend retained active work after load")
-                        if gateway and fixture_after["peak"] > config["max_in_flight"]:
-                            raise RuntimeError(
-                                "Observed mock inference peak exceeds admission limit"
-                            )
-                    ingress_evidence = (
-                        reconcile_gateway_counts(
-                            measured["attempted"],
-                            measured["completed"],
-                            delta["counts"]["requests_started"],
-                            delta["counts"]["requests_finished"],
-                        )
-                        if gateway
-                        else None
-                    )
-                    successful_cache_dispositions = Counter(
-                        row["cache"] for row in measured["raw_records"] if row["status"] == 200
-                    )
-                    if (
-                        scenario == "exact"
-                        and successful_cache_dispositions != {"HIT": measured["http_200"]}
-                        and measured["http_200"]
-                    ):
-                        raise RuntimeError("Warm exact workload was not entirely cache hits")
-                    if (
-                        scenario == "semantic"
-                        and concurrency == 1
-                        and successful_cache_dispositions != {"SEMANTIC_HIT": measured["http_200"]}
-                        and measured["http_200"]
-                    ):
-                        raise RuntimeError(
-                            "Single-worker semantic workload was not entirely semantic hits"
-                        )
-                    hits = sum(
-                        measured["cache_dispositions"].get(name, 0)
-                        for name in ("HIT", "SEMANTIC_HIT")
-                    )
-                    replay_checks = verify_wire_replays(measured, warming, scenario, concurrency)
-                    # Probe after all measured snapshots/counts: not part of RPS,
-                    # percentiles, resource window, or measured upstream calls.
-                    recovery = await run_load(
-                        client,
-                        endpoint,
-                        key or "",
-                        payloads,
-                        ["uncached" if gateway else "direct"],
-                        1,
-                    )
-                    recovery_calls = (
-                        await backend_calls(
-                            client,
-                            backend,
-                            args.ollama_log,
-                            initial_calls + actual_calls + recovery["http_200"],
-                        )
-                        - initial_calls
-                        - actual_calls
-                    )
-                    reconcile_upstream_counts(1, recovery_calls, recovery["http_200"])
-                    recovery_metrics = (
-                        await snapshot(client, gateway, operator_key) if gateway else None
-                    )
-                    if recovery_metrics and recovery_metrics["gauges"]["inference_in_flight"]:
-                        raise RuntimeError("Post-load recovery leaked inference capacity")
-                    measured.update(
-                        **replay_checks,
-                        scenario=scenario,
-                        repeat_index=repeat,
-                        run_order=run_order,
-                        process_ids=owned_pids,
-                        separate_gateway_process=gateway_pid is None or gateway_pid != os.getpid(),
-                        cgroup_cpu_stat_before=cgroup_before,
-                        cgroup_cpu_stat_after=cgroup_after,
-                        cgroup_cpu_stat_delta=_subtract(cgroup_before, cgroup_after)
-                        if cgroup_before is not None and cgroup_after is not None
-                        else None,
-                        fixture_stats_before=fixture_before,
-                        fixture_stats_after=fixture_after,
-                        observed_peak_inference_concurrency=fixture_after["peak"]
-                        if fixture_after is not None
-                        else None,
-                        peak_inference_note=(
-                            "Mock fixture window peak; real Ollama execution peak is unobserved"
-                        ),
-                        recovery={
-                            "successful": recovery["successful"],
-                            "status_counts": recovery["status_counts"],
-                            "latency_successful": recovery["latency_successful"],
-                            "independent_upstream_calls": recovery_calls,
-                            "excluded_from_measurement": True,
-                            "inference_in_flight_after": recovery_metrics["gauges"][
-                                "inference_in_flight"
-                            ]
-                            if recovery_metrics
-                            else None,
-                        },
-                        started_utc=measured_started_utc,
-                        finished_utc=measured_finished_utc,
-                        concurrency=concurrency,
-                        warmup=warming,
-                        model_identity=identity,
-                        independent_upstream_calls=actual_calls,
-                        ingress_count_evidence=ingress_evidence,
-                        unconfirmed_upstream_attempts=count_evidence[
-                            "unconfirmed_upstream_attempts"
-                        ],
-                        call_count_source="dedicated_ollama_gin_log"
-                        if real
-                        else "mock_fixture_stats",
-                        inference_calls_avoided_by_hits=hits,
-                        cache_avoidance_fraction_of_attempts=(
-                            hits / measured["attempted"] if measured["attempted"] else None
-                        ),
-                        metrics_before=before,
-                        metrics_after=after,
-                        metrics_delta=delta,
-                        resources=sampler.summary(resource_duration),
-                        gateway_config=config,
-                    )
-                    results.append(measured)
-                    print(
-                        json.dumps(
-                            {
-                                "point_completed": run_order + 1,
-                                "scenario": scenario,
-                                "concurrency": concurrency,
-                                "repeat_index": repeat,
-                                "successful_rps": measured["successful_rps"],
-                                "http_503": measured["http_503"],
-                            }
-                        ),
-                        file=sys.stderr,
-                        flush=True,
-                    )
+                    break
+            else:
+                unavailable_points.append(
+                    {
+                        "scenario": scenario,
+                        "concurrency": concurrency,
+                        "repeat_index": repeat,
+                        "run_order": run_order,
+                        "reason": "Warm-cache setup unavailable after3freshstarts",
+                        "setup_failures": setup_failures,
+                    }
+                )
     verify_source_manifest(initial_sources)
     return {
         "schema_version": 1,
+        "unavailable_points": unavailable_points,
+        "setup_attempts_limit": 3,
         "code_manifest": initial_sources,
         "code_manifest_verified_unchanged_at_end": True,
         "suite_started_utc": suite_started_utc,

@@ -703,3 +703,32 @@ def test_transport_failure_before_ingress_or_after_response_preserves_counter_bo
     for values in ((100, 99, 98, 98), (100, 99, 101, 101), (100, 99, 100, 99)):
         with pytest.raises(RuntimeError, match="bounds"):
             benchmark.reconcile_gateway_counts(*values)
+
+
+async def test_semantic_setup_fallback_is_recorded_before_measurement_without_relaxing_hit_claim(
+    monkeypatch,
+):
+    phases = iter(
+        [
+            {
+                "successful": 1,
+                "raw_records": [{"cache": "MISS", "response_sha256": "source"}],
+                "cache_dispositions": {"MISS": 1},
+            },
+            {
+                "successful": 5,
+                "raw_records": [{"cache": "HIT"}] * 5,
+                "cache_dispositions": {"HIT": 5},
+            },
+        ]
+    )
+
+    async def load(*args, **kwargs):
+        return next(phases)
+
+    monkeypatch.setattr(benchmark, "run_load", load)
+    result = await benchmark.warmup(None, "", "", "semantic", payloads(), 5)
+    assert result["cache_requirement_met"] is False
+    assert result["measured_cache"] == {"HIT": 5}
+    assert len(result["phase_records"]) == 6
+    assert result["excluded_from_measurement"] is True
