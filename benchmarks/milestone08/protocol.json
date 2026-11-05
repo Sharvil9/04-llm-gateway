@@ -2,8 +2,8 @@
   "baseline_commit": "c389b6366a475d2ff5c8975666cc02ee19727176",
   "frozen_at_utc": "2026-11-05T01:25:11.396334+00:00",
   "source_manifest": {
-    "devtools/benchmark.py": "ec094daa99872a0e173a0df0a2035536382a8085960c58c397ade2b8ba0a81e2",
-    "devtools/load_campaign.py": "ce378a6cd703c928d4ea4e769883fff9a50e5c0fc407b3ff9dd784d9baaadec0",
+    "devtools/benchmark.py": "71ad2560d23d6718ef811ee67c3ac1396bade7ac2fcbf2c4a56cba643795878e",
+    "devtools/load_campaign.py": "a16d5ca0714e3856ea3ac1c9544c12600d315701532491552046a9f1cc0076c2",
     "devtools/load_reliability.py": "7e5434feffa1384211a7798b9eefa8b327038b10c7b31b498c95ec52a4dbe546",
     "devtools/semantic_eval.py": "633e3b941429988209e374abf1beef83f8e05bc5f24fc8748fe5a896d6887b1a",
     "devtools/semantic_probe.py": "ff41da31c5807f290a5dd0a9859ec8c18744b984f27fad819bb75eebbf8f37f5",
@@ -199,6 +199,16 @@
   "report_policy": "Targetarrivals,actualHTTPstarts,localdrops,HTTPstatus,success-onlyRPS/latencies separately; p95N>=100,p99N>=1000 eachdistribution",
   "setup_trials_excluded": [
     "artifacts/milestone08/setup-smoke.json",
-    "artifacts/milestone08/reliability-trial.json"
-  ]
+    "artifacts/milestone08/reliability-trial.json",
+    "artifacts/milestone08/accounting-diagnostic.json"
+  ],
+  "excluded_interrupted_run": {
+    "source_commit": "fae94f9",
+    "log": "artifacts/milestone08/primary-interrupted/primary.stdout.log",
+    "completed_points": 32,
+    "abort_point": "direct, concurrency1, repeat0",
+    "reason": "Strict attempt/backend equality aborted; original rawfailedpointnotretained, exactmismatchcauseunestablished",
+    "isolated_diagnostic": "1000/1000 directsuccess,1000observedbackendcalls; originalfailure not reproduced",
+    "action": "Record failed attempts separately and preserve completion/observedcallbounds; rerunallfinaltrials"
+  }
 }

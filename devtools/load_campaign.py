@@ -180,6 +180,7 @@ def brief(point: dict) -> dict:
         "other_http_errors",
         "unexpected_http_responses",
         "independent_upstream_calls",
+        "unconfirmed_upstream_attempts",
         "observed_peak_inference_concurrency",
         "http_active_peak",
         "process_ids",

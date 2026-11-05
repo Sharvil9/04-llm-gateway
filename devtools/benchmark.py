@@ -140,6 +140,33 @@ def cgroup_cpu_stat() -> dict[str, int] | None:
         return None
 
 
+def reconcile_upstream_counts(attempts: int, actual: int, forwarded_successes: int) -> dict:
+    """An adapter/HTTP attempt need not reach the server after transport failure.
+
+    Successful non-cache responses require observed backend calls. Extra calls or
+    missing successful calls invalidate the experiment; failed attempts may be
+    unobserved and remain explicit failures in client outcome records.
+    """
+    if not 0 <= forwarded_successes <= actual <= attempts:
+        raise RuntimeError(
+            f"Invalid upstream accounting: attempts={attempts}, observed={actual}, "
+            f"successful_forwarded_responses={forwarded_successes}"
+        )
+    return {
+        "upstream_attempts": attempts,
+        "independent_upstream_calls": actual,
+        "unconfirmed_upstream_attempts": attempts - actual,
+    }
+
+
+def reconcile_gateway_counts(attempted: int, completed: int, started: int, finished: int) -> dict:
+    # An HTTP attempt can fail before ingress; a response can also be lost after
+    # the gateway has completed its ASGI send. Neither is a successful client call.
+    if not completed <= finished == started <= attempted:
+        raise RuntimeError("Gateway/client counts violate completion or settled-ingress bounds")
+    return {"http_attempts_not_observed_at_gateway": attempted - started}
+
+
 def time_bins(records: list[dict]) -> list[dict]:
     """One-second start-cohort counts; last bin aggregates beyond one hour."""
     bins = {}
@@ -1017,16 +1044,40 @@ async def run_suite(args) -> dict:
                     attempts = (
                         delta["counts"]["upstream_attempts"] if delta else measured["attempted"]
                     )
+                    forwarded_successes = sum(
+                        row["status"] == 200 and row["cache"] not in {"HIT", "SEMANTIC_HIT"}
+                        for row in measured["raw_records"]
+                    )
                     actual_calls = (
                         await backend_calls(
-                            client, backend, args.ollama_log, initial_calls + attempts
+                            client, backend, args.ollama_log, initial_calls + forwarded_successes
                         )
                         - initial_calls
                     )
-                    if actual_calls != attempts:
-                        raise RuntimeError(
-                            "Upstream count differs; use a dedicated, quiet backend/log"
+                    try:
+                        count_evidence = reconcile_upstream_counts(
+                            attempts, actual_calls, forwarded_successes
                         )
+                    except RuntimeError:
+                        print(
+                            json.dumps(
+                                {
+                                    "invalid_point": {
+                                        "run_order": run_order,
+                                        "scenario": scenario,
+                                        "concurrency": concurrency,
+                                    },
+                                    "attempts": attempts,
+                                    "observed_calls": actual_calls,
+                                    "forwarded_successes": forwarded_successes,
+                                    "status_counts": measured["status_counts"],
+                                    "transport_failures": measured["transport_failures"],
+                                }
+                            ),
+                            file=sys.stderr,
+                            flush=True,
+                        )
+                        raise
                     fixture_after = None
                     if not real:
                         fixture_after = (await client.get(backend + "/_benchmark/stats")).json()
@@ -1036,23 +1087,30 @@ async def run_suite(args) -> dict:
                             raise RuntimeError(
                                 "Observed mock inference peak exceeds admission limit"
                             )
-                    if gateway and (
-                        delta["counts"]["requests_started"] != measured["attempted"]
-                        or delta["counts"]["requests_finished"] != measured["attempted"]
-                    ):
-                        raise RuntimeError("Metrics request counts differ from measured workload")
+                    ingress_evidence = (
+                        reconcile_gateway_counts(
+                            measured["attempted"],
+                            measured["completed"],
+                            delta["counts"]["requests_started"],
+                            delta["counts"]["requests_finished"],
+                        )
+                        if gateway
+                        else None
+                    )
+                    successful_cache_dispositions = Counter(
+                        row["cache"] for row in measured["raw_records"] if row["status"] == 200
+                    )
                     if (
                         scenario == "exact"
-                        and measured["attempted"]
-                        and measured["cache_dispositions"] != {"HIT": measured["attempted"]}
+                        and successful_cache_dispositions != {"HIT": measured["http_200"]}
+                        and measured["http_200"]
                     ):
                         raise RuntimeError("Warm exact workload was not entirely cache hits")
                     if (
                         scenario == "semantic"
                         and concurrency == 1
-                        and measured["attempted"]
-                        and measured["cache_dispositions"]
-                        != {"SEMANTIC_HIT": measured["attempted"]}
+                        and successful_cache_dispositions != {"SEMANTIC_HIT": measured["http_200"]}
+                        and measured["http_200"]
                     ):
                         raise RuntimeError(
                             "Single-worker semantic workload was not entirely semantic hits"
@@ -1072,17 +1130,17 @@ async def run_suite(args) -> dict:
                         ["uncached" if gateway else "direct"],
                         1,
                     )
-                    if recovery["successful"] != 1:
-                        raise RuntimeError("Post-load uncached recovery request failed")
                     recovery_calls = (
                         await backend_calls(
-                            client, backend, args.ollama_log, initial_calls + attempts + 1
+                            client,
+                            backend,
+                            args.ollama_log,
+                            initial_calls + actual_calls + recovery["http_200"],
                         )
                         - initial_calls
-                        - attempts
+                        - actual_calls
                     )
-                    if recovery_calls != 1:
-                        raise RuntimeError("Recovery did not make exactly one upstream call")
+                    reconcile_upstream_counts(1, recovery_calls, recovery["http_200"])
                     recovery_metrics = (
                         await snapshot(client, gateway, operator_key) if gateway else None
                     )
@@ -1126,6 +1184,10 @@ async def run_suite(args) -> dict:
                         warmup=warming,
                         model_identity=identity,
                         independent_upstream_calls=actual_calls,
+                        ingress_count_evidence=ingress_evidence,
+                        unconfirmed_upstream_attempts=count_evidence[
+                            "unconfirmed_upstream_attempts"
+                        ],
                         call_count_source="dedicated_ollama_gin_log"
                         if real
                         else "mock_fixture_stats",

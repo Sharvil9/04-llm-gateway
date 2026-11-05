@@ -682,3 +682,24 @@ def test_sampler_records_start_last_and_peak_rss_without_claiming_allocator_grow
     assert observed["first_sampled_rss_bytes"] == 10
     assert observed["last_sampled_rss_bytes"] == 15
     assert observed["sampled_peak_rss_bytes"] == 20
+
+
+def test_transport_failures_may_prevent_attempts_reaching_backend_but_not_successful_calls():
+    evidence = benchmark.reconcile_upstream_counts(100, 99, 98)
+    assert evidence["unconfirmed_upstream_attempts"] == 1
+    assert evidence["independent_upstream_calls"] == 99
+    for counts in ((100, 101, 100), (100, 99, 100), (100, -1, 0)):
+        with pytest.raises(RuntimeError, match="Invalid upstream accounting"):
+            benchmark.reconcile_upstream_counts(*counts)
+
+
+def test_transport_failure_before_ingress_or_after_response_preserves_counter_bounds():
+    assert benchmark.reconcile_gateway_counts(100, 98, 99, 99) == {
+        "http_attempts_not_observed_at_gateway": 1
+    }
+    assert benchmark.reconcile_gateway_counts(100, 98, 100, 100) == {
+        "http_attempts_not_observed_at_gateway": 0
+    }
+    for values in ((100, 99, 98, 98), (100, 99, 101, 101), (100, 99, 100, 99)):
+        with pytest.raises(RuntimeError, match="bounds"):
+            benchmark.reconcile_gateway_counts(*values)
