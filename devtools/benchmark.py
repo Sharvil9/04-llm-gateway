@@ -825,12 +825,17 @@ def verify_wire_replays(measured: dict, warming: dict, scenario: str, concurrenc
     """Attest only hits with a controlled source; concurrent fallback has new lineage."""
     hits = [row for row in measured["raw_records"] if row["cache"] in {"HIT", "SEMANTIC_HIT"}]
     source = warming["primed_source_sha256"]
+    unprimed_kinds = {
+        row["kind"]
+        for row in measured["raw_records"]
+        if row["status"] == 200 and row["cache"] not in {"HIT", "SEMANTIC_HIT"}
+    }
     controlled = [
         row
         for row in hits
-        if concurrency == 1
-        or scenario == "exact"
-        or (row["kind"] == "exact" and row["cache"] == "HIT")
+        if (concurrency == 1 and not unprimed_kinds.intersection({"exact", "semantic"}))
+        or (scenario == "exact" and "exact" not in unprimed_kinds)
+        or (row["kind"] == "exact" and row["cache"] == "HIT" and "exact" not in unprimed_kinds)
     ]
     for row in controlled:
         if source is None or row["response_sha256"] != source:
@@ -839,8 +844,23 @@ def verify_wire_replays(measured: dict, warming: dict, scenario: str, concurrenc
         "cache_wire_replay_verified": True if hits and len(controlled) == len(hits) else None,
         "checked_cache_wire_replays": len(controlled),
         "total_cache_hits": len(hits),
-        "wire_replay_scope": "controlled canonical source; all single-client-worker hits and "
-        "canonical exact hits checked. Concurrent semantic fallback lineage is not asserted.",
+        "wire_replay_scope": "Stable canonical lineage checked; successful fallback/expiry misses "
+        "can establish new lineage, so those affected replays are not attested.",
+    }
+
+
+def cache_purity(scenario: str, measured: dict) -> dict | None:
+    expected = {"exact": "HIT", "semantic": "SEMANTIC_HIT"}.get(scenario)
+    if expected is None:
+        return None
+    successful = [row for row in measured["raw_records"] if row["status"] == 200]
+    matching = sum(row["cache"] == expected for row in successful)
+    return {
+        "expected": expected,
+        "http_200": len(successful),
+        "matching_http_200": matching,
+        "fraction": matching / len(successful) if successful else None,
+        "all_http_200_expected_type": matching == len(successful) if successful else None,
     }
 
 
@@ -952,6 +972,13 @@ def verify_source_manifest(initial: dict[str, str]) -> None:
 async def run_suite(args) -> dict:
     suite_started_utc = datetime.now(UTC).isoformat()
     initial_sources = source_manifest()
+    checkpoint = (ROOT / args.output).resolve().with_suffix(".points.jsonl")
+    if checkpoint in {args.ollama_log, args.evaluation} or checkpoint.is_relative_to(
+        args.model_dir
+    ):
+        raise ValueError("Checkpoint path must not overwrite an input")
+    checkpoint.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint.write_text(json.dumps({"code_manifest": initial_sources, "partial": True}) + "\n")
     _, families, _ = load_dataset()
     evidence = json.loads(args.evaluation.read_text())
     fingerprint = fingerprint_for_model(args.model_dir)
@@ -1128,25 +1155,6 @@ async def run_suite(args) -> dict:
                             if gateway
                             else None
                         )
-                        successful_cache_dispositions = Counter(
-                            row["cache"] for row in measured["raw_records"] if row["status"] == 200
-                        )
-                        if (
-                            scenario == "exact"
-                            and successful_cache_dispositions != {"HIT": measured["http_200"]}
-                            and measured["http_200"]
-                        ):
-                            raise RuntimeError("Warm exact workload was not entirely cache hits")
-                        if (
-                            scenario == "semantic"
-                            and concurrency == 1
-                            and successful_cache_dispositions
-                            != {"SEMANTIC_HIT": measured["http_200"]}
-                            and measured["http_200"]
-                        ):
-                            raise RuntimeError(
-                                "Single-worker semantic workload was not entirely semantic hits"
-                            )
                         hits = sum(
                             measured["cache_dispositions"].get(name, 0)
                             for name in ("HIT", "SEMANTIC_HIT")
@@ -1183,6 +1191,7 @@ async def run_suite(args) -> dict:
                         measured.update(
                             **replay_checks,
                             scenario=scenario,
+                            cache_purity=cache_purity(scenario, measured),
                             repeat_index=repeat,
                             run_order=run_order,
                             process_ids=owned_pids,
@@ -1238,6 +1247,9 @@ async def run_suite(args) -> dict:
                             gateway_config=config,
                         )
                         results.append(measured)
+                        verify_source_manifest(initial_sources)
+                        with checkpoint.open("a") as partial:
+                            partial.write(json.dumps(measured, allow_nan=False) + "\n")
                         print(
                             json.dumps(
                                 {

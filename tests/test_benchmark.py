@@ -305,7 +305,12 @@ def test_wire_replay_checks_controlled_sources_without_claiming_concurrent_seman
 ):
     source, another = "a" * 64, "b" * 64
     warming = {"primed_source_sha256": source}
-    semantic = {"kind": "semantic", "cache": "SEMANTIC_HIT", "response_sha256": another}
+    semantic = {
+        "kind": "semantic",
+        "status": 200,
+        "cache": "SEMANTIC_HIT",
+        "response_sha256": another,
+    }
     with pytest.raises(RuntimeError, match="differs"):
         verify_wire_replays({"raw_records": [semantic]}, warming, "semantic", 1)
     concurrent = verify_wire_replays({"raw_records": [semantic]}, warming, "semantic", 4)
@@ -313,7 +318,7 @@ def test_wire_replay_checks_controlled_sources_without_claiming_concurrent_seman
     assert concurrent["checked_cache_wire_replays"] == 0
     assert concurrent["total_cache_hits"] == 1
 
-    exact = {"kind": "exact", "cache": "HIT", "response_sha256": source}
+    exact = {"kind": "exact", "status": 200, "cache": "HIT", "response_sha256": source}
     mixed = verify_wire_replays({"raw_records": [exact, semantic]}, warming, "mixed", 4)
     assert mixed["cache_wire_replay_verified"] is None
     assert mixed["checked_cache_wire_replays"] == 1
@@ -732,3 +737,21 @@ async def test_semantic_setup_fallback_is_recorded_before_measurement_without_re
     assert result["measured_cache"] == {"HIT": 5}
     assert len(result["phase_records"]) == 6
     assert result["excluded_from_measurement"] is True
+
+
+def test_measured_semantic_fallback_retains_actual_mix_and_does_not_attest_new_lineage():
+    rows = [
+        {"kind": "semantic", "status": 200, "cache": "SEMANTIC_HIT", "response_sha256": "seed"},
+        {"kind": "semantic", "status": 200, "cache": "MISS", "response_sha256": "new"},
+        {"kind": "semantic", "status": 200, "cache": "HIT", "response_sha256": "new"},
+    ]
+    measured = {"raw_records": rows}
+    purity = benchmark.cache_purity("semantic", measured)
+    assert purity["fraction"] == 1 / 3
+    assert purity["all_http_200_expected_type"] is False
+    replay = benchmark.verify_wire_replays(
+        measured, {"primed_source_sha256": "seed"}, "semantic", 1
+    )
+    assert replay["checked_cache_wire_replays"] == 0
+    assert replay["cache_wire_replay_verified"] is None
+    assert benchmark.cache_purity("semantic", {"raw_records": []})["fraction"] is None

@@ -2,8 +2,8 @@
   "baseline_commit": "c389b6366a475d2ff5c8975666cc02ee19727176",
   "frozen_at_utc": "2026-11-05T01:25:11.396334+00:00",
   "source_manifest": {
-    "devtools/benchmark.py": "f6689f1f71af4e96efacdf63ffeb74f0faab8f2beee224cfa4db905e951eb015",
-    "devtools/load_campaign.py": "aaaabbc6cb6bfae14eba4c9b304ccf55910798dda6442a56e1f1800e56f17ffa",
+    "devtools/benchmark.py": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+    "devtools/load_campaign.py": "f659cf2b7098bd1dff03ab3039113434620f2c5e9100da9a4cd2d115feb32ea6",
     "devtools/load_reliability.py": "7e5434feffa1384211a7798b9eefa8b327038b10c7b31b498c95ec52a4dbe546",
     "devtools/semantic_eval.py": "633e3b941429988209e374abf1beef83f8e05bc5f24fc8748fe5a896d6887b1a",
     "devtools/semantic_probe.py": "ff41da31c5807f290a5dd0a9859ec8c18744b984f27fad819bb75eebbf8f37f5",
@@ -201,7 +201,8 @@
     "artifacts/milestone08/setup-smoke.json",
     "artifacts/milestone08/reliability-trial.json",
     "artifacts/milestone08/accounting-diagnostic.json",
-    "artifacts/milestone08/final-setup-smoke.json"
+    "artifacts/milestone08/final-setup-smoke.json",
+    "artifacts/milestone08/semantic-fallback-diagnostic.json"
   ],
   "excluded_interrupted_run": {
     "source_commit": "fae94f9",
@@ -226,5 +227,15 @@
     "completed_points": 7,
     "reason": "Semantic warmup requiredhitdispositionnotmet; exactcoldsetupcauseunobserved",
     "action": "Recordwarmupoutcomes, boundedfreshstarts, unavailablepoints; nomodel/threshold/policychange"
+  },
+  "final_freeze_utc": "2026-11-05T01:49:35.466093+00:00",
+  "measured_cache_policy": "Recordactualcachepurity/mix; legitimatefallbackorTTLeffectsneverdiscardmeasuredrequests; stablewirelineageonly",
+  "checkpoints": "Eachvalidatedpointiswrittenoutsideitsmeasurementwindowwithsourcehashheader",
+  "third_interrupted_run": {
+    "source_commit": "59f401c",
+    "log": "artifacts/milestone08/primary-purity-interrupted/primary.stdout.log",
+    "completed_points": 73,
+    "reason": "Semanticc1actualdispositionschangedundermesuredload; strictpurityassertwasinvalidexperimentalassumption",
+    "action": "Recordpurityandlineageinstead; allfinaltrialsrerunwithimmutableharness; priorpartialexcluded"
   }
 }

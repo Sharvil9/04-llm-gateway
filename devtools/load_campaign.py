@@ -170,6 +170,7 @@ def brief(point: dict) -> dict:
         "target_arrival_rate",
         "status_counts",
         "cache_dispositions",
+        "cache_purity",
         "latency_successful",
         "latency_rejected",
         "latency_all",
