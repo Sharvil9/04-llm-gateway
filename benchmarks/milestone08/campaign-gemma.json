@@ -1,0 +1,2978 @@
+{
+  "schema_version": 1,
+  "stage": "gemma",
+  "source_manifest": {
+    "devtools/benchmark.py": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+    "devtools/load_campaign.py": "f659cf2b7098bd1dff03ab3039113434620f2c5e9100da9a4cd2d115feb32ea6",
+    "devtools/load_reliability.py": "7e5434feffa1384211a7798b9eefa8b327038b10c7b31b498c95ec52a4dbe546",
+    "devtools/semantic_eval.py": "633e3b941429988209e374abf1beef83f8e05bc5f24fc8748fe5a896d6887b1a",
+    "devtools/semantic_probe.py": "ff41da31c5807f290a5dd0a9859ec8c18744b984f27fad819bb75eebbf8f37f5",
+    "devtools/smoke.py": "37efb71ece2467d28f25e954120904700f8d4330a05fbf83d23b9961dc37b0f5",
+    "src/llm_gateway/__init__.py": "717b78cbb6791ca1c8e730ce7fa61f79918e208aaa7a5fc91c0e82da63c28828",
+    "src/llm_gateway/app.py": "b30ceb6009bd464ddcf645692a40a03f9e3990045d555fbd7e322cbcbc142652",
+    "src/llm_gateway/backend.py": "e15217b9191967879ea9c2bc07346621624761f660796153b41c2dad5e0e331d",
+    "src/llm_gateway/cache.py": "b3361651316a6a704a7f61a8f61c026b95234a9195aaea9524184e3367f16a2a",
+    "src/llm_gateway/config.py": "115d6132f67f025ac5c09740d04a2c0c737de963c48453f3b57e7d4ef9639dc5",
+    "src/llm_gateway/embeddings.py": "48ec89a7a3f474b8490c7c8c6f3eceaf3c9496c912fc5221ede45f849dd29e05",
+    "src/llm_gateway/metrics.py": "f9daabbd5575b265370966a417a21157cdc2809b3cdd000f06f3e4abb41e5536",
+    "src/llm_gateway/schemas.py": "8c009bdaacea952b8c6487a837eeabb02815c90286a00b973fa15f015ca83c01",
+    "src/llm_gateway/semantic.py": "7fb0eda909a2c3db2419f3e1199a43878d684d1cfb13f11ec7ae223cef6ae530",
+    "src/llm_gateway/traffic.py": "a18c31c05ce67b772f01c091f5a2f55f49753c2cf0ec844f1b80bfd47c536be9",
+    "uv.lock": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "started_utc": "2026-11-05T02:02:17.597344+00:00",
+  "finished_utc": "2026-11-05T02:06:31.859534+00:00",
+  "hardware_and_software": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "logical_cpus": 3,
+    "cgroup_cpu_max": "200000 100000",
+    "cgroup_memory_max": "8589934592",
+    "packages": {
+      "fastapi": "0.141.1",
+      "starlette": "1.10.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.14.1",
+      "uvicorn": "0.52.4",
+      "numpy": "2.5.4",
+      "onnxruntime": "1.31.1",
+      "tokenizers": "0.23.3"
+    },
+    "source_sha256": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+    "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "controller_pid": 2400,
+  "independent_hardware": false,
+  "separate_load_driver_process": true,
+  "conditions": "Loopback; all processes share the same cgroup CPU and memory budget",
+  "seed": 20261030,
+  "dry_run": false,
+  "trials": [
+    {
+      "name": "gemma-closed",
+      "command": [
+        "/workspace/04-llm-gateway/.venv/bin/python",
+        "-m",
+        "devtools.benchmark",
+        "--requests",
+        "20",
+        "--concurrency",
+        "1",
+        "2",
+        "--scenarios",
+        "direct",
+        "uncached",
+        "--repeats",
+        "2",
+        "--randomize-order",
+        "--seed",
+        "20261030",
+        "--warmup",
+        "5",
+        "--delay-ms",
+        "10",
+        "--output",
+        "/workspace/04-llm-gateway/artifacts/milestone08/gemma/gemma-closed.json",
+        "--ollama-log",
+        "artifacts/milestone08/ollama.log",
+        "--ollama-pid",
+        "2343"
+      ],
+      "load_driver_pid": 2401,
+      "controller_pid": 2400,
+      "raw_sha256": "e17c415b1caddaa7b11dc9246b3b92020a23e9c58e3f8e634832e0cf20a5b13d",
+      "raw_gzip_file": "artifacts/milestone08/gemma/gemma-closed.json.gz",
+      "backend": "ollama",
+      "unavailable_points": [],
+      "points": [
+        {
+          "scenario": "direct",
+          "concurrency": 2,
+          "repeat_index": 1,
+          "run_order": 0,
+          "duration_seconds": 28.247185316000014,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 20,
+          "generator_dropped": 0,
+          "offered_rps": 0.7080357624969403,
+          "attempted_rps": 0.7080351467327057,
+          "successful_rps": 0.7080351467327057,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 20
+          },
+          "cache_dispositions": {
+            "UNLABELLED": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 20,
+            "p50_ms": 2826.040789000217,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 2826.040789000217,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 20,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 2,
+          "process_ids": {
+            "load_generator": 2401,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 844.2622069997014,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": null
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 56484024,
+            "user_usec": 54459589,
+            "system_usec": 2024435,
+            "nice_usec": 0,
+            "nr_periods": 283,
+            "nr_throttled": 280,
+            "throttled_usec": 27855842,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 117,
+            "sampling_window_seconds": 28.314757206000195,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 1.04,
+                "mean_cpu_cores": 0.03672996354634512,
+                "sampled_peak_rss_bytes": 45215744,
+                "first_sampled_rss_bytes": 44916736,
+                "last_sampled_rss_bytes": 45215744,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": false,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": false,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": null,
+                "mean_cpu_cores": null,
+                "sampled_peak_rss_bytes": null,
+                "first_sampled_rss_bytes": null,
+                "last_sampled_rss_bytes": null,
+                "reason": "Process discovery or observation incomplete; aggregate withheld"
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 2,
+              "successful": 2,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 8,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 9,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 11,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 13,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 15,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 16,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 18,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 19,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 21,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 22,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 24,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 25,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 26,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 1,
+          "repeat_index": 0,
+          "run_order": 1,
+          "duration_seconds": 22.62383099500039,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 20,
+          "generator_dropped": 0,
+          "offered_rps": 0.884024259761486,
+          "attempted_rps": 0.8840235769273459,
+          "successful_rps": 0.8840235769273459,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 20
+          },
+          "cache_dispositions": {
+            "BYPASS": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 20,
+            "p50_ms": 1087.604428999839,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 1087.604428999839,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 20,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 1,
+          "process_ids": {
+            "load_generator": 2401,
+            "gateway": 2765,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 828.0716770000254,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": 0
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 45457797,
+            "user_usec": 44930197,
+            "system_usec": 527600,
+            "nice_usec": 0,
+            "nr_periods": 228,
+            "nr_throttled": 228,
+            "throttled_usec": 22242874,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 121,
+            "sampling_window_seconds": 22.72391599799994,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.67,
+                "mean_cpu_cores": 0.029484354723849998,
+                "sampled_peak_rss_bytes": 47157248,
+                "first_sampled_rss_bytes": 47140864,
+                "last_sampled_rss_bytes": 47157248,
+                "reason": null
+              },
+              "gateway": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.16,
+                "mean_cpu_cores": 0.007041039934053731,
+                "sampled_peak_rss_bytes": 46481408,
+                "first_sampled_rss_bytes": 46424064,
+                "last_sampled_rss_bytes": 46481408,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": true,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": 41.88,
+                "mean_cpu_cores": 1.8429922027385641,
+                "sampled_peak_rss_bytes": 945856512,
+                "first_sampled_rss_bytes": 945434624,
+                "last_sampled_rss_bytes": 945553408,
+                "reason": null
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 7,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 8,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 9,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 10,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 11,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 13,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 14,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 15,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 16,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 17,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 18,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 19,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 20,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 21,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 1,
+          "repeat_index": 1,
+          "run_order": 2,
+          "duration_seconds": 26.080698283999936,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 20,
+          "generator_dropped": 0,
+          "offered_rps": 0.7668511636782717,
+          "attempted_rps": 0.7668506334536932,
+          "successful_rps": 0.7668506334536932,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 20
+          },
+          "cache_dispositions": {
+            "BYPASS": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 20,
+            "p50_ms": 1336.4902900002562,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 1336.4902900002562,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 20,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 1,
+          "process_ids": {
+            "load_generator": 2401,
+            "gateway": 3136,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 821.838382000351,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": 0
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 52418064,
+            "user_usec": 50485517,
+            "system_usec": 1932546,
+            "nice_usec": 0,
+            "nr_periods": 262,
+            "nr_throttled": 262,
+            "throttled_usec": 25307935,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 124,
+            "sampling_window_seconds": 26.20007034399987,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.93,
+                "mean_cpu_cores": 0.03549608790317547,
+                "sampled_peak_rss_bytes": 47853568,
+                "first_sampled_rss_bytes": 47845376,
+                "last_sampled_rss_bytes": 47853568,
+                "reason": null
+              },
+              "gateway": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.13,
+                "mean_cpu_cores": 0.00496181873915356,
+                "sampled_peak_rss_bytes": 46690304,
+                "first_sampled_rss_bytes": 46632960,
+                "last_sampled_rss_bytes": 46690304,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": true,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": 47.849999999999994,
+                "mean_cpu_cores": 1.82633097437306,
+                "sampled_peak_rss_bytes": 945766400,
+                "first_sampled_rss_bytes": 945573888,
+                "last_sampled_rss_bytes": 945545216,
+                "reason": null
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 3,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 8,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 9,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 11,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 12,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 14,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 15,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 16,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 18,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 19,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 20,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 21,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 23,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 24,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 25,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 1,
+          "repeat_index": 0,
+          "run_order": 3,
+          "duration_seconds": 28.973021072999927,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 20,
+          "generator_dropped": 0,
+          "offered_rps": 0.6902977888826498,
+          "attempted_rps": 0.6902973614525162,
+          "successful_rps": 0.6902973614525162,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 20
+          },
+          "cache_dispositions": {
+            "UNLABELLED": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 20,
+            "p50_ms": 1408.8174510002318,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 1408.8174510002318,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 20,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 1,
+          "process_ids": {
+            "load_generator": 2401,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 1397.8028890001042,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": null
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 57725260,
+            "user_usec": 55694244,
+            "system_usec": 2031015,
+            "nice_usec": 0,
+            "nr_periods": 291,
+            "nr_throttled": 291,
+            "throttled_usec": 28669056,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 124,
+            "sampling_window_seconds": 29.061618253999768,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 1.05,
+                "mean_cpu_cores": 0.036130128433418805,
+                "sampled_peak_rss_bytes": 48406528,
+                "first_sampled_rss_bytes": 48406528,
+                "last_sampled_rss_bytes": 48406528,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": false,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": false,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": null,
+                "mean_cpu_cores": null,
+                "sampled_peak_rss_bytes": null,
+                "first_sampled_rss_bytes": null,
+                "last_sampled_rss_bytes": null,
+                "reason": "Process discovery or observation incomplete; aggregate withheld"
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 8,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 10,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 12,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 13,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 15,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 16,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 18,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 19,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 20,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 21,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 22,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 23,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 25,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 26,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 27,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "repeat_index": 1,
+          "run_order": 4,
+          "duration_seconds": 1.5715974649997406,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 1,
+          "generator_dropped": 0,
+          "offered_rps": 12.72606199518892,
+          "attempted_rps": 12.725904975930526,
+          "successful_rps": 0.6362952487965263,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 1,
+            "503": 19
+          },
+          "cache_dispositions": {
+            "BYPASS": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 1,
+            "p50_ms": 1571.3636450000195,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 19,
+            "p50_ms": 2.4767439999777707,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 2.4767439999777707,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 1,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 2,
+          "process_ids": {
+            "load_generator": 2401,
+            "gateway": 3887,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 1083.3493149998503,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": 0
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 3302358,
+            "user_usec": 3040597,
+            "system_usec": 261761,
+            "nice_usec": 0,
+            "nr_periods": 17,
+            "nr_throttled": 17,
+            "throttled_usec": 1626098,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 10,
+            "sampling_window_seconds": 1.6530616310001278,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.07,
+                "mean_cpu_cores": 0.042345668598967434,
+                "sampled_peak_rss_bytes": 48832512,
+                "first_sampled_rss_bytes": 48824320,
+                "last_sampled_rss_bytes": 48832512,
+                "reason": null
+              },
+              "gateway": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.02,
+                "mean_cpu_cores": 0.012098762456847838,
+                "sampled_peak_rss_bytes": 46456832,
+                "first_sampled_rss_bytes": 46428160,
+                "last_sampled_rss_bytes": 46456832,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": true,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": 2.92,
+                "mean_cpu_cores": 1.7664193186997843,
+                "sampled_peak_rss_bytes": 945348608,
+                "first_sampled_rss_bytes": 945348608,
+                "last_sampled_rss_bytes": 945348608,
+                "reason": null
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 20,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 19,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 2,
+          "repeat_index": 0,
+          "run_order": 5,
+          "duration_seconds": 27.59224393400018,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 20,
+          "generator_dropped": 0,
+          "offered_rps": 0.7248418814082133,
+          "attempted_rps": 0.7248413738237238,
+          "successful_rps": 0.7248413738237238,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 20
+          },
+          "cache_dispositions": {
+            "UNLABELLED": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 20,
+            "p50_ms": 2537.4776469998324,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 2537.4776469998324,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 20,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 2,
+          "process_ids": {
+            "load_generator": 2401,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 1183.6309290001736,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": null
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 55352472,
+            "user_usec": 53237509,
+            "system_usec": 2114964,
+            "nice_usec": 0,
+            "nr_periods": 277,
+            "nr_throttled": 274,
+            "throttled_usec": 27149878,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 120,
+            "sampling_window_seconds": 27.681941644999824,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.72,
+                "mean_cpu_cores": 0.026009736211189984,
+                "sampled_peak_rss_bytes": 49934336,
+                "first_sampled_rss_bytes": 48967680,
+                "last_sampled_rss_bytes": 49934336,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": true,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": 50.46,
+                "mean_cpu_cores": 1.822849012800898,
+                "sampled_peak_rss_bytes": 945524736,
+                "first_sampled_rss_bytes": 945180672,
+                "last_sampled_rss_bytes": 945524736,
+                "reason": null
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 2,
+              "successful": 2,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 3,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 7,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 9,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 10,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 11,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 13,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 14,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 16,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 18,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 19,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 21,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 22,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 24,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 1,
+          "repeat_index": 1,
+          "run_order": 6,
+          "duration_seconds": 7.686496290999912,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 20,
+          "generator_dropped": 0,
+          "offered_rps": 2.6019724585273645,
+          "attempted_rps": 2.6019657387225856,
+          "successful_rps": 2.6019657387225856,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 20
+          },
+          "cache_dispositions": {
+            "UNLABELLED": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 20,
+            "p50_ms": 387.8944739999497,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 387.8944739999497,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 20,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 1,
+          "process_ids": {
+            "load_generator": 2401,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 293.71244100002514,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": null
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 15499542,
+            "user_usec": 15499542,
+            "system_usec": 0,
+            "nice_usec": 0,
+            "nr_periods": 78,
+            "nr_throttled": 78,
+            "throttled_usec": 7694078,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 52,
+            "sampling_window_seconds": 7.745823693000148,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.22,
+                "mean_cpu_cores": 0.028402402213054838,
+                "sampled_peak_rss_bytes": 52805632,
+                "first_sampled_rss_bytes": 52805632,
+                "last_sampled_rss_bytes": 52805632,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": true,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": 14.62,
+                "mean_cpu_cores": 1.887468728885735,
+                "sampled_peak_rss_bytes": 945373184,
+                "first_sampled_rss_bytes": 945373184,
+                "last_sampled_rss_bytes": 945352704,
+                "reason": null
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 3,
+              "successful": 3,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 3,
+              "successful": 3,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 2,
+              "successful": 2,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 3,
+              "http_started": 3,
+              "successful": 3,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 2,
+              "successful": 2,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 3,
+              "successful": 3,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 3,
+              "successful": 3,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 7,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "repeat_index": 0,
+          "run_order": 7,
+          "duration_seconds": 2.591553185000066,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 1,
+          "generator_dropped": 0,
+          "offered_rps": 7.717435400767146,
+          "attempted_rps": 7.717379722615838,
+          "successful_rps": 0.38586898613079185,
+          "target_arrival_rate": null,
+          "status_counts": {
+            "200": 1,
+            "503": 19
+          },
+          "cache_dispositions": {
+            "BYPASS": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 1,
+            "p50_ms": 2591.2265699998898,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 19,
+            "p50_ms": 4.262799999651179,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 4.262799999651179,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 1,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 2,
+          "process_ids": {
+            "load_generator": 2401,
+            "gateway": 4437,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 1223.669260999941,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": 0
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 5238151,
+            "user_usec": 4962457,
+            "system_usec": 275693,
+            "nice_usec": 0,
+            "nr_periods": 27,
+            "nr_throttled": 25,
+            "throttled_usec": 2767300,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 8,
+            "sampling_window_seconds": 2.6961247740000545,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.21,
+                "mean_cpu_cores": 0.07788957025473174,
+                "sampled_peak_rss_bytes": 53112832,
+                "first_sampled_rss_bytes": 53112832,
+                "last_sampled_rss_bytes": 53112832,
+                "reason": null
+              },
+              "gateway": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.06,
+                "mean_cpu_cores": 0.022254162929923355,
+                "sampled_peak_rss_bytes": 46665728,
+                "first_sampled_rss_bytes": 46637056,
+                "last_sampled_rss_bytes": 46665728,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": false,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": false,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": null,
+                "mean_cpu_cores": null,
+                "sampled_peak_rss_bytes": null,
+                "first_sampled_rss_bytes": null,
+                "last_sampled_rss_bytes": null,
+                "reason": "Process discovery or observation incomplete; aggregate withheld"
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 20,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 19,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        }
+      ],
+      "aggregate": [
+        {
+          "scenario": "direct",
+          "concurrency": 1,
+          "trials": 2,
+          "successful_rps_median": 1.6461315500875509,
+          "successful_rps_min": 0.6902973614525162,
+          "successful_rps_max": 2.6019657387225856,
+          "successful_p50_ms_median": 898.3559625000908,
+          "http_429_total": 0,
+          "http_503_total": 0,
+          "http_504_total": 0,
+          "actual_upstream_calls_total": 40,
+          "note": "Trial median/range; no pooled quantiles or confidence bounds"
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 2,
+          "trials": 2,
+          "successful_rps_median": 0.7164382602782148,
+          "successful_rps_min": 0.7080351467327057,
+          "successful_rps_max": 0.7248413738237238,
+          "successful_p50_ms_median": 2681.7592180000247,
+          "http_429_total": 0,
+          "http_503_total": 0,
+          "http_504_total": 0,
+          "actual_upstream_calls_total": 40,
+          "note": "Trial median/range; no pooled quantiles or confidence bounds"
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 1,
+          "trials": 2,
+          "successful_rps_median": 0.8254371051905196,
+          "successful_rps_min": 0.7668506334536932,
+          "successful_rps_max": 0.8840235769273459,
+          "successful_p50_ms_median": 1212.0473595000476,
+          "http_429_total": 0,
+          "http_503_total": 0,
+          "http_504_total": 0,
+          "actual_upstream_calls_total": 40,
+          "note": "Trial median/range; no pooled quantiles or confidence bounds"
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "trials": 2,
+          "successful_rps_median": 0.5110821174636591,
+          "successful_rps_min": 0.38586898613079185,
+          "successful_rps_max": 0.6362952487965263,
+          "successful_p50_ms_median": 2081.2951074999546,
+          "http_429_total": 0,
+          "http_503_total": 38,
+          "http_504_total": 0,
+          "actual_upstream_calls_total": 2,
+          "note": "Trial median/range; no pooled quantiles or confidence bounds"
+        }
+      ]
+    },
+    {
+      "name": "gemma-arrival-1",
+      "command": [
+        "/workspace/04-llm-gateway/.venv/bin/python",
+        "-m",
+        "devtools.benchmark",
+        "--requests",
+        "20",
+        "--concurrency",
+        "2",
+        "--scenarios",
+        "uncached",
+        "--arrival-rate",
+        "1",
+        "--seed",
+        "20261030",
+        "--warmup",
+        "5",
+        "--delay-ms",
+        "10",
+        "--output",
+        "/workspace/04-llm-gateway/artifacts/milestone08/gemma/gemma-arrival-1.json",
+        "--ollama-log",
+        "artifacts/milestone08/ollama.log",
+        "--ollama-pid",
+        "2343"
+      ],
+      "load_driver_pid": 4464,
+      "controller_pid": 2400,
+      "raw_sha256": "babdb99c3e29b94d9da22ce1b0af7aecd875aacb86e614813b4c1c2eebe36ba3",
+      "raw_gzip_file": "artifacts/milestone08/gemma/gemma-arrival-1.json.gz",
+      "backend": "ollama",
+      "unavailable_points": [],
+      "points": [
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "repeat_index": 0,
+          "run_order": 0,
+          "duration_seconds": 20.00080674999981,
+          "planned_requests": 20,
+          "attempted": 20,
+          "completed": 20,
+          "successful": 10,
+          "generator_dropped": 0,
+          "offered_rps": 0.9999624519099276,
+          "attempted_rps": 0.9999596641270577,
+          "successful_rps": 0.49997983206352886,
+          "target_arrival_rate": 1.0,
+          "status_counts": {
+            "200": 10,
+            "503": 10
+          },
+          "cache_dispositions": {
+            "BYPASS": 20
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 10,
+            "p50_ms": 1166.374707000159,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 10,
+            "p50_ms": 6.663297000159218,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 20,
+            "p50_ms": 207.01396899994506,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 20,
+            "p50_ms": 10.178725000059785,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 20,
+            "p50_ms": 10.178725000059785,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 10,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 2,
+          "process_ids": {
+            "load_generator": 4464,
+            "gateway": 4465,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 983.1491790000655,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": 0
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 32522065,
+            "user_usec": 31163473,
+            "system_usec": 1358591,
+            "nice_usec": 0,
+            "nr_periods": 201,
+            "nr_throttled": 155,
+            "throttled_usec": 15123813,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 103,
+            "sampling_window_seconds": 20.049631379000402,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 1.39,
+                "mean_cpu_cores": 0.0693279578923261,
+                "sampled_peak_rss_bytes": 49065984,
+                "first_sampled_rss_bytes": 48930816,
+                "last_sampled_rss_bytes": 49065984,
+                "reason": null
+              },
+              "gateway": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.51,
+                "mean_cpu_cores": 0.02543687663675274,
+                "sampled_peak_rss_bytes": 46690304,
+                "first_sampled_rss_bytes": 46632960,
+                "last_sampled_rss_bytes": 46690304,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": true,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": 28.0,
+                "mean_cpu_cores": 1.396534403586425,
+                "sampled_peak_rss_bytes": 945647616,
+                "first_sampled_rss_bytes": 945455104,
+                "last_sampled_rss_bytes": 945557504,
+                "reason": null
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 3,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 7,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 8,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 9,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 10,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 11,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 12,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 13,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 14,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 15,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 16,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 17,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 18,
+              "http_started": 1,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 0,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 19,
+              "http_started": 1,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 1,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        }
+      ],
+      "aggregate": [
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "trials": 1,
+          "successful_rps_median": 0.49997983206352886,
+          "successful_rps_min": 0.49997983206352886,
+          "successful_rps_max": 0.49997983206352886,
+          "successful_p50_ms_median": 1166.374707000159,
+          "http_429_total": 0,
+          "http_503_total": 10,
+          "http_504_total": 0,
+          "actual_upstream_calls_total": 10,
+          "note": "Trial median/range; no pooled quantiles or confidence bounds"
+        }
+      ]
+    },
+    {
+      "name": "gemma-arrival-3",
+      "command": [
+        "/workspace/04-llm-gateway/.venv/bin/python",
+        "-m",
+        "devtools.benchmark",
+        "--requests",
+        "30",
+        "--concurrency",
+        "2",
+        "--scenarios",
+        "uncached",
+        "--arrival-rate",
+        "3",
+        "--seed",
+        "20261030",
+        "--warmup",
+        "5",
+        "--delay-ms",
+        "10",
+        "--output",
+        "/workspace/04-llm-gateway/artifacts/milestone08/gemma/gemma-arrival-3.json",
+        "--ollama-log",
+        "artifacts/milestone08/ollama.log",
+        "--ollama-pid",
+        "2343"
+      ],
+      "load_driver_pid": 4781,
+      "controller_pid": 2400,
+      "raw_sha256": "57d8bf858f849da26f536bd8ec17fe16c75d4160af5303d2e055c3c93d15e030",
+      "raw_gzip_file": "artifacts/milestone08/gemma/gemma-arrival-3.json.gz",
+      "backend": "ollama",
+      "unavailable_points": [],
+      "points": [
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "repeat_index": 0,
+          "run_order": 0,
+          "duration_seconds": 10.001662789999955,
+          "planned_requests": 30,
+          "attempted": 30,
+          "completed": 30,
+          "successful": 8,
+          "generator_dropped": 0,
+          "offered_rps": 2.9995134045377525,
+          "attempted_rps": 2.999501245932341,
+          "successful_rps": 0.799866998915291,
+          "target_arrival_rate": 3.0,
+          "status_counts": {
+            "200": 8,
+            "503": 22
+          },
+          "cache_dispositions": {
+            "BYPASS": 30
+          },
+          "cache_purity": null,
+          "latency_successful": {
+            "count": 8,
+            "p50_ms": 976.8444290002662,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_rejected": {
+            "count": 22,
+            "p50_ms": 6.578399999852991,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "latency_all": {
+            "count": 30,
+            "p50_ms": 8.42413200007286,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag": {
+            "count": 30,
+            "p50_ms": 1.3527123336043445,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "scheduling_lag_http_starts": {
+            "count": 30,
+            "p50_ms": 1.3527123336043445,
+            "p95_ms": null,
+            "p99_ms": null,
+            "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+          },
+          "transport_failures": 0,
+          "incorrect_responses": 0,
+          "other_http_errors": 0,
+          "unexpected_http_responses": 0,
+          "independent_upstream_calls": 8,
+          "unconfirmed_upstream_attempts": 0,
+          "observed_peak_inference_concurrency": null,
+          "http_active_peak": 2,
+          "process_ids": {
+            "load_generator": 4781,
+            "gateway": 4782,
+            "owned_ollama_tree": 2343
+          },
+          "recovery": {
+            "successful": 1,
+            "status_counts": {
+              "200": 1
+            },
+            "latency_successful": {
+              "count": 1,
+              "p50_ms": 749.8240029999579,
+              "p95_ms": null,
+              "p99_ms": null,
+              "caveat": "nearest-rank samples; p95 withheld below100 and p99 below1000; no confidence interval or population-tail guarantee"
+            },
+            "independent_upstream_calls": 1,
+            "excluded_from_measurement": true,
+            "inference_in_flight_after": 0
+          },
+          "setup_failures": [],
+          "cgroup_cpu_stat_delta": {
+            "usage_usec": 19421428,
+            "user_usec": 18884210,
+            "system_usec": 537218,
+            "nice_usec": 0,
+            "nr_periods": 100,
+            "nr_throttled": 98,
+            "throttled_usec": 9464383,
+            "nr_bursts": 0,
+            "burst_usec": 0
+          },
+          "resources": {
+            "available": true,
+            "sample_interval_seconds": 0.1,
+            "samples": 54,
+            "sampling_window_seconds": 10.042694512000253,
+            "maximum_recorded_process_identities": 128,
+            "groups": {
+              "load_generator": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.32,
+                "mean_cpu_cores": 0.03186395838463715,
+                "sampled_peak_rss_bytes": 49422336,
+                "first_sampled_rss_bytes": 49274880,
+                "last_sampled_rss_bytes": 49422336,
+                "reason": null
+              },
+              "gateway": {
+                "available": true,
+                "observed_process_identities": 1,
+                "descendant_discovery_complete": true,
+                "discovery_methods": [
+                  "supplied_pid"
+                ],
+                "cpu_core_seconds": 0.09,
+                "mean_cpu_cores": 0.0089617382956792,
+                "sampled_peak_rss_bytes": 46682112,
+                "first_sampled_rss_bytes": 46624768,
+                "last_sampled_rss_bytes": 46682112,
+                "reason": null
+              },
+              "owned_ollama_tree": {
+                "available": false,
+                "observed_process_identities": 3,
+                "descendant_discovery_complete": false,
+                "discovery_methods": [
+                  "ps_ppid"
+                ],
+                "cpu_core_seconds": null,
+                "mean_cpu_cores": null,
+                "sampled_peak_rss_bytes": null,
+                "first_sampled_rss_bytes": null,
+                "last_sampled_rss_bytes": null,
+                "reason": "Process discovery or observation incomplete; aggregate withheld"
+              }
+            },
+            "note": "CPU cores are CPUtime/walltime, not percent; RSS sums can double-count shared pages; 10Hz peaks can miss spikes. Process lifetime/model allocation differs. Owned-child discovery can use bounded GNU ps fallback; its subprocess CPU is not included in parent CPU ticks. Sampling I/O runs off the driver's event loop."
+          },
+          "start_cohort_one_second_bins": [
+            {
+              "start_second": 0,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 1,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 2,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 3,
+              "http_started": 3,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 3,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 4,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 5,
+              "http_started": 3,
+              "successful": 0,
+              "http_429": 0,
+              "http_503": 3,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 6,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 7,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 8,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            },
+            {
+              "start_second": 9,
+              "http_started": 3,
+              "successful": 1,
+              "http_429": 0,
+              "http_503": 2,
+              "http_504": 0,
+              "transport_failed": 0
+            }
+          ]
+        }
+      ],
+      "aggregate": [
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "trials": 1,
+          "successful_rps_median": 0.799866998915291,
+          "successful_rps_min": 0.799866998915291,
+          "successful_rps_max": 0.799866998915291,
+          "successful_p50_ms_median": 976.8444290002662,
+          "http_429_total": 0,
+          "http_503_total": 22,
+          "http_504_total": 0,
+          "actual_upstream_calls_total": 8,
+          "note": "Trial median/range; no pooled quantiles or confidence bounds"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Closed-loop issue rate is achieved demand, not independently controlled arrivals.",
+    "Open-loop local drops never reach gateway and are not HTTP rejections.",
+    "Client, sampler, gateway and backend contend for two CPU cores; no remote hardware.",
+    "RPS is verified successful responses; rejection throughput is reported separately.",
+    "Concurrent reviewed semantic requests may become exact hits; inspect dispositions.",
+    "Sampled RSS and short sustained windows cannot prove absence of memory leaks."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "version": {
+    "version": "0.40.11"
+  },
+  "tags": {
+    "models": [
+      {
+        "name": "gemma3:1b",
+        "model": "gemma3:1b",
+        "modified_at": "2026-10-27T16:19:20.052463265Z",
+        "size": 806067407,
+        "digest": "97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "details": {
+          "parent_model": "dhiltgen/gemma3:1b-it-q4_K_M-llamacpp",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3"
+          ],
+          "parameter_size": "999.89M",
+          "quantization_level": "Q4_K_M",
+          "context_length": 32768,
+          "embedding_length": 1152,
+          "runner": "llamacpp"
+        },
+        "capabilities": [
+          "completion"
+        ]
+      }
+    ]
+  },
+  "loaded": {
+    "models": [
+      {
+        "name": "gemma3:1b",
+        "model": "gemma3:1b",
+        "size": 881076469,
+        "digest": "97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "gemma3",
+          "families": [
+            "gemma3"
+          ],
+          "parameter_size": "999.89M",
+          "quantization_level": "Q4_K_M"
+        },
+        "expires_at": "2026-11-05T02:07:31.446551521Z",
+        "size_vram": 0,
+        "context_length": 2048,
+        "runner": "llamacpp"
+      }
+    ]
+  },
+  "dedicated_log_chat_POSTs": 200
+}

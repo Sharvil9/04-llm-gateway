@@ -10,6 +10,9 @@ Milestone 7 independently tested a bounded unseen-wording candidate; final
 coverage was 0/24 positives. The candidate was not promoted and its runtime
 changes were reverted. The supported architecture and configuration remain
 unchanged; its frozen experiment is reproducible at commit `d9955fa`.
+Milestone 8 adds repeated/randomized and offered-load measurements with a separate
+driver process on the same host. The serving runtime remains unchanged from
+`c389b63`; independent hardware capacity and target macOS remain unverified.
 Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
@@ -393,6 +396,48 @@ including 6 genuine equivalents. This is an explicit generalization limitation,
 not evidence to broaden eligibility. Five original metadata-only negatives still
 require explicit wire context; bare approved text remains eligible. Preserve
 original and final datasets/results without tuning on the final set.
+
+## Independent load protocol (milestone 8)
+
+`devtools.load_campaign` runs an idle controller plus a separate benchmark driver;
+one gateway and one mock backend are separate processes. They share the two-core /
+8 GiB Linux quota. No remote hardware, dedicated CPU or distributed-state claim.
+The serving authentication, reviewed membership, L3/0.75, TTL, quotas, zero-queue
+admission and cancellation protections are unchanged.
+
+Three randomized repeats cover direct/uncached/exact/reviewed-semantic/mixed at
+concurrency 1/2/4/8/16, N1000 each. Bounded open-loop schedules additionally record
+planned versus actual HTTP starts, schedule lag, local drops and response drain.
+At most the configured client concurrency is active; arrivals over one period late
+or without a slot are dropped locally, never queued or counted as gateway errors.
+Actual HTTP offered rate and successful throughput have separate denominators.
+
+Warm-up/setup runs outside timing; at most three fresh starts establish requested
+warm-cache conditions, with all setup failures/unavailable points retained. Measured
+requests are never retried. Valid fallback/expiry can change the cache mix after
+setup: record purity/dispositions and avoid claiming pure semantic throughput.
+Wire hashes are attested only for stable source lineage. Gateway counts may be
+lower than HTTP attempts after pre-ingress failure; independently observed backend
+calls must cover successful forwarded responses and cannot exceed adapter attempts.
+Record missing/unconfirmed attempts without treating failed requests as successes.
+
+Each point records successful/rejected latency distributions, 429/503/504 and
+unexpected statuses, actual upstream calls, fixture inference peak, recovery,
+owned CPU/RSS samples and cgroup CPU deltas. Mock peaks reset after warm-up;
+native Gemma execution peak is unobserved. Partial process-tree discovery yields
+null resources. Per-point raw checkpoints and final compressed reports retain
+source/lock hashes. Quantiles remain sample-aware, without confidence guarantees.
+Post-point uncached recovery is excluded from timing, resources and measured calls.
+
+Final evidence: 92 points, 110753 HTTP attempts /106362 correct successes /4391
+intentional overload 503s, plus 2457 local drops. No measured transport/wrong/unexpected
+outcomes. Quota, repeated socket cancellation and timeout recovery are separate
+HTTP correctness probes. Real Gemma produced 140 measured calls; 50 warm-up and 10
+recovery calls independently reconcile 200 log POSTs. Shared-host/client constraints,
+native resource gaps, semantic fallback and finite soak duration remain explicit.
+See `benchmarks/milestone08/summary.json`, protocol and README for exact commands.
+Proceed to final target-macOS/release validation; do not publish an isolated-server
+capacity guarantee or treat the unsuccessful M07 grammar as supported.
 
 ## Measurable completion gates
 

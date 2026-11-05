@@ -2,10 +2,10 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with conservative caching and process-local traffic controls.
-**Current status: milestone 7 evaluated independent unseen-wording reuse and
-did not establish useful generalization.** Exact/reviewed-phrase caching, bounded
-traffic controls, protected metrics and verified Gemma inference remain intact.
-The experimental eligibility gate was not promoted to the serving runtime.
+**Current status: milestone 8 completed repeated concurrency, offered-load and
+recovery measurements.** The single-worker prototype is ready for final macOS
+and release validation. Semantic reuse remains reviewed-phrase-only: milestone 7
+did not establish unseen-wording generalization, and its candidate was not promoted.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
 and one pooled HTTPX async client. A separate deterministic HTTP service validates
@@ -703,6 +703,137 @@ Using captured sources performs no new model inference. Current release checks:
   --output artifacts/milestone07/release-semantic-probe.json
 ```
 
+## Independent load characterization (milestone 8)
+
+Measured **2026-11-05**, baseline `c389b63`, immutable measurement source
+**`e7e7854`**. A separate controller launched the HTTP driver as another process;
+gateway and mock were separate processes too. Independent hardware was unavailable.
+All shared Linux 6.18.57 / Python 3.12.14, a **two-core CPU quota and 8 GiB** memory
+limit, with three visible CPUs (guest reports Intel Xeon Platinum 8573C).
+This characterizes the whole contended loopback setup, not isolated server capacity.
+Runtime code, authentication, quotas, admission and reviewed cache policy are
+unchanged from the baseline. No production performance optimization was made.
+
+Three seeded randomized repeats, **1,000 attempts per point**, fresh gateway,
+five excluded warm-ups plus cache seed where needed. Model seed 42, temperature 0,
+top_p 1, max_tokens 32; scheduling seed 20261030. Same 10 ms mock, capacity 8/pool 64,
+benchmark quota 10000 burst/refill per second, TTL 60 s and pinned L3/0.75 as M06. Actual
+dispositions qualify the requested workload. Cells show **median successful RPS**:
+
+| Requested workload | c1 | c2 | c4 | c8 | c16 |
+|---|---:|---:|---:|---:|---:|
+| Direct mock control | 73.0 | 137.2 | 247.3 | 452.3 | 280.6 |
+| Uncached gateway | 62.4 | 92.2 | 189.1 | 293.6 | 129.4 |
+| Primed exact replay | 444.1 | 370.0 | 388.9 | 567.4 | 214.0 |
+| Primed reviewed-semantic opt-in* | 170.5 | 433.8 | 343.1 | 530.0 | 344.9 |
+| Mixed request kinds, 40/40/20 | 148.4 | 344.1 | 349.4 | 257.4 | 264.0 |
+
+Ranges and all per-trial successful p50/p95/p99 are in the
+[summary](benchmarks/milestone08/summary.json) and raw reports. These are descriptive
+trial medians, not pooled quantiles or confidence bounds. For example, uncached c8
+varied **183.3–306.0 RPS**; c16 **119.5–230.5**, with **896/3000 HTTP 503** and 2104
+upstream calls. Its successful p99 is withheld because each trial has fewer than
+1000 successes. Exact c1 median trial p50/p95/p99 was **1.93/3.33/4.66 ms**;
+uncached c1 **15.50/19.27/24.34 ms**. Rejections never count as successful RPS.
+
+*Semantic opt-in is often a mixture: two c1 trials each produced 1000 semantic
+hits (151.3/202.7 RPS). The third produced **20 semantic hits, one miss, then 979
+exact hits**. That miss recorded one optional lookup failure and 361.609ms semantic
+stage time against the 250ms cooperative budget. Its root cause is unestablished;
+the stage includes scheduling. At c4, all three trials together had **2980 exact
+hits, 11 semantic hits and 9 misses**. These rates cannot represent pure embedding
+lookup throughput. The fallback and complete hit mix are retained, without policy
+tuning or retries of measured traffic.
+
+Bounded open-loop uncached ramp, c16, 3000 planned arrivals each:
+
+| Target/s | Actual HTTP starts/s | Successful RPS | Client-local drops | Gateway 503 |
+|---:|---:|---:|---:|---:|
+| 100 | 99.9 | 99.9 | 2 | 0 |
+| 300 | 281.3 | 262.7 | 187 | 174 |
+| 600 | 182.6 | 174.7 | 2073 | 25 |
+
+At target600, 2038 drops were scheduler-late and 35 lacked a free client slot.
+Those arrivals never reached the gateway. The driver has no waiting queue and
+never catches up with a burst of stale arrivals. Offered starts/s uses the offer
+window; successful RPS includes response drain. This proves generator limits in
+this setup, not 600/s gateway capacity. At uncached c16 the driver used
+0.40–0.93 core while the gateway used 0.58–0.98; cgroup throttling occurred in some
+windows. Direct control and cached scaling were also noisy. Independent hardware
+is needed before attributing a precise server bottleneck or comparing M06 speedups.
+
+Sustained uncached N=10000: c8 **218.4 successful RPS**, no errors, observed upstream
+peak 8, gateway RSS **44.5→45.3 MiB** over 45.8 s. c16 **144.2 successful RPS**, 3213
+overload 503s, peak 8, RSS **44.4→45.5 MiB** over 47.1 s. Thirty-second rate-controlled
+windows served **5903 exact hits** (196.8RPS, 97 local drops) and **2902 semantic
+hits** (96.7RPS, 98 drops), each with **zero upstream calls/peak0**. Their successful
+p50/p95/p99 were **2.29/8.63/12.80 ms** and **5.29/9.34/11.98 ms** respectively.
+Semantic gateway RSS was **121.1→122.7 MiB**, exact **44.5→44.5 MiB**. RSS is sampled;
+brief bounded growth does not prove leak freedom. Driver memory retains capped raw
+records and must not be interpreted as gateway growth. Time bins are start cohorts,
+not per-second completion throughput.
+
+Real Gemma is separate: Ollama 0.40.11 / pinned `gemma3:1b` Q4_K_M, context 2048,
+one model/parallel worker on CPU. Two uncached gateway c1 trials each served 20/20 correct
+answers at **0.77–0.88 RPS**, p50 **1088–1336 ms**. Both c2 trials served 1/20 and
+rejected 19 with 503; direct c2 queued requests in Ollama instead. Offered 1/s served
+10/20, and 3/s served 8/30; no generator drops. **140 measured inference calls +50
+warm-up +10 recovery =200 dedicated log POSTs**. No Gemma p95/p99 is justified.
+Valid model resource windows used roughly **1.83–1.84 cores /902 MiB RSS** in uncached
+c1; four of ten model-tree windows had incomplete discovery and are null rather
+than zero. Direct c1 varied 0.69–2.60 RPS, preventing causal gateway-overhead claims.
+Repeated prompts may reuse Ollama KV state independently of gateway caching.
+
+Reliability: quota isolation gave A 3 accepted/9 quota 429s and B 2/10 (24 attempts,
+5 upstream calls). Held capacity 2 rejected 20 excess requests and recovered. Five
+socket-cancellation cycles produced 15 disconnects and 100 overload rejections; three
+150 ms timeout cycles returned 504 in 155–157 ms. Every recovery returned 200 and all
+gateway permits released. The deliberately uncooperative fixture retained work
+until explicitly released; remote compute cancellation is not guaranteed.
+Across all 92 measured points: **113210 planned, 110753 HTTP requests, 106362 correct
+successes, 4391 intentional overload503, 2457 local drops**, zero429/504, transport
+failures, wrong answers or unexpected statuses. Reliability probes are separate.
+
+The measurement harness passed 287 tests before trials; final checks passed **289**.
+One metrics-concurrency test exhausted its 1 s deadline while deliberately holding
+inference during snapshots. Its test-only budget is now 30 s; runtime deadlines
+and dedicated timeout/cleanup tests are unchanged. Interrupted setup/strict-accounting/purity
+trials are excluded and described in [protocol](benchmarks/milestone08/protocol.json).
+Their failed-point raw data was not retained; the original count mismatch remains
+unattributed. They are not assumed error-free. The complete final matrix was rerun
+under the corrected source freeze. Warm-cache setup allows at most 3 fresh starts, recording failures/unavailable
+points; no final point was unavailable. Measured outcomes are never retried.
+Per-point checkpoints prevent data loss; final source/lock/hash checks, upstream
+accounting bounds and independent raw audit passed. All 92 recovery calls succeeded.
+
+Reproduce sequentially from this repository; the semantic extra/L3 installation
+is documented above. Use a dedicated quiet Ollama server from the server recipe,
+with KEEP_ALIVE=1m and log `artifacts/milestone08/ollama.log` for the Gemma stage.
+`OLLAMA_DEMO_PID` must be that owned server/wrapper PID, not an unrelated process.
+
+```sh
+uv sync --locked --extra semantic --cache-dir .cache/uv
+.venv/bin/pytest
+.venv/bin/python -m devtools.load_reliability --output artifacts/milestone08/reliability.json
+.venv/bin/python -m devtools.load_campaign --stage primary --output-dir artifacts/milestone08/primary
+.venv/bin/python -m devtools.load_campaign --stage ramp --output-dir artifacts/milestone08/ramp
+.venv/bin/python -m devtools.load_campaign --stage sustained --output-dir artifacts/milestone08/sustained
+# Start only the dedicated Ollama server, then:
+.venv/bin/python -m devtools.load_campaign --stage gemma --output-dir artifacts/milestone08/gemma \
+  --ollama-log artifacts/milestone08/ollama.log --ollama-pid "$OLLAMA_DEMO_PID"
+.venv/bin/python -m devtools.load_report --capture-runtime --ollama-log artifacts/milestone08/ollama.log
+.venv/bin/python -m devtools.load_report
+```
+
+Each campaign saves exact argv, configuration, UTC windows, software/hardware,
+process IDs, payload hashes/sizes, warm-up, statuses, latency by outcome,
+source manifests and resources. [Tracked artifacts](benchmarks/milestone08/)
+include four campaign JSONs, ten full `.json.gz` reports, reliability and runtime
+identity; the summary verifies their digests. Gzip retains every bounded raw row.
+Readiness: proceed to target macOS/Metal and final release checks. Independent
+hardware capacity, long-duration soak behavior and Internet deployment remain
+unvalidated. No grammar reactivation, new gateway features or speculative tuning.
+
 ## Timeout scope and investigation
 
 `request_timeout_seconds` bounds the upstream operation: connection/pool wait,
@@ -924,7 +1055,7 @@ Verification environment: Linux x86_64, Python 3.12.14, 8 GiB cgroup memory limi
 two CPU cores' quota (three visible logical CPUs). No Ollama or GPU tooling was
 available initially. These are not MacBook results.
 
-Milestones 1–7 evidence is recorded in `PLAN.md`, including **262 release tests**,
+Milestones 1–8 evidence is recorded in `PLAN.md`, including **289 passing tests**,
 lint/format checks, deterministic HTTP enforcement/deadline probes, and real-model
 verification. Concurrent forwarding tests are not a load benchmark.
 Recorded RPS applies only to the named workload and conditions. Cache/mock RPS
@@ -943,6 +1074,7 @@ logged by application code; access logging is disabled in examples.
 The benchmark harness covers uncached/exact/semantic/mixed, concurrency, quotas
 and failure probes with raw results and separate mock, overhead and real-model
 measurements. Generalization remains outside the supported cache policy. Remaining
-priorities are independent-load benchmarking, target-MacBook measurements and final
-release-readiness verification, with profiling before optimization. See [SPEC.md](SPEC.md) for cache
+priorities are target-MacBook measurements and final release-readiness verification;
+independent hardware is still needed for isolated capacity claims. Profile before
+optimization. See [SPEC.md](SPEC.md) for cache
 safety/security boundaries and [PLAN.md](PLAN.md) for the remaining gates.

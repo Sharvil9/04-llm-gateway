@@ -578,30 +578,90 @@ and final release-readiness checks. General unseen equivalence is outside the
 supported release scope; future investigation needs a new independent final set.
 No new services, providers, training, infrastructure or performance tuning.
 
-## 8 — Independent load and concurrency characterization (in progress)
+## 8 — Independent load and concurrency characterization (complete)
 
-- [x] Inspect M06 driver, metrics/quotas/admission and M07 reviewed-only release.
-- [x] Keep gateway runtime/security/cache policy unchanged; extend only benchmark
-  tooling with bounded arrival scheduling, repeated randomized points, independent
-  backend peaks, recovery probes and resource accounting.
-- [ ] Freeze harness after checks, then measure three randomized repeats of
-  direct/uncached/exact/reviewed-semantic/mixed at concurrency 1/2/4/8/16, N=1000
-  each, five excluded warm-ups plus source seed when required. Seed 20261030.
-- [ ] Arrival-rate ramp: uncached c16, 3000 planned arrivals at 100/300/600 per s;
-  no client queue, bounded active HTTP work, scheduler/slot drops reported locally.
-- [ ] Sustained: uncached c8/c16 N10000; exact c16 target200/s N6000 and reviewed
-  semantic c1 target100/s N3000. Preserve TTL60, original reviewed registry/L3/.75.
-- [ ] Limited sequential real Gemma: direct/uncached c1/c2, N20, two repeats;
-  uncached c2 target1/s N20 and3/s N30. Pin quiet Ollama/model/context and count logs.
-- [ ] Repeated quota/burst/cancellation/timeout recovery, regressions and artifact
-  integrity; save raw reports, commands and outcome-separated summaries.
-- [ ] Document measured bottlenecks/limits and macOS/release readiness decision.
+- [x] Inspect the M06 harness/traffic controls and M07 reviewed-only release.
+- [x] Preserve runtime, security and semantic policy; extend benchmark tooling only.
+- [x] Freeze source and run three randomized repeats of five workloads at
+  concurrency 1/2/4/8/16, N=1000 each, with excluded warm-up and fresh gateways.
+- [x] Run bounded arrival-rate ramps and sustained cache/uncached windows.
+- [x] Run limited sequential genuine Gemma inference, independently counting calls.
+- [x] Verify quota isolation, repeated socket cancellation, timeouts and recovery.
+- [x] Audit raw artifacts, resource limits, source manifests and regression checks.
+- [x] Document bottlenecks, measurement limits and readiness for target macOS.
 
-Only the managed Linux host is available: 8 GiB and two CPU cores' cgroup quota.
-An idle controller launches a separate driver process; gateway/mock are separate
-children. Driver/sampler and all servers still share hardware; no CPU/network
-isolation or independent-hardware claim. Offered HTTP rate excludes local drops;
-successful RPS excludes 429/503/504 and incorrect answers. Start-cohort bins are
-not per-second completion throughput. Empirical p95 requires100 successful samples,
-p99 requires1000; no confidence/population-tail guarantee. Concurrent semantic
-fallback may create exact hits and must retain observed disposition counts.
+Verified 2026-11-05, final measurement source **`e7e7854`**, baseline `c389b63`.
+An idle controller launches a separate HTTP driver; gateway and backend are other
+processes. Only the shared Linux host was available: two-core CPU quota, 8 GiB,
+three visible CPUs, guest-reported Intel Xeon Platinum 8573C. No independent
+hardware, CPU isolation or distributed-state claim. Serving code is unchanged.
+
+The fixed protocol uses scheduling seed 20261030, model seed 42, temperature 0,
+top_p 1, cap 32 output tokens, five excluded warm-ups, TTL 60 s and reviewed L3/0.75.
+Mock capacity is 8; Gemma capacity/parallelism is 1. High benchmark quotas avoid
+confounding quota errors; the separate quota probe verifies real enforcement.
+
+- **75 matrix points:** 75000 attempts, 74091 correct successes, 909 overload 503s,
+  no transport/incorrect/unexpected outcomes. Uncached median successful RPS at
+  c1/2/4/8/16: **62.4/92.2/189.1/293.6/129.4**. At c16, 896/3000 were rejected.
+  Exact c1/c8 medians were 444.1/567.4 RPS. Raw trial ranges and tails are preserved.
+- **Semantic mix:** two pure c1 trials each returned 1000 semantic hits at
+  151.3/202.7 RPS. The third had 20 semantic hits, one miss, then 979 exact hits;
+  its optional lookup stage took 361.609 ms against a 250 ms budget. Cause is
+  unestablished. At c4: 2980 exact /11 semantic /9 misses across 3000 requests.
+  Report actual mix; do not interpret these as pure embedding-lookup throughput.
+- **Arrival targets 100/300/600 per second:** actual starts 99.9/281.3/182.6,
+  local drops 2/187/2073 and gateway 503s 0/174/25. Most drops at target 600 were
+  scheduler-late. These arrivals never reached the gateway; no client waiting queue.
+- **Sustained uncached N=10000:** c8 served 218.4 successful RPS without errors;
+  c16 served 144.2 with 3213 overload 503s. Both upstream peaks were 8. Gateway RSS
+  grew 44.5→45.3 MiB over 45.8 s and 44.4→45.5 MiB over 47.1 s. Thirty-second exact/
+  semantic windows served 5903/2902 hits with zero upstream calls and 97/98 local
+  drops. Semantic RSS was 121.1→122.7 MiB. Brief samples cannot establish leak freedom.
+- **Ten Gemma points:** 210 attempts, 140 correct successes, 70 overload 503s.
+  All 140 measured model calls +50 warm-up +10 recovery reconcile 200 dedicated
+  log POSTs. CPU-only Ollama 0.40.11 / Gemma 3 1B Q4_K_M /context 2048. Gateway c1:
+  20/20 per trial at 0.77–0.88 RPS; c2: 1/20 per trial plus 19 rejections. Targets
+  1/s and 3/s yielded 10/20 and 8/30. Real p95/p99 withheld. Valid model resource
+  windows used about 1.83–1.84 cores /902 MiB in uncached c1; four of ten model-tree
+  windows were incomplete and withheld. Direct c1 varied 0.69–2.60 RPS, preventing
+  causal overhead attribution. Repeated prompts may reuse provider KV state.
+- **Reliability:** 24 quota attempts gave 19 HTTP 429s and five calls (A3/B2
+  accepted). Held capacity 2 rejected 20 excess requests. Five cancellation cycles
+  produced 15 socket disconnects, 100 overload rejections and 20 calls. Three
+  timeout cycles returned 504 in 155–157 ms for a 150 ms budget, with six calls
+  including recoveries. All recovered with 200 and zero gateway permits retained.
+  The uncooperative fixture retained remote jobs until explicitly released.
+
+Totals: **113210 planned =110753 HTTP requests +2457 local drops**; 106362 correct
+successes and 4391 intentional 503s. No measured 429/504, transport, incorrect or
+unexpected outcomes. All 92 post-point recoveries succeeded; no unavailable points.
+Start-cohort bins are not completion RPS. Offered starts and successful throughput
+have separate windows. p95 requires 100 samples and p99 1000 per outcome/trial;
+there is no confidence or population-tail guarantee. CPU throttling occurred in
+some windows; generator and server contention cannot isolate true server capacity.
+
+Three pre-final suites were excluded: strict attempt/call equality, an unmet
+warm-up hit requirement and a semantic-purity assertion. Their failed-point raw
+records were not retained; the first mismatch remains unattributed. The final
+harness records failed attempts, cache purity and per-point raw checkpoints.
+Setup permits at most three fresh starts and records failures; measured requests
+are never retried. All final suites were rerun under the final immutable source.
+The protocol preserves excluded sources/reasons. No policy or performance tuning.
+
+Regression suite: **287 passed** before final measurements; lint/format clean.
+Final checks: **289 passed in 7.11 s**, lint clean, 47 files formatted, diff check
+clean. A metrics-concurrency test's deliberate hold exhausted its 1 s deadline in
+one slow run (correct 504); its test-only budget is now 30 s to separate coordination
+from deadline assertions. Dedicated timeout/cleanup tests and runtime are unchanged.
+Source/lock/raw hashes and all
+92 points independently audited. No OOM/max events; owned servers stopped.
+`benchmarks/milestone08/` contains ten compressed raw reports, four campaign
+reports, runtime/reliability evidence and the verified summary. README has exact
+commands. `devtools.load_report` regenerates packaging/comparisons; optional runtime
+capture sends only metadata GETs. Runtime remains identical to `c389b63`.
+
+Proceed to final macOS/Metal and release validation as a single-worker local
+prototype. Independent hardware capacity and long-duration soak behavior remain
+unverified. No isolated-server SLA, distributed consistency, guaranteed remote
+cancellation or general semantic-generalization claim follows from these data.

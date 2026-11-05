@@ -112,7 +112,10 @@ async def test_concurrent_gauges_and_overload_are_accurate_and_recover():
         await release.wait()
         return httpx.Response(200, json=completion())
 
-    settings = operator_settings(make_settings(max_in_flight=1))
+    # This test deliberately holds inference while exercising metric snapshots
+    # and overload. Give that coordination room on slow/contended hosts;
+    # separate deadline tests verify timeout classification and cleanup.
+    settings = operator_settings(make_settings(max_in_flight=1, request_timeout_seconds=30.0))
     async with gateway(backend, settings=settings) as (client, _):
         task = asyncio.create_task(client.post("/v1/chat/completions", json=QUESTION, headers=AUTH))
         try:

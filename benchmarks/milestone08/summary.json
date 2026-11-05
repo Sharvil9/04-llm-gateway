@@ -1,0 +1,1360 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "c389b6366a475d2ff5c8975666cc02ee19727176",
+  "measurement_source_commit": "e7e7854c5e0109be3edef798a21045edc57ad234",
+  "measurement_source_manifest": {
+    "devtools/benchmark.py": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+    "devtools/load_campaign.py": "f659cf2b7098bd1dff03ab3039113434620f2c5e9100da9a4cd2d115feb32ea6",
+    "devtools/load_reliability.py": "7e5434feffa1384211a7798b9eefa8b327038b10c7b31b498c95ec52a4dbe546",
+    "devtools/semantic_eval.py": "633e3b941429988209e374abf1beef83f8e05bc5f24fc8748fe5a896d6887b1a",
+    "devtools/semantic_probe.py": "ff41da31c5807f290a5dd0a9859ec8c18744b984f27fad819bb75eebbf8f37f5",
+    "devtools/smoke.py": "37efb71ece2467d28f25e954120904700f8d4330a05fbf83d23b9961dc37b0f5",
+    "src/llm_gateway/__init__.py": "717b78cbb6791ca1c8e730ce7fa61f79918e208aaa7a5fc91c0e82da63c28828",
+    "src/llm_gateway/app.py": "b30ceb6009bd464ddcf645692a40a03f9e3990045d555fbd7e322cbcbc142652",
+    "src/llm_gateway/backend.py": "e15217b9191967879ea9c2bc07346621624761f660796153b41c2dad5e0e331d",
+    "src/llm_gateway/cache.py": "b3361651316a6a704a7f61a8f61c026b95234a9195aaea9524184e3367f16a2a",
+    "src/llm_gateway/config.py": "115d6132f67f025ac5c09740d04a2c0c737de963c48453f3b57e7d4ef9639dc5",
+    "src/llm_gateway/embeddings.py": "48ec89a7a3f474b8490c7c8c6f3eceaf3c9496c912fc5221ede45f849dd29e05",
+    "src/llm_gateway/metrics.py": "f9daabbd5575b265370966a417a21157cdc2809b3cdd000f06f3e4abb41e5536",
+    "src/llm_gateway/schemas.py": "8c009bdaacea952b8c6487a837eeabb02815c90286a00b973fa15f015ca83c01",
+    "src/llm_gateway/semantic.py": "7fb0eda909a2c3db2419f3e1199a43878d684d1cfb13f11ec7ae223cef6ae530",
+    "src/llm_gateway/traffic.py": "a18c31c05ce67b772f01c091f5a2f55f49753c2cf0ec844f1b80bfd47c536be9",
+    "uv.lock": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "analysis_source_sha256": "903ff6c2a29288ad9933b91c1dd698e9099443d5718193f88ef78c822263f69c",
+  "independent_hardware": false,
+  "semantic_policy_changed": false,
+  "campaigns": {
+    "primary": {
+      "started_utc": "2026-11-05T01:49:35.908546+00:00",
+      "finished_utc": "2026-11-05T01:57:20.730982+00:00",
+      "points": 75,
+      "trials": [
+        {
+          "name": "primary",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "1000",
+            "--concurrency",
+            "1",
+            "2",
+            "4",
+            "8",
+            "16",
+            "--scenarios",
+            "direct",
+            "uncached",
+            "exact",
+            "semantic",
+            "mixed",
+            "--repeats",
+            "3",
+            "--randomize-order",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/primary/primary.json"
+          ],
+          "points": 75,
+          "independent_upstream_calls": 32178
+        }
+      ],
+      "hardware": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "machine": "x86_64",
+        "python": "3.12.14",
+        "logical_cpus": 3,
+        "cgroup_cpu_max": "200000 100000",
+        "cgroup_memory_max": "8589934592",
+        "packages": {
+          "fastapi": "0.141.1",
+          "starlette": "1.10.0",
+          "httpx": "0.28.1",
+          "pydantic": "2.14.1",
+          "uvicorn": "0.52.4",
+          "numpy": "2.5.4",
+          "onnxruntime": "1.31.1",
+          "tokenizers": "0.23.3"
+        },
+        "source_sha256": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+        "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+      },
+      "comparison": [
+        {
+          "scenario": "direct",
+          "concurrency": 1,
+          "trials": 3,
+          "successful_rps_median": 73.00377556254193,
+          "successful_rps_range": [
+            61.30010821452217,
+            74.96623731888472
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 12.245276999919952,
+            "p95_ms": 16.02700300009019,
+            "p99_ms": 28.351414000098885
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "UNLABELLED": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 2,
+          "trials": 3,
+          "successful_rps_median": 137.18087161482288,
+          "successful_rps_range": [
+            119.03308498040964,
+            138.15819901482763
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 13.988709999921412,
+            "p95_ms": 17.81202300003315,
+            "p99_ms": 26.592811999989863
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "UNLABELLED": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 4,
+          "trials": 3,
+          "successful_rps_median": 247.28174576567568,
+          "successful_rps_range": [
+            243.70289218372582,
+            265.2315061305586
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 15.387034000013955,
+            "p95_ms": 22.032942999885563,
+            "p99_ms": 27.415665000035006
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "UNLABELLED": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 8,
+          "trials": 3,
+          "successful_rps_median": 452.27139900301984,
+          "successful_rps_range": [
+            355.74321278812243,
+            538.7014023055208
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 15.66484400018453,
+            "p95_ms": 25.194211999860272,
+            "p99_ms": 48.35996600013459
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "UNLABELLED": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 16,
+          "trials": 3,
+          "successful_rps_median": 280.6348776569838,
+          "successful_rps_range": [
+            233.63595571755246,
+            354.35549667942155
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 33.67426199997681,
+            "p95_ms": 189.83718899994528,
+            "p99_ms": 392.14604100016004
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "UNLABELLED": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "exact",
+          "concurrency": 1,
+          "trials": 3,
+          "successful_rps_median": 444.09481175716405,
+          "successful_rps_range": [
+            425.2563051964057,
+            547.3245565268849
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 1.925960999869858,
+            "p95_ms": 3.3309370001006755,
+            "p99_ms": 4.66281700005311
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "HIT": 3000
+          },
+          "pure_expected_hit_trials": 3
+        },
+        {
+          "scenario": "exact",
+          "concurrency": 2,
+          "trials": 3,
+          "successful_rps_median": 370.03786229628093,
+          "successful_rps_range": [
+            231.27325540900708,
+            453.05967540664477
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 4.926926000052845,
+            "p95_ms": 9.377470000117683,
+            "p99_ms": 17.68253799991726
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "HIT": 3000
+          },
+          "pure_expected_hit_trials": 3
+        },
+        {
+          "scenario": "exact",
+          "concurrency": 4,
+          "trials": 3,
+          "successful_rps_median": 388.91086094815785,
+          "successful_rps_range": [
+            387.8756753951213,
+            396.49879023003035
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 8.392200000116645,
+            "p95_ms": 16.542802000003576,
+            "p99_ms": 26.431480999917767
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "HIT": 3000
+          },
+          "pure_expected_hit_trials": 3
+        },
+        {
+          "scenario": "exact",
+          "concurrency": 8,
+          "trials": 3,
+          "successful_rps_median": 567.3685810709009,
+          "successful_rps_range": [
+            538.1004484321971,
+            626.0518798474961
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 12.286392000078195,
+            "p95_ms": 22.855609000089316,
+            "p99_ms": 55.5424110000331
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "HIT": 3000
+          },
+          "pure_expected_hit_trials": 3
+        },
+        {
+          "scenario": "exact",
+          "concurrency": 16,
+          "trials": 3,
+          "successful_rps_median": 213.98819683561106,
+          "successful_rps_range": [
+            194.1607292631142,
+            367.04972304883023
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 34.83368499996686,
+            "p95_ms": 248.37898800001312,
+            "p99_ms": 463.7906530001601
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "HIT": 3000
+          },
+          "pure_expected_hit_trials": 3
+        },
+        {
+          "scenario": "mixed",
+          "concurrency": 1,
+          "trials": 3,
+          "successful_rps_median": 148.3703647073891,
+          "successful_rps_range": [
+            132.86624295969906,
+            167.8712710100307
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 4.274942000165538,
+            "p95_ms": 17.39769300002081,
+            "p99_ms": 19.819802000029085
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 600,
+          "cache_dispositions": {
+            "HIT": 1200,
+            "SEMANTIC_HIT": 1200,
+            "BYPASS": 600
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "mixed",
+          "concurrency": 2,
+          "trials": 3,
+          "successful_rps_median": 344.11554374768116,
+          "successful_rps_range": [
+            317.443132298467,
+            371.8395092353868
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 2.913321000050928,
+            "p95_ms": 18.16213499978403,
+            "p99_ms": 21.396844000264537
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 603,
+          "cache_dispositions": {
+            "HIT": 2388,
+            "SEMANTIC_HIT": 9,
+            "MISS": 3,
+            "BYPASS": 600
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "mixed",
+          "concurrency": 4,
+          "trials": 3,
+          "successful_rps_median": 349.44151472618995,
+          "successful_rps_range": [
+            344.0197108405116,
+            358.9133233709505
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 8.207422999930714,
+            "p95_ms": 32.719710000037594,
+            "p99_ms": 40.6220239999584
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 604,
+          "cache_dispositions": {
+            "HIT": 2389,
+            "SEMANTIC_HIT": 7,
+            "MISS": 4,
+            "BYPASS": 600
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "mixed",
+          "concurrency": 8,
+          "trials": 3,
+          "successful_rps_median": 257.4494507882963,
+          "successful_rps_range": [
+            245.52981097080539,
+            262.7623606988664
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 22.76406600003611,
+            "p95_ms": 77.78305499982707,
+            "p99_ms": 134.0388849998817
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 607,
+          "cache_dispositions": {
+            "HIT": 2383,
+            "MISS": 7,
+            "BYPASS": 600,
+            "SEMANTIC_HIT": 10
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "mixed",
+          "concurrency": 16,
+          "trials": 3,
+          "successful_rps_median": 263.9558732824632,
+          "successful_rps_range": [
+            142.09283986349476,
+            307.73122765565097
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 32.47791800004052,
+            "p95_ms": 194.57985999997618,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 2997,
+            "503": 3
+          },
+          "actual_upstream_calls": 606,
+          "cache_dispositions": {
+            "HIT": 2369,
+            "SEMANTIC_HIT": 22,
+            "BYPASS": 600,
+            "MISS": 9
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "semantic",
+          "concurrency": 1,
+          "trials": 3,
+          "successful_rps_median": 170.4964064200445,
+          "successful_rps_range": [
+            151.33439718377966,
+            202.684430797121
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 4.4663959997706115,
+            "p95_ms": 8.929485999942699,
+            "p99_ms": 18.207312999948044
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 1,
+          "cache_dispositions": {
+            "SEMANTIC_HIT": 2020,
+            "MISS": 1,
+            "HIT": 979
+          },
+          "pure_expected_hit_trials": 2
+        },
+        {
+          "scenario": "semantic",
+          "concurrency": 2,
+          "trials": 3,
+          "successful_rps_median": 433.7828696930573,
+          "successful_rps_range": [
+            395.7887347208428,
+            523.7984428285391
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 4.0052189999642,
+            "p95_ms": 7.77770300010161,
+            "p99_ms": 9.92652500008262
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3,
+          "cache_dispositions": {
+            "SEMANTIC_HIT": 14,
+            "MISS": 3,
+            "HIT": 2983
+          },
+          "pure_expected_hit_trials": 0
+        },
+        {
+          "scenario": "semantic",
+          "concurrency": 4,
+          "trials": 3,
+          "successful_rps_median": 343.096789141625,
+          "successful_rps_range": [
+            327.9214695553546,
+            565.8590663826789
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 10.960456000020713,
+            "p95_ms": 17.297335999955976,
+            "p99_ms": 24.161712000022817
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 9,
+          "cache_dispositions": {
+            "SEMANTIC_HIT": 11,
+            "MISS": 9,
+            "HIT": 2980
+          },
+          "pure_expected_hit_trials": 0
+        },
+        {
+          "scenario": "semantic",
+          "concurrency": 8,
+          "trials": 3,
+          "successful_rps_median": 530.0044828733002,
+          "successful_rps_range": [
+            276.2310110288255,
+            543.407747512416
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 13.17149800001971,
+            "p95_ms": 27.812402000108705,
+            "p99_ms": 55.2804990002187
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 21,
+          "cache_dispositions": {
+            "SEMANTIC_HIT": 11,
+            "MISS": 21,
+            "HIT": 2968
+          },
+          "pure_expected_hit_trials": 0
+        },
+        {
+          "scenario": "semantic",
+          "concurrency": 16,
+          "trials": 3,
+          "successful_rps_median": 344.8753358757123,
+          "successful_rps_range": [
+            211.12560185716544,
+            395.6670549871186
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 20.50634300007914,
+            "p95_ms": 158.89088100016124,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 2990,
+            "503": 10
+          },
+          "actual_upstream_calls": 20,
+          "cache_dispositions": {
+            "SEMANTIC_HIT": 18,
+            "MISS": 30,
+            "HIT": 2952
+          },
+          "pure_expected_hit_trials": 0
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 1,
+          "trials": 3,
+          "successful_rps_median": 62.367716459624546,
+          "successful_rps_range": [
+            56.97720184110948,
+            64.53003665816543
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 15.495650000048045,
+            "p95_ms": 19.26663099993675,
+            "p99_ms": 24.33569400000124
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "BYPASS": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "trials": 3,
+          "successful_rps_median": 92.2018320423609,
+          "successful_rps_range": [
+            81.55458081440756,
+            99.4946384153153
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 19.73740399989765,
+            "p95_ms": 28.450521000195295,
+            "p99_ms": 34.40940799987402
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "BYPASS": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 4,
+          "trials": 3,
+          "successful_rps_median": 189.09322004109987,
+          "successful_rps_range": [
+            112.49974477323673,
+            196.69751230175066
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 20.351336999738123,
+            "p95_ms": 28.37926999973206,
+            "p99_ms": 39.01746299993647
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "BYPASS": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 8,
+          "trials": 3,
+          "successful_rps_median": 293.61886417229164,
+          "successful_rps_range": [
+            183.26255172496434,
+            306.0011585822072
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 25.17687699992166,
+            "p95_ms": 38.846909000312735,
+            "p99_ms": 60.010148999936064
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 3000
+          },
+          "actual_upstream_calls": 3000,
+          "cache_dispositions": {
+            "BYPASS": 3000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 16,
+          "trials": 3,
+          "successful_rps_median": 129.41982157726778,
+          "successful_rps_range": [
+            119.54819824940982,
+            230.48775585343208
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 65.42732299999443,
+            "p95_ms": 151.34884199960652,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 2104,
+            "503": 896
+          },
+          "actual_upstream_calls": 2104,
+          "cache_dispositions": {
+            "BYPASS": 3000
+          },
+          "pure_expected_hit_trials": null
+        }
+      ]
+    },
+    "ramp": {
+      "started_utc": "2026-11-05T01:57:38.909042+00:00",
+      "finished_utc": "2026-11-05T01:58:32.555445+00:00",
+      "points": 3,
+      "trials": [
+        {
+          "name": "arrival-100",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "3000",
+            "--concurrency",
+            "16",
+            "--scenarios",
+            "uncached",
+            "--arrival-rate",
+            "100",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/ramp/arrival-100.json"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 2998
+        },
+        {
+          "name": "arrival-300",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "3000",
+            "--concurrency",
+            "16",
+            "--scenarios",
+            "uncached",
+            "--arrival-rate",
+            "300",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/ramp/arrival-300.json"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 2639
+        },
+        {
+          "name": "arrival-600",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "3000",
+            "--concurrency",
+            "16",
+            "--scenarios",
+            "uncached",
+            "--arrival-rate",
+            "600",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/ramp/arrival-600.json"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 902
+        }
+      ],
+      "hardware": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "machine": "x86_64",
+        "python": "3.12.14",
+        "logical_cpus": 3,
+        "cgroup_cpu_max": "200000 100000",
+        "cgroup_memory_max": "8589934592",
+        "packages": {
+          "fastapi": "0.141.1",
+          "starlette": "1.10.0",
+          "httpx": "0.28.1",
+          "pydantic": "2.14.1",
+          "uvicorn": "0.52.4",
+          "numpy": "2.5.4",
+          "onnxruntime": "1.31.1",
+          "tokenizers": "0.23.3"
+        },
+        "source_sha256": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+        "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+      },
+      "comparison": [
+        {
+          "scenario": "uncached",
+          "concurrency": 16,
+          "trials": 3,
+          "successful_rps_median": 174.72324309002184,
+          "successful_rps_range": [
+            99.90400957504649,
+            262.6592124579394
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 19.893946000138385,
+            "p95_ms": 67.36115699959555,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 6539,
+            "503": 199
+          },
+          "actual_upstream_calls": 6539,
+          "cache_dispositions": {
+            "BYPASS": 6738
+          },
+          "pure_expected_hit_trials": null
+        }
+      ]
+    },
+    "sustained": {
+      "started_utc": "2026-11-05T01:58:48.548725+00:00",
+      "finished_utc": "2026-11-05T02:01:33.239065+00:00",
+      "points": 4,
+      "trials": [
+        {
+          "name": "sustained-uncached",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "10000",
+            "--concurrency",
+            "8",
+            "16",
+            "--scenarios",
+            "uncached",
+            "--randomize-order",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/sustained/sustained-uncached.json"
+          ],
+          "points": 2,
+          "independent_upstream_calls": 16787
+        },
+        {
+          "name": "sustained-exact",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "6000",
+            "--concurrency",
+            "16",
+            "--scenarios",
+            "exact",
+            "--arrival-rate",
+            "200",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/sustained/sustained-exact.json"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 0
+        },
+        {
+          "name": "sustained-semantic",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "3000",
+            "--concurrency",
+            "1",
+            "--scenarios",
+            "semantic",
+            "--arrival-rate",
+            "100",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/sustained/sustained-semantic.json"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 0
+        }
+      ],
+      "hardware": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "machine": "x86_64",
+        "python": "3.12.14",
+        "logical_cpus": 3,
+        "cgroup_cpu_max": "200000 100000",
+        "cgroup_memory_max": "8589934592",
+        "packages": {
+          "fastapi": "0.141.1",
+          "starlette": "1.10.0",
+          "httpx": "0.28.1",
+          "pydantic": "2.14.1",
+          "uvicorn": "0.52.4",
+          "numpy": "2.5.4",
+          "onnxruntime": "1.31.1",
+          "tokenizers": "0.23.3"
+        },
+        "source_sha256": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+        "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+      },
+      "comparison": [
+        {
+          "scenario": "exact",
+          "concurrency": 16,
+          "trials": 1,
+          "successful_rps_median": 196.76470054130908,
+          "successful_rps_range": [
+            196.76470054130908,
+            196.76470054130908
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 2.29230800005098,
+            "p95_ms": 8.633692000330484,
+            "p99_ms": 12.7964719999909
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 5903
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "HIT": 5903
+          },
+          "pure_expected_hit_trials": 1
+        },
+        {
+          "scenario": "semantic",
+          "concurrency": 1,
+          "trials": 1,
+          "successful_rps_median": 96.73217481076948,
+          "successful_rps_range": [
+            96.73217481076948,
+            96.73217481076948
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 5.286952999995265,
+            "p95_ms": 9.343878999970912,
+            "p99_ms": 11.97554099962872
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 2902
+          },
+          "actual_upstream_calls": 0,
+          "cache_dispositions": {
+            "SEMANTIC_HIT": 2902
+          },
+          "pure_expected_hit_trials": 1
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 8,
+          "trials": 1,
+          "successful_rps_median": 218.4376916551694,
+          "successful_rps_range": [
+            218.4376916551694,
+            218.4376916551694
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 30.535946999862063,
+            "p95_ms": 66.67304899974624,
+            "p99_ms": 91.96619100021053
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 10000
+          },
+          "actual_upstream_calls": 10000,
+          "cache_dispositions": {
+            "BYPASS": 10000
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 16,
+          "trials": 1,
+          "successful_rps_median": 144.17615726071577,
+          "successful_rps_range": [
+            144.17615726071577,
+            144.17615726071577
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 69.31204200009233,
+            "p95_ms": 230.89177300016672,
+            "p99_ms": 464.05221499981053
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 6787,
+            "503": 3213
+          },
+          "actual_upstream_calls": 6787,
+          "cache_dispositions": {
+            "BYPASS": 10000
+          },
+          "pure_expected_hit_trials": null
+        }
+      ]
+    },
+    "gemma": {
+      "started_utc": "2026-11-05T02:02:17.597344+00:00",
+      "finished_utc": "2026-11-05T02:06:31.859534+00:00",
+      "points": 10,
+      "trials": [
+        {
+          "name": "gemma-closed",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "20",
+            "--concurrency",
+            "1",
+            "2",
+            "--scenarios",
+            "direct",
+            "uncached",
+            "--repeats",
+            "2",
+            "--randomize-order",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/gemma/gemma-closed.json",
+            "--ollama-log",
+            "artifacts/milestone08/ollama.log",
+            "--ollama-pid",
+            "2343"
+          ],
+          "points": 8,
+          "independent_upstream_calls": 122
+        },
+        {
+          "name": "gemma-arrival-1",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "20",
+            "--concurrency",
+            "2",
+            "--scenarios",
+            "uncached",
+            "--arrival-rate",
+            "1",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/gemma/gemma-arrival-1.json",
+            "--ollama-log",
+            "artifacts/milestone08/ollama.log",
+            "--ollama-pid",
+            "2343"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 10
+        },
+        {
+          "name": "gemma-arrival-3",
+          "command": [
+            "/workspace/04-llm-gateway/.venv/bin/python",
+            "-m",
+            "devtools.benchmark",
+            "--requests",
+            "30",
+            "--concurrency",
+            "2",
+            "--scenarios",
+            "uncached",
+            "--arrival-rate",
+            "3",
+            "--seed",
+            "20261030",
+            "--warmup",
+            "5",
+            "--delay-ms",
+            "10",
+            "--output",
+            "/workspace/04-llm-gateway/artifacts/milestone08/gemma/gemma-arrival-3.json",
+            "--ollama-log",
+            "artifacts/milestone08/ollama.log",
+            "--ollama-pid",
+            "2343"
+          ],
+          "points": 1,
+          "independent_upstream_calls": 8
+        }
+      ],
+      "hardware": {
+        "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "machine": "x86_64",
+        "python": "3.12.14",
+        "logical_cpus": 3,
+        "cgroup_cpu_max": "200000 100000",
+        "cgroup_memory_max": "8589934592",
+        "packages": {
+          "fastapi": "0.141.1",
+          "starlette": "1.10.0",
+          "httpx": "0.28.1",
+          "pydantic": "2.14.1",
+          "uvicorn": "0.52.4",
+          "numpy": "2.5.4",
+          "onnxruntime": "1.31.1",
+          "tokenizers": "0.23.3"
+        },
+        "source_sha256": "de8be5ea1aa856b2c2b916153bbf146d4523b61d7fe63be0dedcab18a2ad163c",
+        "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+      },
+      "comparison": [
+        {
+          "scenario": "direct",
+          "concurrency": 1,
+          "trials": 2,
+          "successful_rps_median": 1.6461315500875509,
+          "successful_rps_range": [
+            0.6902973614525162,
+            2.6019657387225856
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 898.3559625000908,
+            "p95_ms": null,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 40
+          },
+          "actual_upstream_calls": 40,
+          "cache_dispositions": {
+            "UNLABELLED": 40
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "direct",
+          "concurrency": 2,
+          "trials": 2,
+          "successful_rps_median": 0.7164382602782148,
+          "successful_rps_range": [
+            0.7080351467327057,
+            0.7248413738237238
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 2681.7592180000247,
+            "p95_ms": null,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 40
+          },
+          "actual_upstream_calls": 40,
+          "cache_dispositions": {
+            "UNLABELLED": 40
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 1,
+          "trials": 2,
+          "successful_rps_median": 0.8254371051905196,
+          "successful_rps_range": [
+            0.7668506334536932,
+            0.8840235769273459
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 1212.0473595000476,
+            "p95_ms": null,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 40
+          },
+          "actual_upstream_calls": 40,
+          "cache_dispositions": {
+            "BYPASS": 40
+          },
+          "pure_expected_hit_trials": null
+        },
+        {
+          "scenario": "uncached",
+          "concurrency": 2,
+          "trials": 4,
+          "successful_rps_median": 0.5681375404300276,
+          "successful_rps_range": [
+            0.38586898613079185,
+            0.799866998915291
+          ],
+          "median_of_trial_successful_latency_quantiles": {
+            "p50_ms": 1368.8691760000893,
+            "p95_ms": null,
+            "p99_ms": null
+          },
+          "quantile_scope": "Trial-quantile median; withheld if any trial is undersampled",
+          "statuses": {
+            "200": 20,
+            "503": 70
+          },
+          "actual_upstream_calls": 20,
+          "cache_dispositions": {
+            "BYPASS": 90
+          },
+          "pure_expected_hit_trials": null
+        }
+      ]
+    }
+  },
+  "artifacts": {
+    "benchmarks/milestone08/primary.json.gz": {
+      "gzip_sha256": "7557305de2fa8b10f0c34cd27e645402be74c8975ac9eb391f144ae3567c3777",
+      "raw_sha256": "796e0af638e22ecf413ca308e377ccb60f7e8eb2ccdc29ede7fdd0caa47c63a9"
+    },
+    "benchmarks/milestone08/campaign-primary.json": {
+      "sha256": "b1ee42fe8d61c11ca41bf902dcd23a57d2e88e0d7b84a9cb3cb62da2a45e86dd"
+    },
+    "benchmarks/milestone08/arrival-100.json.gz": {
+      "gzip_sha256": "7d5546c5a4351269e17c2a6cff29b0987a3900c191de08967ffb9559da91d84d",
+      "raw_sha256": "4e2bc1709b0ccfc7f4ff39f745e38f56a39b43aedf6327283c6f92f3a595380c"
+    },
+    "benchmarks/milestone08/arrival-300.json.gz": {
+      "gzip_sha256": "dbf9a690b3160680669f3552c03780ceea53e632a91514ba70ec5df27c023b7e",
+      "raw_sha256": "6634ca57d5073723ac8511c45fbef3cc4e5ed126ae03ba5834c4fbc8a81afb77"
+    },
+    "benchmarks/milestone08/arrival-600.json.gz": {
+      "gzip_sha256": "571d21d1894ef8b9d19c5cae02e77b03df919a79b31e7104aed327aa40730098",
+      "raw_sha256": "d59356bc58ea4e1fcf36ced9fe71a0020bfe3c193ae967932f4772adda94453e"
+    },
+    "benchmarks/milestone08/campaign-ramp.json": {
+      "sha256": "446c33c842244dad68b0365e8ae68328433ac354d1bb0ed300f9565ddcbcc2cd"
+    },
+    "benchmarks/milestone08/sustained-uncached.json.gz": {
+      "gzip_sha256": "7e2065fed3e7680e425c8449fba27735095216b43beca8ca7090a47e539df33c",
+      "raw_sha256": "e8a484bc34c0853348f5055da0cf88ea838507656dcaf48dc08da7272a0864f1"
+    },
+    "benchmarks/milestone08/sustained-exact.json.gz": {
+      "gzip_sha256": "ba92ade13af1988d8fb0a4a1e18d5e8e1e4f8e73a8940a509879e1b3fc988180",
+      "raw_sha256": "fe12506c7905834645bc9031b08df9feb13798124bca7dc5f80f2dbf6bbca356"
+    },
+    "benchmarks/milestone08/sustained-semantic.json.gz": {
+      "gzip_sha256": "90aa9a58253637c4325d9c33c746591204ac0819d7cde1f5655c9a104f345c5d",
+      "raw_sha256": "34fb3af6ad57c072b6973eaab8a380b3aef6c10061dad52ea2125b09b323ba7c"
+    },
+    "benchmarks/milestone08/campaign-sustained.json": {
+      "sha256": "d61953f3835f7d3de4a1ab8bcf282a65697cd00102df8b13316ca7891123b279"
+    },
+    "benchmarks/milestone08/gemma-closed.json.gz": {
+      "gzip_sha256": "e35cab73a06a369d7780cdf3643f7cb8126cd01816ab30d711e4919ebfd960c4",
+      "raw_sha256": "e17c415b1caddaa7b11dc9246b3b92020a23e9c58e3f8e634832e0cf20a5b13d"
+    },
+    "benchmarks/milestone08/gemma-arrival-1.json.gz": {
+      "gzip_sha256": "a7e9dbd9c990f905c45664de2ebe6f7b8deecc35de914f32f58f970a7fd3efce",
+      "raw_sha256": "babdb99c3e29b94d9da22ce1b0af7aecd875aacb86e614813b4c1c2eebe36ba3"
+    },
+    "benchmarks/milestone08/gemma-arrival-3.json.gz": {
+      "gzip_sha256": "1ca78b4b692840098c9ab9a11a3262ca4ef94690e3e3bb96ac70c156790ae0ba",
+      "raw_sha256": "57d8bf858f849da26f536bd8ec17fe16c75d4160af5303d2e055c3c93d15e030"
+    },
+    "benchmarks/milestone08/campaign-gemma.json": {
+      "sha256": "afdf2d0a149cbe92901af96e3c78f215c40f0c2888898286c6223b185d701916"
+    },
+    "benchmarks/milestone08/reliability.json": {
+      "sha256": "19a6636480d288d404a917eea0d7075384ded54ce6ee98357547c4fa2818ec96"
+    },
+    "benchmarks/milestone08/model-runtime.json": {
+      "sha256": "b67a5c30c032e40ab70f642d787a12f074d1f849de7e56b258b72ad6ec7c6b07"
+    }
+  },
+  "totals": {
+    "planned_requests": 113210,
+    "attempted": 110753,
+    "completed": 110753,
+    "successful": 106362,
+    "generator_dropped": 2457,
+    "http_429": 0,
+    "http_503": 4391,
+    "http_504": 0,
+    "transport_failures": 0,
+    "incorrect_responses": 0,
+    "unexpected_http_responses": 0
+  },
+  "real_model_measured_upstream_calls": 140,
+  "real_model_excluded_warmup_calls": 50,
+  "real_model_excluded_recovery_calls": 10,
+  "guest_cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "limitations": [
+    "Same host: shared two-core quota and 8 GiB; process separation is not CPU isolation.",
+    "Closed-loop starts depend on responses; open-loop local drops never reached gateway.",
+    "Semantic fallback can establish exact entries; inspect the actual hit mix.",
+    "Gemma samples lack p95/p99 support; repeated prompts may reuse backend KV state.",
+    "Incomplete resource windows have null CPU/RSS; brief samples cannot prove leak freedom.",
+    "Trial ranges are descriptive, not confidence bounds or production capacity guarantees."
+  ]
+}

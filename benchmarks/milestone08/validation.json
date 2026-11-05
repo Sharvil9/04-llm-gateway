@@ -1,0 +1,19 @@
+{
+  "tests_passed": 289,
+  "elapsed_seconds": 7.11,
+  "measurement_preflight_tests_passed": 287,
+  "ruff": "passed",
+  "format_files_checked": 47,
+  "runtime_equals_baseline": true,
+  "measurement_manifest_verified": true,
+  "independent_audit_points": 92,
+  "all_post_point_recoveries": 92,
+  "model_log_calls": 200,
+  "measured_model_calls": 140,
+  "excluded_model_warmup_calls": 50,
+  "excluded_model_recovery_calls": 10,
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "test_only_change": "Metrics coordination test hold budget1s\u219230s; runtime and dedicated deadline tests unchanged. Prior final run had288pass/1correct504duringdeliberatehold.",
+  "metadata_capture_test": "MockTransport unit verifiesGET-onlycapture, notmodelinference evidence. Actual inference independentlycountedOllamaPOSTs.",
+  "checks": "Full frozen source hashes, raw digests, processseparation, counters, quantiles, correctresponseflags audited."
+}
