@@ -15,6 +15,7 @@ import platform
 import random
 import secrets
 import subprocess
+import sys
 import tempfile
 import time
 import tomllib
@@ -41,6 +42,14 @@ _fixture_stats = {"calls": 0, "active": 0, "peak": 0}
 
 @fixture_app.get("/_benchmark/stats")
 async def fixture_stats():
+    return _fixture_stats
+
+
+@fixture_app.post("/_benchmark/reset_peak")
+async def fixture_reset_peak():
+    if _fixture_stats["active"]:
+        raise RuntimeError("Cannot reset an active benchmark window")
+    _fixture_stats["peak"] = 0
     return _fixture_stats
 
 
@@ -102,6 +111,56 @@ def make_schedule(name: str, count: int, seed: int = 42) -> list[str]:
     return schedule[:count]
 
 
+def point_order(
+    concurrency: list[int], scenarios: list[str], repeats: int, seed: int, randomized: bool
+) -> list[tuple[int, int, str]]:
+    """Retain every point/repeat exactly once in a reproducible order."""
+    if not 1 <= repeats <= 5:
+        raise ValueError("Use repeats1..5")
+    points = [
+        (repeat, level, scenario)
+        for repeat in range(repeats)
+        for level in concurrency
+        for scenario in scenarios
+    ]
+    if randomized:
+        random.Random(seed).shuffle(points)
+    return points
+
+
+def cgroup_cpu_stat() -> dict[str, int] | None:
+    try:
+        return {
+            key: int(value)
+            for key, value in (
+                line.split() for line in Path("/sys/fs/cgroup/cpu.stat").read_text().splitlines()
+            )
+        }
+    except (OSError, ValueError):
+        return None
+
+
+def time_bins(records: list[dict]) -> list[dict]:
+    """One-second start-cohort counts; last bin aggregates beyond one hour."""
+    bins = {}
+    for row in records:
+        offset = row["start_offset_seconds"]
+        if offset is None:
+            offset = row["planned_offset_seconds"]
+        index = min(int(offset), 3599)
+        bucket = bins.setdefault(index, Counter())
+        if row["generator_drop"]:
+            bucket["generator_dropped"] += 1
+        else:
+            bucket["http_started"] += 1
+            bucket["successful"] += row["status"] == 200 and row["response_correct"]
+            bucket["http_429"] += row["status"] == 429
+            bucket["http_503"] += row["status"] == 503
+            bucket["http_504"] += row["status"] == 504
+            bucket["transport_failed"] += row["status"] is None
+    return [{"start_second": index, **dict(counts)} for index, counts in sorted(bins.items())]
+
+
 async def run_load(
     client: httpx.AsyncClient,
     url: str,
@@ -110,107 +169,197 @@ async def run_load(
     schedule: list[str],
     concurrency: int,
     expected_city: str = "Paris",
+    *,
+    arrival_rate: float | None = None,
 ) -> dict:
-    """Use a fixed worker set, retaining at most one raw record per bounded request."""
+    """Bounded HTTP work: fixed closed-loop workers or a zero-queue arrival schedule.
+
+    In open-loop mode a planned arrival is discarded locally when HTTP slots are
+    full or the scheduler is over one period late. Local drops never count as
+    attempted HTTP requests, provider failures, or gateway quota rejections.
+    """
     if not 1 <= concurrency <= 64 or not 1 <= len(schedule) <= 10_000:
         raise ValueError("Use concurrency1..64 and requests1..10000")
+    if arrival_rate is not None and (
+        not math.isfinite(arrival_rate) or not 0.1 <= arrival_rate <= 10000
+    ):
+        raise ValueError("Use finite arrival-rate0.1..10000 or None")
     records, next_index = [None] * len(schedule), 0
     expected_models = {kind: json.loads(body).get("model") for kind, body in payloads.items()}
+    started = time.perf_counter()
+    active = peak = 0
+
+    def row_for(index: int, planned: float | None) -> dict:
+        return {
+            "index": index,
+            "kind": schedule[index],
+            "status": None,
+            "cache": None,
+            "timing_ms": {},
+            "response_correct": False,
+            "response_sha256": None,
+            "transport_error": None,
+            "generator_drop": None,
+            "planned_offset_seconds": planned,
+            "start_offset_seconds": None,
+            "scheduling_lag_ms": None,
+            "latency_ms": None,
+        }
+
+    async def perform(index: int, planned: float | None):
+        nonlocal active, peak
+        kind = schedule[index]
+        headers = {"Content-Type": "application/json"}
+        if credential:
+            headers["Authorization"] = f"Bearer {credential}"
+        if kind in {"exact", "semantic"}:
+            headers["X-Gateway-Cache"] = kind
+        elif kind == "uncached":
+            headers["Cache-Control"] = "no-store"
+        request_started = time.perf_counter()
+        row = row_for(index, planned)
+        row["start_offset_seconds"] = request_started - started
+        row["scheduling_lag_ms"] = (
+            max(0.0, (request_started - started - planned) * 1000) if planned is not None else None
+        )
+        active += 1
+        peak = max(peak, active)
+        try:
+            response = await client.post(url, content=payloads[kind], headers=headers)
+            row["latency_ms"] = (time.perf_counter() - request_started) * 1000
+            row["status"] = response.status_code
+            row["cache"] = response.headers.get("x-gateway-cache")
+            if "server-timing" in response.headers:
+                row["timing_ms"] = server_timings(response)
+            if response.status_code == 200:
+                row["response_sha256"] = hashlib.sha256(response.content).hexdigest()
+                try:
+                    result = response.json()
+                    row["response_correct"] = result["choices"][0]["message"][
+                        "content"
+                    ].strip() == expected_city and (
+                        expected_models[kind] is None or result["model"] == expected_models[kind]
+                    )
+                except (ValueError, KeyError, IndexError, TypeError, AttributeError):
+                    row["response_correct"] = False
+        except httpx.HTTPError as exc:
+            row["latency_ms"] = (time.perf_counter() - request_started) * 1000
+            row["transport_error"] = type(exc).__name__
+        finally:
+            active -= 1
+            records[index] = row
 
     async def worker():
         nonlocal next_index
         while next_index < len(schedule):
             index = next_index
             next_index += 1  # No await: assignment is atomic on this event loop.
-            kind = schedule[index]
-            headers = {"Content-Type": "application/json"}
-            if credential:
-                headers["Authorization"] = f"Bearer {credential}"
-            if kind in {"exact", "semantic"}:
-                headers["X-Gateway-Cache"] = kind
-            elif kind == "uncached":
-                headers["Cache-Control"] = "no-store"
-            started = time.perf_counter()
-            row = {
-                "index": index,
-                "kind": kind,
-                "status": None,
-                "cache": None,
-                "timing_ms": {},
-                "response_correct": False,
-                "response_sha256": None,
-                "transport_error": None,
-            }
-            try:
-                response = await client.post(url, content=payloads[kind], headers=headers)
-                row["latency_ms"] = (time.perf_counter() - started) * 1000
-                row["status"] = response.status_code
-                row["cache"] = response.headers.get("x-gateway-cache")
-                if "server-timing" in response.headers:
-                    row["timing_ms"] = server_timings(response)
-                if response.status_code == 200:
-                    row["response_sha256"] = hashlib.sha256(response.content).hexdigest()
-                    try:
-                        result = response.json()
-                        row["response_correct"] = result["choices"][0]["message"][
-                            "content"
-                        ].strip() == expected_city and (
-                            expected_models[kind] is None
-                            or result["model"] == expected_models[kind]
-                        )
-                    except (ValueError, KeyError, IndexError, TypeError, AttributeError):
-                        row["response_correct"] = False
-            except httpx.HTTPError as exc:
-                row["latency_ms"] = (time.perf_counter() - started) * 1000
-                row["transport_error"] = type(exc).__name__  # Never raw exception text/secrets.
-            records[index] = row
+            await perform(index, None)
 
-    started = time.perf_counter()
-    tasks = [asyncio.create_task(worker()) for _ in range(min(concurrency, len(schedule)))]
+    tasks = set()
     try:
-        await asyncio.gather(*tasks)
+        if arrival_rate is None:
+            tasks = {asyncio.create_task(worker()) for _ in range(min(concurrency, len(schedule)))}
+            await asyncio.gather(*tasks)
+            offer_window = time.perf_counter() - started
+        else:
+            period = 1 / arrival_rate
+            for index in range(len(schedule)):
+                planned = index * period
+                await asyncio.sleep(max(0.0, started + planned - time.perf_counter()))
+                done = {task for task in tasks if task.done()}
+                for task in done:
+                    task.result()  # Unexpected driver errors must not disappear.
+                tasks -= done
+                lag = time.perf_counter() - started - planned
+                reason = (
+                    "scheduler_late"
+                    if lag > period
+                    else "http_slots_full"
+                    if len(tasks) >= concurrency
+                    else None
+                )
+                if reason:
+                    row = row_for(index, planned)
+                    row["generator_drop"] = reason
+                    row["scheduling_lag_ms"] = max(0.0, lag * 1000)
+                    records[index] = row
+                else:
+                    tasks.add(asyncio.create_task(perform(index, planned)))
+            await asyncio.sleep(max(0.0, started + len(schedule) * period - time.perf_counter()))
+            offer_window = time.perf_counter() - started
+            await asyncio.gather(*tasks)
     finally:
         for task in tasks:
             if not task.done():
                 task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
     duration = time.perf_counter() - started
-    completed = sum(row["status"] is not None for row in records)
-    successes = sum(row["status"] == 200 and row["response_correct"] for row in records)
-    rejected = sum(row["status"] in {429, 503} for row in records)
+    attempts = [row for row in records if row["generator_drop"] is None]
+    completed = sum(row["status"] is not None for row in attempts)
+    successful = [row for row in attempts if row["status"] == 200 and row["response_correct"]]
+    rejected = [row for row in attempts if row["status"] in {429, 503}]
+    statuses = Counter(str(row["status"]) for row in attempts)
     return {
+        "load_mode": "bounded_open_loop" if arrival_rate is not None else "closed_loop",
+        "target_arrival_rate": arrival_rate,
+        "planned_requests": len(schedule),
+        "planned_offer_window_seconds": len(schedule) / arrival_rate if arrival_rate else None,
+        "actual_offer_window_seconds": offer_window,
+        "planned_offered_rps": arrival_rate,
+        "offered_rps": len(attempts) / offer_window,
+        "offered_rate_note": (
+            "Actual HTTP starts / offer window; closed-loop starts depend on responses. "
+            "Local drops are never HTTP attempts."
+        ),
+        "generator_dropped": len(records) - len(attempts),
+        "generator_drop_reasons": dict(
+            Counter(row["generator_drop"] for row in records if row["generator_drop"])
+        ),
+        "http_active_peak": peak,
         "duration_seconds": duration,
-        "attempted": len(records),
+        "attempted": len(attempts),
         "completed": completed,
-        "successful": successes,
-        "http_200": sum(row["status"] == 200 for row in records),
-        "rejected": rejected,
+        "successful": len(successful),
+        "http_200": sum(row["status"] == 200 for row in attempts),
+        "http_429": statuses.get("429", 0),
+        "http_503": statuses.get("503", 0),
+        "http_504": statuses.get("504", 0),
+        "unexpected_http_responses": sum(
+            row["status"] is not None and row["status"] not in {200, 429, 503, 504}
+            for row in attempts
+        ),
+        "rejected": len(rejected),
         "other_http_errors": sum(
             row["status"] is not None and row["status"] >= 400 and row["status"] not in {429, 503}
-            for row in records
+            for row in attempts
         ),
-        "transport_failures": len(records) - completed,
+        "transport_failures": len(attempts) - completed,
         "incorrect_responses": sum(
-            row["status"] == 200 and not row["response_correct"] for row in records
+            row["status"] == 200 and not row["response_correct"] for row in attempts
         ),
-        "attempted_rps": len(records) / duration,
+        "attempted_rps": len(attempts) / duration,
         "completed_rps": completed / duration,
-        "successful_rps": successes / duration,
-        "status_counts": dict(Counter(str(row["status"]) for row in records)),
-        "cache_dispositions": dict(Counter(row["cache"] or "UNLABELLED" for row in records)),
-        "latency_all": quantiles([row["latency_ms"] for row in records]),
-        "latency_successful": quantiles(
-            [
-                row["latency_ms"]
-                for row in records
-                if row["status"] == 200 and row["response_correct"]
-            ]
+        "successful_rps": len(successful) / duration,
+        "status_counts": dict(statuses),
+        "cache_dispositions": dict(Counter(row["cache"] or "UNLABELLED" for row in attempts)),
+        "latency_all": quantiles([row["latency_ms"] for row in attempts]),
+        "latency_successful": quantiles([row["latency_ms"] for row in successful]),
+        "latency_rejected": quantiles([row["latency_ms"] for row in rejected]),
+        "scheduling_lag": quantiles(
+            [row["scheduling_lag_ms"] for row in records if row["scheduling_lag_ms"] is not None]
+        ),
+        "scheduling_lag_http_starts": quantiles(
+            [row["scheduling_lag_ms"] for row in attempts if row["scheduling_lag_ms"] is not None]
         ),
         "server_timing": {
-            name: quantiles([row["timing_ms"][name] for row in records if name in row["timing_ms"]])
+            name: quantiles(
+                [row["timing_ms"][name] for row in attempts if name in row["timing_ms"]]
+            )
             for name in ("gateway", "adapter", "exact", "semantic", "residual")
         },
         "raw_records": records,
+        "start_cohort_one_second_bins": time_bins(records),
     }
 
 
@@ -290,6 +439,7 @@ class ProcessSampler:
     def __init__(self, pids: dict[str, int], *, descendants: set[str] | None = None):
         self.pids, self.descendants = pids, descendants or set()
         self.records, self.group_peaks, self.samples = {}, Counter(), 0
+        self.group_first_rss, self.group_last_rss = {}, {}
         self.discovery_methods = {name: set() for name in pids}
         self.discovery_complete = dict.fromkeys(pids, True)
         self.available = platform.system() == "Linux" and Path("/proc/self/stat").is_file()
@@ -321,6 +471,8 @@ class ProcessSampler:
                 record["last"] = observed["cpu_ticks"]
                 group_rss += observed["rss_bytes"]
             self.group_peaks[group] = max(self.group_peaks[group], group_rss)
+            self.group_first_rss.setdefault(group, group_rss)
+            self.group_last_rss[group] = group_rss
 
     async def collect(self, stop: asyncio.Event):
         while not stop.is_set():
@@ -363,6 +515,8 @@ class ProcessSampler:
                 "cpu_core_seconds": cpu_seconds if available else None,
                 "mean_cpu_cores": cpu_seconds / duration if available else None,
                 "sampled_peak_rss_bytes": self.group_peaks[group] if available else None,
+                "first_sampled_rss_bytes": self.group_first_rss.get(group) if available else None,
+                "last_sampled_rss_bytes": self.group_last_rss.get(group) if available else None,
                 "reason": (
                     "No successful observations of the supplied PID tree"
                     if not observed
@@ -746,6 +900,11 @@ def source_manifest() -> dict[str, str]:
         ROOT / "devtools/semantic_eval.py",
         ROOT / "devtools/smoke.py",
         ROOT / "uv.lock",
+        *(
+            path
+            for name in ("load_campaign.py", "load_reliability.py")
+            if (path := ROOT / "devtools" / name).exists()
+        ),
         *(ROOT / "src/llm_gateway").glob("*.py"),
     ]
     return {
@@ -782,129 +941,219 @@ async def run_suite(args) -> dict:
     payloads = payloads_for(families, real)
     (ROOT / "artifacts").mkdir(exist_ok=True)
     with backend_server(args.delay_ms, real) as (backend, backend_pid):
-        for concurrency in args.concurrency:
-            for scenario in args.scenarios:
-                with gateway_server(backend, scenario, concurrency, args, families, threshold) as (
-                    gateway,
-                    key,
-                    operator_key,
-                    gateway_pid,
-                    config,
-                ):
-                    async with httpx.AsyncClient(
-                        trust_env=False,
-                        timeout=70.0 if real else 15.0,
-                        limits=httpx.Limits(max_connections=64, max_keepalive_connections=64),
-                    ) as client:
-                        endpoint = (gateway or backend) + "/v1/chat/completions"
-                        if real:
-                            await real_identity(client, backend)
-                        before_warmup_calls = await backend_calls(client, backend, args.ollama_log)
-                        warming = await warmup(
-                            client, endpoint, key or "", scenario, payloads, args.warmup
+        points = point_order(
+            args.concurrency, args.scenarios, args.repeats, args.seed, args.randomize_order
+        )
+        for run_order, (repeat, concurrency, scenario) in enumerate(points):
+            with gateway_server(backend, scenario, concurrency, args, families, threshold) as (
+                gateway,
+                key,
+                operator_key,
+                gateway_pid,
+                config,
+            ):
+                async with httpx.AsyncClient(
+                    trust_env=False,
+                    timeout=70.0 if real else 15.0,
+                    limits=httpx.Limits(max_connections=64, max_keepalive_connections=64),
+                ) as client:
+                    endpoint = (gateway or backend) + "/v1/chat/completions"
+                    if real:
+                        await real_identity(client, backend)
+                    before_warmup_calls = await backend_calls(client, backend, args.ollama_log)
+                    warming = await warmup(
+                        client, endpoint, key or "", scenario, payloads, args.warmup
+                    )
+                    identity = await real_identity(client, backend, loaded=True) if real else None
+                    before = await snapshot(client, gateway, operator_key) if gateway else None
+                    expected_warm_calls = before_warmup_calls + warming["upstream_calls_expected"]
+                    initial_calls = await backend_calls(
+                        client, backend, args.ollama_log, expected_warm_calls
+                    )
+                    if initial_calls != expected_warm_calls:
+                        raise RuntimeError(
+                            "Warmup backend count differs; require a dedicated backend/log"
                         )
-                        identity = (
-                            await real_identity(client, backend, loaded=True) if real else None
+                    fixture_before = None
+                    if not real:
+                        reset = await client.post(backend + "/_benchmark/reset_peak")
+                        reset.raise_for_status()
+                        fixture_before = reset.json()
+                        if fixture_before["active"]:
+                            raise RuntimeError("Mock backend not idle before measured window")
+                    owned_pids = {"load_generator": os.getpid()}
+                    if gateway_pid:
+                        owned_pids["gateway"] = gateway_pid
+                    if backend_pid:
+                        owned_pids["mock_backend"] = backend_pid
+                    if args.ollama_pid:
+                        owned_pids["owned_ollama_tree"] = args.ollama_pid
+                    sampler = ProcessSampler(owned_pids, descendants={"owned_ollama_tree"})
+                    resource_started = time.perf_counter()
+                    cgroup_before = cgroup_cpu_stat()
+                    sampler.sample()
+                    stop = asyncio.Event()
+                    sampling = asyncio.create_task(sampler.collect(stop))
+                    try:
+                        measured_started_utc = datetime.now(UTC).isoformat()
+                        measured = await run_load(
+                            client,
+                            endpoint,
+                            key or "",
+                            payloads,
+                            make_schedule(scenario, args.requests, args.seed),
+                            concurrency,
+                            arrival_rate=args.arrival_rate,
                         )
-                        before = await snapshot(client, gateway, operator_key) if gateway else None
-                        expected_warm_calls = (
-                            before_warmup_calls + warming["upstream_calls_expected"]
-                        )
-                        initial_calls = await backend_calls(
-                            client, backend, args.ollama_log, expected_warm_calls
-                        )
-                        if initial_calls != expected_warm_calls:
-                            raise RuntimeError(
-                                "Warmup backend count differs; require a dedicated backend/log"
-                            )
-                        owned_pids = {"load_generator": os.getpid()}
-                        if gateway_pid:
-                            owned_pids["gateway"] = gateway_pid
-                        if backend_pid:
-                            owned_pids["mock_backend"] = backend_pid
-                        if args.ollama_pid:
-                            owned_pids["owned_ollama_tree"] = args.ollama_pid
-                        sampler = ProcessSampler(owned_pids, descendants={"owned_ollama_tree"})
-                        resource_started = time.perf_counter()
+                        measured_finished_utc = datetime.now(UTC).isoformat()
+                    finally:
+                        stop.set()
+                        await sampling
                         sampler.sample()
-                        stop = asyncio.Event()
-                        sampling = asyncio.create_task(sampler.collect(stop))
-                        try:
-                            measured_started_utc = datetime.now(UTC).isoformat()
-                            measured = await run_load(
-                                client,
-                                endpoint,
-                                key or "",
-                                payloads,
-                                make_schedule(scenario, args.requests, args.seed),
-                                concurrency,
-                            )
-                            measured_finished_utc = datetime.now(UTC).isoformat()
-                        finally:
-                            stop.set()
-                            await sampling
-                            sampler.sample()
-                        resource_duration = time.perf_counter() - resource_started
-                        after = await snapshot(client, gateway, operator_key) if gateway else None
-                        delta = metrics_delta(before, after) if gateway else None
-                        attempts = delta["counts"]["upstream_attempts"] if delta else args.requests
-                        actual_calls = (
-                            await backend_calls(
-                                client, backend, args.ollama_log, initial_calls + attempts
-                            )
-                            - initial_calls
+                    resource_duration = time.perf_counter() - resource_started
+                    cgroup_after = cgroup_cpu_stat()
+                    after = await snapshot(client, gateway, operator_key) if gateway else None
+                    delta = metrics_delta(before, after) if gateway else None
+                    attempts = (
+                        delta["counts"]["upstream_attempts"] if delta else measured["attempted"]
+                    )
+                    actual_calls = (
+                        await backend_calls(
+                            client, backend, args.ollama_log, initial_calls + attempts
                         )
-                        if actual_calls != attempts:
+                        - initial_calls
+                    )
+                    if actual_calls != attempts:
+                        raise RuntimeError(
+                            "Upstream count differs; use a dedicated, quiet backend/log"
+                        )
+                    fixture_after = None
+                    if not real:
+                        fixture_after = (await client.get(backend + "/_benchmark/stats")).json()
+                        if fixture_after["active"]:
+                            raise RuntimeError("Mock backend retained active work after load")
+                        if gateway and fixture_after["peak"] > config["max_in_flight"]:
                             raise RuntimeError(
-                                "Upstream count differs; use a dedicated, quiet backend/log"
+                                "Observed mock inference peak exceeds admission limit"
                             )
-                        if gateway and (
-                            delta["counts"]["requests_started"] != args.requests
-                            or delta["counts"]["requests_finished"] != args.requests
-                        ):
-                            raise RuntimeError(
-                                "Metrics request counts differ from measured workload"
-                            )
-                        if scenario == "exact" and measured["cache_dispositions"] != {
-                            "HIT": args.requests
-                        }:
-                            raise RuntimeError("Warm exact workload was not entirely cache hits")
-                        if (
-                            scenario == "semantic"
-                            and concurrency == 1
-                            and measured["cache_dispositions"] != {"SEMANTIC_HIT": args.requests}
-                        ):
-                            raise RuntimeError(
-                                "Single-worker semantic workload was not entirely semantic hits"
-                            )
-                        hits = sum(
-                            measured["cache_dispositions"].get(name, 0)
-                            for name in ("HIT", "SEMANTIC_HIT")
+                    if gateway and (
+                        delta["counts"]["requests_started"] != measured["attempted"]
+                        or delta["counts"]["requests_finished"] != measured["attempted"]
+                    ):
+                        raise RuntimeError("Metrics request counts differ from measured workload")
+                    if (
+                        scenario == "exact"
+                        and measured["attempted"]
+                        and measured["cache_dispositions"] != {"HIT": measured["attempted"]}
+                    ):
+                        raise RuntimeError("Warm exact workload was not entirely cache hits")
+                    if (
+                        scenario == "semantic"
+                        and concurrency == 1
+                        and measured["attempted"]
+                        and measured["cache_dispositions"]
+                        != {"SEMANTIC_HIT": measured["attempted"]}
+                    ):
+                        raise RuntimeError(
+                            "Single-worker semantic workload was not entirely semantic hits"
                         )
-                        replay_checks = verify_wire_replays(
-                            measured, warming, scenario, concurrency
+                    hits = sum(
+                        measured["cache_dispositions"].get(name, 0)
+                        for name in ("HIT", "SEMANTIC_HIT")
+                    )
+                    replay_checks = verify_wire_replays(measured, warming, scenario, concurrency)
+                    # Probe after all measured snapshots/counts: not part of RPS,
+                    # percentiles, resource window, or measured upstream calls.
+                    recovery = await run_load(
+                        client,
+                        endpoint,
+                        key or "",
+                        payloads,
+                        ["uncached" if gateway else "direct"],
+                        1,
+                    )
+                    if recovery["successful"] != 1:
+                        raise RuntimeError("Post-load uncached recovery request failed")
+                    recovery_calls = (
+                        await backend_calls(
+                            client, backend, args.ollama_log, initial_calls + attempts + 1
                         )
-                        measured.update(
-                            **replay_checks,
-                            scenario=scenario,
-                            started_utc=measured_started_utc,
-                            finished_utc=measured_finished_utc,
-                            concurrency=concurrency,
-                            warmup=warming,
-                            model_identity=identity,
-                            independent_upstream_calls=actual_calls,
-                            call_count_source="dedicated_ollama_gin_log"
-                            if real
-                            else "mock_fixture_stats",
-                            inference_calls_avoided_by_hits=hits,
-                            cache_avoidance_fraction_of_attempts=hits / args.requests,
-                            metrics_before=before,
-                            metrics_after=after,
-                            metrics_delta=delta,
-                            resources=sampler.summary(resource_duration),
-                            gateway_config=config,
-                        )
-                        results.append(measured)
+                        - initial_calls
+                        - attempts
+                    )
+                    if recovery_calls != 1:
+                        raise RuntimeError("Recovery did not make exactly one upstream call")
+                    recovery_metrics = (
+                        await snapshot(client, gateway, operator_key) if gateway else None
+                    )
+                    if recovery_metrics and recovery_metrics["gauges"]["inference_in_flight"]:
+                        raise RuntimeError("Post-load recovery leaked inference capacity")
+                    measured.update(
+                        **replay_checks,
+                        scenario=scenario,
+                        repeat_index=repeat,
+                        run_order=run_order,
+                        process_ids=owned_pids,
+                        separate_gateway_process=gateway_pid is None or gateway_pid != os.getpid(),
+                        cgroup_cpu_stat_before=cgroup_before,
+                        cgroup_cpu_stat_after=cgroup_after,
+                        cgroup_cpu_stat_delta=_subtract(cgroup_before, cgroup_after)
+                        if cgroup_before is not None and cgroup_after is not None
+                        else None,
+                        fixture_stats_before=fixture_before,
+                        fixture_stats_after=fixture_after,
+                        observed_peak_inference_concurrency=fixture_after["peak"]
+                        if fixture_after is not None
+                        else None,
+                        peak_inference_note=(
+                            "Mock fixture window peak; real Ollama execution peak is unobserved"
+                        ),
+                        recovery={
+                            "successful": recovery["successful"],
+                            "status_counts": recovery["status_counts"],
+                            "latency_successful": recovery["latency_successful"],
+                            "independent_upstream_calls": recovery_calls,
+                            "excluded_from_measurement": True,
+                            "inference_in_flight_after": recovery_metrics["gauges"][
+                                "inference_in_flight"
+                            ]
+                            if recovery_metrics
+                            else None,
+                        },
+                        started_utc=measured_started_utc,
+                        finished_utc=measured_finished_utc,
+                        concurrency=concurrency,
+                        warmup=warming,
+                        model_identity=identity,
+                        independent_upstream_calls=actual_calls,
+                        call_count_source="dedicated_ollama_gin_log"
+                        if real
+                        else "mock_fixture_stats",
+                        inference_calls_avoided_by_hits=hits,
+                        cache_avoidance_fraction_of_attempts=(
+                            hits / measured["attempted"] if measured["attempted"] else None
+                        ),
+                        metrics_before=before,
+                        metrics_after=after,
+                        metrics_delta=delta,
+                        resources=sampler.summary(resource_duration),
+                        gateway_config=config,
+                    )
+                    results.append(measured)
+                    print(
+                        json.dumps(
+                            {
+                                "point_completed": run_order + 1,
+                                "scenario": scenario,
+                                "concurrency": concurrency,
+                                "repeat_index": repeat,
+                                "successful_rps": measured["successful_rps"],
+                                "http_503": measured["http_503"],
+                            }
+                        ),
+                        file=sys.stderr,
+                        flush=True,
+                    )
     verify_source_manifest(initial_sources)
     return {
         "schema_version": 1,
@@ -918,6 +1167,10 @@ async def run_suite(args) -> dict:
         "requests_per_scenario": args.requests,
         "concurrency_levels": args.concurrency,
         "seed": args.seed,
+        "repeats": args.repeats,
+        "randomized_point_order": args.randomize_order,
+        "target_arrival_rate": args.arrival_rate,
+        "load_generator_pid": os.getpid(),
         "hardware_and_software": hardware(),
         "embedding_fingerprint": fingerprint,
         "dataset_sha256": FROZEN_SHA256,
@@ -937,7 +1190,8 @@ async def run_suite(args) -> dict:
         else None,
         "results": results,
         "limitations": [
-            "Closed-loop fixed workers; one observed run per point, not an arrival-rate test.",
+            "Closed-loop starts depend on responses; optional open-loop schedule drops local "
+            "arrivals with no client queue.",
             "Cache RPS is not model generation speed; no token-rate or monetary savings claim.",
             "Header durations are walltime, not CPU; direct/gateway differences are not CPU costs.",
             "Concurrent semantic fallback can create later exact hits; dispositions show this.",
@@ -952,9 +1206,7 @@ def main():
     parser.add_argument(
         "--requests", type=int, help="Per-scenario requests1..10000; defaultmock1000/real30"
     )
-    parser.add_argument(
-        "--concurrency", type=int, nargs="+", help="Defaultmock1,4,8,16; real only1"
-    )
+    parser.add_argument("--concurrency", type=int, nargs="+", help="Defaultmock1,4,8,16; real1..4")
     parser.add_argument(
         "--scenarios",
         nargs="+",
@@ -963,6 +1215,11 @@ def main():
     )
     parser.add_argument("--warmup", type=int, default=5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument("--randomize-order", action="store_true")
+    parser.add_argument(
+        "--arrival-rate", type=float, help="Optional planned requests/second; zero client queue"
+    )
     parser.add_argument("--delay-ms", type=float, default=10.0)
     parser.add_argument("--model-dir", type=Path, default=Path("artifacts/embeddings/l3"))
     parser.add_argument("--evaluation", type=Path, default=Path("evaluation/l3_results.json"))
@@ -983,6 +1240,14 @@ def main():
         args.requests if args.requests is not None else (30 if args.ollama_log else 1000)
     )
     args.concurrency = args.concurrency or ([1] if args.ollama_log else [1, 4, 8, 16])
+    if not 1 <= args.repeats <= 5:
+        parser.error("Use repeats1..5")
+    if args.arrival_rate is not None and (
+        not math.isfinite(args.arrival_rate)
+        or not 0.1 <= args.arrival_rate <= 10000
+        or args.requests / args.arrival_rate > 600
+    ):
+        parser.error("Use finite arrival-rate0.1..10000 and at most600seconds planned window")
     if (
         not 1 <= args.requests <= 10000
         or not 1 <= args.warmup <= 20
@@ -999,8 +1264,8 @@ def main():
         not args.ollama_log.is_relative_to(ROOT / "artifacts") or not args.ollama_log.is_file()
     ):
         parser.error("--ollama-log must be an existing file under artifacts/")
-    if args.ollama_log and args.concurrency != [1]:
-        parser.error("Consumer-hardware real inference benchmark supports only concurrency1")
+    if args.ollama_log and any(level > 4 for level in args.concurrency):
+        parser.error("Consumer-hardware real inference benchmark supports concurrency1..4")
     if args.ollama_pid is not None and (not args.ollama_log or args.ollama_pid < 1):
         parser.error("--ollama-pid requires realmode and a positive owned server PID")
     args.model_dir, args.evaluation, output = (

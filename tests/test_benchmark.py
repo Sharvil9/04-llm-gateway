@@ -511,3 +511,174 @@ async def test_sampler_io_runs_off_loop_and_cancellation_waits_for_its_one_job(m
     finally:
         release.set()
         await asyncio.gather(collector, return_exceptions=True)
+
+
+def test_repeated_point_order_is_complete_seeded_and_not_blocked_by_scenario():
+    points = benchmark.point_order([1, 2, 4], ["uncached", "exact"], 3, 42, True)
+    assert len(points) == len(set(points)) == 18
+    assert points == benchmark.point_order([1, 2, 4], ["uncached", "exact"], 3, 42, True)
+    assert points != benchmark.point_order([1, 2, 4], ["uncached", "exact"], 3, 43, True)
+    assert set(points) == {
+        (r, c, s) for r in range(3) for c in [1, 2, 4] for s in ["uncached", "exact"]
+    }
+    assert benchmark.point_order([1, 2], ["uncached"], 1, 42, False) == [
+        (0, 1, "uncached"),
+        (0, 2, "uncached"),
+    ]
+
+
+async def test_open_loop_bounds_active_work_and_separates_generator_drops_from_http_errors():
+    active = peak = calls = 0
+
+    async def handler(request):
+        nonlocal active, peak, calls
+        active += 1
+        calls += 1
+        peak = max(peak, active)
+        try:
+            await asyncio.sleep(0.03)
+            return httpx.Response(200, json=completion())
+        finally:
+            active -= 1
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        result = await run_load(
+            client,
+            "http://gateway.invalid/v1/chat/completions",
+            "",
+            payloads(),
+            ["uncached"] * 100,
+            2,
+            arrival_rate=1000,
+        )
+    assert active == 0 and peak == result["http_active_peak"] == 2
+    assert result["generator_dropped"] > 0
+    assert result["attempted"] == result["successful"] == calls
+    assert result["planned_requests"] == result["attempted"] + result["generator_dropped"] == 100
+    assert result["http_429"] == result["http_503"] == result["http_504"] == 0
+    assert result["transport_failures"] == result["rejected"] == 0
+    assert result["latency_all"]["count"] == calls
+    assert result["status_counts"] == {"200": calls}
+    assert result["load_mode"] == "bounded_open_loop"
+    assert result["planned_offered_rps"] == 1000
+    assert result["offered_rps"] < 1000
+    assert sum(b["http_started"] for b in result["start_cohort_one_second_bins"]) == calls
+    for row in result["raw_records"]:
+        assert row["planned_offset_seconds"] == pytest.approx(row["index"] / 1000)
+        if row["generator_drop"]:
+            assert row["start_offset_seconds"] is row["status"] is row["latency_ms"] is None
+        else:
+            assert row["start_offset_seconds"] >= 0 and row["scheduling_lag_ms"] >= 0
+
+
+async def test_open_loop_http_rejections_are_counted_separately_from_local_drops():
+    statuses = iter([429, 503, 504])
+
+    async def handler(request):
+        return httpx.Response(next(statuses), json={"error": {"code": "fixture"}})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        result = await run_load(
+            client,
+            "http://gateway.invalid/v1/chat/completions",
+            "",
+            payloads(),
+            ["uncached"] * 3,
+            2,
+            arrival_rate=20,
+        )
+    assert result["generator_dropped"] == 0
+    assert result["attempted"] == result["completed"] == 3
+    assert result["http_429"] == result["http_503"] == result["http_504"] == 1
+    assert result["successful"] == result["successful_rps"] == 0
+    assert result["latency_successful"]["count"] == 0
+    assert result["latency_rejected"]["count"] == 2
+    assert result["latency_all"]["count"] == 3
+
+
+async def test_cancelling_open_loop_drains_only_bounded_started_work():
+    active = 0
+    entered = asyncio.Event()
+    block = asyncio.Event()
+
+    async def handler(request):
+        nonlocal active
+        active += 1
+        if active == 2:
+            entered.set()
+        try:
+            await block.wait()
+            return httpx.Response(200, json=completion())
+        finally:
+            active -= 1
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        task = asyncio.create_task(
+            run_load(
+                client,
+                "http://gateway.invalid/v1/chat/completions",
+                "",
+                payloads(),
+                ["uncached"] * 100,
+                2,
+                arrival_rate=100,
+            )
+        )
+        await asyncio.wait_for(entered.wait(), 1)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+    assert active == 0
+
+
+async def test_open_loop_propagates_unexpected_driver_errors_from_completed_tasks():
+    async def handler(request):
+        return httpx.Response(200, json=completion(), headers={"Server-Timing": "gateway;dur=oops"})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(ValueError):
+            await run_load(
+                client,
+                "http://gateway.invalid/v1/chat/completions",
+                "",
+                payloads(),
+                ["uncached"] * 3,
+                2,
+                arrival_rate=100,
+            )
+
+
+@pytest.mark.parametrize("rate", [0, -1, float("inf"), float("nan"), 10001])
+async def test_invalid_open_loop_rates_fail_before_traffic(rate):
+    async with httpx.AsyncClient() as client:
+        with pytest.raises(ValueError, match="arrival-rate"):
+            await run_load(
+                client, "http://gateway.invalid", "", payloads(), ["exact"], 1, arrival_rate=rate
+            )
+
+
+async def test_fixture_peak_reset_refuses_live_requests_and_resets_only_peak(monkeypatch):
+    stats = {"calls": 12, "active": 1, "peak": 8}
+    monkeypatch.setattr(benchmark, "_fixture_stats", stats)
+    with pytest.raises(RuntimeError):
+        await benchmark.fixture_reset_peak()
+    assert stats == {"calls": 12, "active": 1, "peak": 8}
+    stats["active"] = 0
+    assert await benchmark.fixture_reset_peak() == {"calls": 12, "active": 0, "peak": 0}
+
+
+def test_sampler_records_start_last_and_peak_rss_without_claiming_allocator_growth(monkeypatch):
+    sampler = benchmark.ProcessSampler({"gateway": 111222})
+    sampler.available = True
+    samples = iter([10, 20, 15])
+    monkeypatch.setattr(
+        benchmark,
+        "_process",
+        lambda _pid: {"identity": (111222, "start"), "cpu_ticks": 0, "rss_bytes": next(samples)},
+    )
+    for _ in range(3):
+        sampler.sample()
+    observed = sampler.summary(1.0)["groups"]["gateway"]
+    assert observed["first_sampled_rss_bytes"] == 10
+    assert observed["last_sampled_rss_bytes"] == 15
+    assert observed["sampled_peak_rss_bytes"] == 20

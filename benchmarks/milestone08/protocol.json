@@ -1,0 +1,204 @@
+{
+  "baseline_commit": "c389b6366a475d2ff5c8975666cc02ee19727176",
+  "frozen_at_utc": "2026-11-05T01:25:11.396334+00:00",
+  "source_manifest": {
+    "devtools/benchmark.py": "ec094daa99872a0e173a0df0a2035536382a8085960c58c397ade2b8ba0a81e2",
+    "devtools/load_campaign.py": "ce378a6cd703c928d4ea4e769883fff9a50e5c0fc407b3ff9dd784d9baaadec0",
+    "devtools/load_reliability.py": "7e5434feffa1384211a7798b9eefa8b327038b10c7b31b498c95ec52a4dbe546",
+    "devtools/semantic_eval.py": "633e3b941429988209e374abf1beef83f8e05bc5f24fc8748fe5a896d6887b1a",
+    "devtools/semantic_probe.py": "ff41da31c5807f290a5dd0a9859ec8c18744b984f27fad819bb75eebbf8f37f5",
+    "devtools/smoke.py": "37efb71ece2467d28f25e954120904700f8d4330a05fbf83d23b9961dc37b0f5",
+    "src/llm_gateway/__init__.py": "717b78cbb6791ca1c8e730ce7fa61f79918e208aaa7a5fc91c0e82da63c28828",
+    "src/llm_gateway/app.py": "b30ceb6009bd464ddcf645692a40a03f9e3990045d555fbd7e322cbcbc142652",
+    "src/llm_gateway/backend.py": "e15217b9191967879ea9c2bc07346621624761f660796153b41c2dad5e0e331d",
+    "src/llm_gateway/cache.py": "b3361651316a6a704a7f61a8f61c026b95234a9195aaea9524184e3367f16a2a",
+    "src/llm_gateway/config.py": "115d6132f67f025ac5c09740d04a2c0c737de963c48453f3b57e7d4ef9639dc5",
+    "src/llm_gateway/embeddings.py": "48ec89a7a3f474b8490c7c8c6f3eceaf3c9496c912fc5221ede45f849dd29e05",
+    "src/llm_gateway/metrics.py": "f9daabbd5575b265370966a417a21157cdc2809b3cdd000f06f3e4abb41e5536",
+    "src/llm_gateway/schemas.py": "8c009bdaacea952b8c6487a837eeabb02815c90286a00b973fa15f015ca83c01",
+    "src/llm_gateway/semantic.py": "7fb0eda909a2c3db2419f3e1199a43878d684d1cfb13f11ec7ae223cef6ae530",
+    "src/llm_gateway/traffic.py": "a18c31c05ce67b772f01c091f5a2f55f49753c2cf0ec844f1b80bfd47c536be9",
+    "uv.lock": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "hardware": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "machine": "x86_64",
+    "python": "3.12.14",
+    "logical_cpus": 3,
+    "cgroup_cpu_max": "200000 100000",
+    "cgroup_memory_max": "8589934592",
+    "packages": {
+      "fastapi": "0.141.1",
+      "starlette": "1.10.0",
+      "httpx": "0.28.1",
+      "pydantic": "2.14.1",
+      "uvicorn": "0.52.4",
+      "numpy": "2.5.4",
+      "onnxruntime": "1.31.1",
+      "tokenizers": "0.23.3"
+    },
+    "source_sha256": "ec094daa99872a0e173a0df0a2035536382a8085960c58c397ade2b8ba0a81e2",
+    "lock_sha256": "3fd5e4928538ddfbab041c8e531325060f0bc55ea929b7fc79f9cef1227b5390"
+  },
+  "planned_stages": {
+    "primary": [
+      [
+        "primary",
+        [
+          "--requests",
+          "1000",
+          "--concurrency",
+          "1",
+          "2",
+          "4",
+          "8",
+          "16",
+          "--scenarios",
+          "direct",
+          "uncached",
+          "exact",
+          "semantic",
+          "mixed",
+          "--repeats",
+          "3",
+          "--randomize-order"
+        ]
+      ]
+    ],
+    "ramp": [
+      [
+        "arrival-100",
+        [
+          "--requests",
+          "3000",
+          "--concurrency",
+          "16",
+          "--scenarios",
+          "uncached",
+          "--arrival-rate",
+          "100"
+        ]
+      ],
+      [
+        "arrival-300",
+        [
+          "--requests",
+          "3000",
+          "--concurrency",
+          "16",
+          "--scenarios",
+          "uncached",
+          "--arrival-rate",
+          "300"
+        ]
+      ],
+      [
+        "arrival-600",
+        [
+          "--requests",
+          "3000",
+          "--concurrency",
+          "16",
+          "--scenarios",
+          "uncached",
+          "--arrival-rate",
+          "600"
+        ]
+      ]
+    ],
+    "sustained": [
+      [
+        "sustained-uncached",
+        [
+          "--requests",
+          "10000",
+          "--concurrency",
+          "8",
+          "16",
+          "--scenarios",
+          "uncached",
+          "--randomize-order"
+        ]
+      ],
+      [
+        "sustained-exact",
+        [
+          "--requests",
+          "6000",
+          "--concurrency",
+          "16",
+          "--scenarios",
+          "exact",
+          "--arrival-rate",
+          "200"
+        ]
+      ],
+      [
+        "sustained-semantic",
+        [
+          "--requests",
+          "3000",
+          "--concurrency",
+          "1",
+          "--scenarios",
+          "semantic",
+          "--arrival-rate",
+          "100"
+        ]
+      ]
+    ],
+    "gemma": [
+      [
+        "gemma-closed",
+        [
+          "--requests",
+          "20",
+          "--concurrency",
+          "1",
+          "2",
+          "--scenarios",
+          "direct",
+          "uncached",
+          "--repeats",
+          "2",
+          "--randomize-order"
+        ]
+      ],
+      [
+        "gemma-arrival-1",
+        [
+          "--requests",
+          "20",
+          "--concurrency",
+          "2",
+          "--scenarios",
+          "uncached",
+          "--arrival-rate",
+          "1"
+        ]
+      ],
+      [
+        "gemma-arrival-3",
+        [
+          "--requests",
+          "30",
+          "--concurrency",
+          "2",
+          "--scenarios",
+          "uncached",
+          "--arrival-rate",
+          "3"
+        ]
+      ]
+    ]
+  },
+  "independent_hardware": false,
+  "load_driver_separate_process": true,
+  "semantic_policy": "Unchanged reviewed literal families and pinned L3 at0.75; no experimental grammar",
+  "window_policy": "5warmups and optionalcache seed excluded; postpointoneupstreamrecovery excluded",
+  "report_policy": "Targetarrivals,actualHTTPstarts,localdrops,HTTPstatus,success-onlyRPS/latencies separately; p95N>=100,p99N>=1000 eachdistribution",
+  "setup_trials_excluded": [
+    "artifacts/milestone08/setup-smoke.json",
+    "artifacts/milestone08/reliability-trial.json"
+  ]
+}

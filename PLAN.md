@@ -577,3 +577,31 @@ Next priorities: independent-load/repeated benchmarking, target macOS validation
 and final release-readiness checks. General unseen equivalence is outside the
 supported release scope; future investigation needs a new independent final set.
 No new services, providers, training, infrastructure or performance tuning.
+
+## 8 — Independent load and concurrency characterization (in progress)
+
+- [x] Inspect M06 driver, metrics/quotas/admission and M07 reviewed-only release.
+- [x] Keep gateway runtime/security/cache policy unchanged; extend only benchmark
+  tooling with bounded arrival scheduling, repeated randomized points, independent
+  backend peaks, recovery probes and resource accounting.
+- [ ] Freeze harness after checks, then measure three randomized repeats of
+  direct/uncached/exact/reviewed-semantic/mixed at concurrency 1/2/4/8/16, N=1000
+  each, five excluded warm-ups plus source seed when required. Seed 20261030.
+- [ ] Arrival-rate ramp: uncached c16, 3000 planned arrivals at 100/300/600 per s;
+  no client queue, bounded active HTTP work, scheduler/slot drops reported locally.
+- [ ] Sustained: uncached c8/c16 N10000; exact c16 target200/s N6000 and reviewed
+  semantic c1 target100/s N3000. Preserve TTL60, original reviewed registry/L3/.75.
+- [ ] Limited sequential real Gemma: direct/uncached c1/c2, N20, two repeats;
+  uncached c2 target1/s N20 and3/s N30. Pin quiet Ollama/model/context and count logs.
+- [ ] Repeated quota/burst/cancellation/timeout recovery, regressions and artifact
+  integrity; save raw reports, commands and outcome-separated summaries.
+- [ ] Document measured bottlenecks/limits and macOS/release readiness decision.
+
+Only the managed Linux host is available: 8 GiB and two CPU cores' cgroup quota.
+An idle controller launches a separate driver process; gateway/mock are separate
+children. Driver/sampler and all servers still share hardware; no CPU/network
+isolation or independent-hardware claim. Offered HTTP rate excludes local drops;
+successful RPS excludes 429/503/504 and incorrect answers. Start-cohort bins are
+not per-second completion throughput. Empirical p95 requires100 successful samples,
+p99 requires1000; no confidence/population-tail guarantee. Concurrent semantic
+fallback may create exact hits and must retain observed disposition counts.
