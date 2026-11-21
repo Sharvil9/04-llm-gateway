@@ -2,9 +2,10 @@
 
 An independent Python infrastructure project for a 24 GB MacBook: a centralized
 LLM HTTP API with conservative caching and process-local traffic controls.
-**Current status: milestone 8 completed repeated concurrency, offered-load and
-recovery measurements.** The single-worker prototype is ready for final macOS
-and release validation. Semantic reuse remains reviewed-phrase-only: milestone 7
+**Current status: milestone 9 complete; release ready for the documented
+single-worker, loopback-only local prototype.** The original pinned Gemma 3 1B
+passed isolated macOS/Metal verification and the final release pass has 296 tests.
+Semantic reuse remains reviewed-phrase-only: milestone 7
 did not establish unseen-wording generalization, and its candidate was not promoted.
 
 The foundation uses FastAPI, strict Pydantic schemas, a fixed model-routing table,
@@ -304,7 +305,8 @@ uv sync --locked --extra semantic --cache-dir .cache/uv
 
 The extra installs NumPy, ONNX Runtime and Tokenizers; the ordinary gateway needs
 none of them. Core-only tests skip the optional NumPy integration cases. No
-model weights are committed. macOS/Metal is not verified here.
+model weights are committed. The embedding measurements above were performed on
+Linux; M09 separately verifies the gateway and original LLM on macOS/Metal.
 The probe uses the frozen families and checks the evaluation/model fingerprint;
 its temporary configuration enables reuse, then cleans up its gateway. Dedicated
 Ollama logs independently count actual chat POSTs, so unrelated traffic invalidates
@@ -654,7 +656,7 @@ independently counted Ollama calls**: two source inferences (`Paris`, `Tokyo`),
 two suitable unseen development replays, Germany→`Berlin` BYPASS, tenant-B MISS.
 Captured genuine source answers were replayed through both full datasets.
 Ollama 0.40.11 / pinned Gemma 3 1B Q4_K_M, context 2048, CPU-only Linux 8 GiB /
-two-core quota; macOS remains untested. This is correctness evidence, not a new
+two-core quota; macOS was untested at M07. This is correctness evidence, not a new
 performance experiment. The restored release's real semantic probe also passed.
 
 Artifacts: [summary](evaluation/generalization_summary.json),
@@ -830,7 +832,7 @@ process IDs, payload hashes/sizes, warm-up, statuses, latency by outcome,
 source manifests and resources. [Tracked artifacts](benchmarks/milestone08/)
 include four campaign JSONs, ten full `.json.gz` reports, reliability and runtime
 identity; the summary verifies their digests. Gzip retains every bounded raw row.
-Readiness: proceed to target macOS/Metal and final release checks. Independent
+M09 subsequently completed original-pin macOS/Metal and final release checks. Independent
 hardware capacity, long-duration soak behavior and Internet deployment remain
 unvalidated. No grammar reactivation, new gateway features or speculative tuning.
 
@@ -1039,15 +1041,54 @@ does not establish answer correctness. Local raw JSON, logs, and one-off drivers
 remain in ignored `artifacts/milestone02/`; committed evidence is summarized here
 and in `PLAN.md`. All verification servers were stopped afterward.
 
-No installation, registry-access, or OOM blocker remained. macOS/Metal has not
-been tested. On macOS 14+, install the [official Ollama app](https://ollama.com/download),
-set the same context/concurrency controls when launching `ollama serve`, pull
-`gemma3:1b`, and use the same gateway/request commands; native Ollama writes to
-`~/.ollama`, while the filesystem-isolation wrapper above is Linux-specific.
+No installation, registry-access, or OOM blocker remained at M02. M09 below records
+the later macOS/Metal verification. The bubblewrap filesystem wrapper above is
+Linux-specific. M09 uses a project-local runtime with its own HOME, model store,
+temporary directory and port, leaving an existing Mac Ollama installation available.
 References: [release](https://github.com/ollama/ollama/releases/tag/v0.40.11),
 [Linux installation](https://docs.ollama.com/linux),
 [memory/concurrency controls](https://docs.ollama.com/faq), and
 [OpenAI subset](https://docs.ollama.com/api/openai-compatibility).
+
+## Original-pin macOS verification (milestone 9)
+
+Verified 2026-11-21 on macOS 27.0.1, Apple M5 arm64, 24 GiB, Python 3.14.7.
+The original `gemma3:1b` manifest was retrieved from the official Ollama registry
+and matched the exact configured digest `97558784...e58ba7c`. All five blobs passed
+size/SHA256 checks, including the 806,058,400-byte weight layer `2f8c3d13...cafeeef`.
+The [official v0.40.11 macOS archive](https://github.com/ollama/ollama/releases/tag/v0.40.11)
+matched SHA256 `aea7d3f2e32371b7644a6e2ec8d4f26820a0e3965918cce8a46cef3e947f6291`;
+server and runner binaries contain native arm64 support.
+
+A separate server used `OLLAMA_HOST=127.0.0.1:11435`, isolated HOME/TMPDIR and
+`OLLAMA_MODELS`, `OLLAMA_CONTEXT_LENGTH=2048`, `OLLAMA_NUM_PARALLEL=1`,
+`OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_NO_CLOUD=1`. Temporary gateway configuration
+changed only the backend URL's port; tracked model/backend pins stayed intact.
+Both gateway caches were disabled. API metadata verified the exact digest and
+effective context 2048; runner logs showed Apple M5/Metal and **27/27 layers
+offloaded to GPU** without a loading/resource error.
+
+Sequential city-only France requests used temperature 0/top_p 1/seed 42,
+max_tokens 32/stream false, after a separate successful model load.
+
+| Request | HTTP | Assistant text | Public/physical model | Reported usage | Client sample |
+| --- | ---: | --- | --- | --- | ---: |
+| Direct Ollama | 200 | Paris | gemma3:1b | 23/2/25 | 245.109 ms |
+| Authenticated gateway | 200 | Paris | gemma | 23/2/25 | 37.945 ms |
+
+Dedicated logs independently counted two chat POSTs. Gateway metrics reported one
+upstream attempt, BYPASS, zero stores/entries and zero retained inference permits.
+Native `ps` samples observed runner RSS 927.8–934.1 MiB and gateway RSS 59.7–59.8 MiB.
+Three process-average CPU/RSS samples can miss peaks and overlap unified-memory
+allocation. The second request restored provider KV state, so these samples do
+not establish gateway overhead or a speedup. Linux Gemma 3 measurements and the
+earlier approved Mac Gemma 2 substitute remain separate experiments.
+
+Owned verification processes stopped afterward; the existing daemon on port11434
+remained available. Local manifests/blobs, API/request/response snapshots, runtime
+logs, native samples, temporary config and the probe driver are retained under
+ignored `artifacts/milestone09/gemma3-original/`. Full results and final release
+checks are recorded in `PLAN.md`.
 
 ## Evidence and limitations
 
@@ -1062,6 +1103,13 @@ Recorded RPS applies only to the named workload and conditions. Cache/mock RPS
 is separate from actual Gemma inference; no general token-rate, cost or hardware
 performance guarantee is claimed.
 
+M09's separate macOS release pass completed on 2026-11-21, macOS 27.0.1 / Apple M5
+/ 24 GiB / Python 3.14.7, with **296 tests passed, zero failures/skips**, clean Ruff
+lint/format and HTTP smoke, quota/admission, deadline and exact-cache probes.
+Semantic dataset/threshold validation and preserved evaluation/benchmark hashes
+passed; actual embedding score measurements remain the recorded Linux results.
+`PLAN.md` records exact commands, artifacts and the earlier embedding-worker fix.
+
 Use loopback and one worker. There is no public metrics endpoint or ingress
 slow-client deadline, or shared state across workers. Pool capacity and inference
 admission are distinct from request quotas. Task/ASGI-disconnect cancellation
@@ -1073,8 +1121,8 @@ logged by application code; access logging is disabled in examples.
 
 The benchmark harness covers uncached/exact/semantic/mixed, concurrency, quotas
 and failure probes with raw results and separate mock, overhead and real-model
-measurements. Generalization remains outside the supported cache policy. Remaining
-priorities are target-MacBook measurements and final release-readiness verification;
-independent hardware is still needed for isolated capacity claims. Profile before
-optimization. See [SPEC.md](SPEC.md) for cache
-safety/security boundaries and [PLAN.md](PLAN.md) for the remaining gates.
+measurements. Generalization remains outside the supported cache policy.
+Independent hardware is still needed for isolated capacity claims; long-duration
+soak behavior and Internet deployment remain unvalidated. Profile before optimization.
+See [SPEC.md](SPEC.md) for cache safety/security boundaries and [PLAN.md](PLAN.md)
+for completed milestones and retained limitations.

@@ -11,8 +11,11 @@ coverage was 0/24 positives. The candidate was not promoted and its runtime
 changes were reverted. The supported architecture and configuration remain
 unchanged; its frozen experiment is reproducible at commit `d9955fa`.
 Milestone 8 adds repeated/randomized and offered-load measurements with a separate
-driver process on the same host. The serving runtime remains unchanged from
-`c389b63`; independent hardware capacity and target macOS remain unverified.
+driver process on the same host. Its measured serving runtime was unchanged from
+`c389b63`; independent hardware capacity remains unverified. Milestone 9 corrects
+the embedding-worker completion race and verifies original-pin macOS/Metal
+inference plus the final 296-test release pass. The documented single-worker,
+loopback-only local prototype is release ready within the limits below.
 Python 3.12+, FastAPI/Pydantic v2, Uvicorn, and one shared
 HTTPX `AsyncClient` per application lifespan. One worker; no Redis or database.
 
@@ -107,7 +110,11 @@ CPU time or isolated model inference; differences include scheduling/boundaries.
 ## Backends and embeddings
 
 Ollama 0.40.11 / `gemma3:1b` remains the verified model backend, alias `gemma`,
-endpoint `http://127.0.0.1:11434/v1`; CPU, one model, context 2048. macOS is untested.
+endpoint `http://127.0.0.1:11434/v1`; the original Linux baseline used CPU, one model,
+context 2048. M09 verifies the same pinned artifact/runtime on Apple M5/Metal with
+context 2048 using an isolated store and port 11435. Only the temporary backend URL
+changes; the tracked model/backend pins remain intact. An earlier approved Gemma 2
+Mac substitute remains a separate verification record. See README and PLAN.
 No Qwen models or implicit fallback.
 
 Compared quantized ONNX conversions of all-MiniLM-L6-v2 and paraphrase-MiniLM-L3-v2
@@ -436,8 +443,9 @@ HTTP correctness probes. Real Gemma produced 140 measured calls; 50 warm-up and 
 recovery calls independently reconcile 200 log POSTs. Shared-host/client constraints,
 native resource gaps, semantic fallback and finite soak duration remain explicit.
 See `benchmarks/milestone08/summary.json`, protocol and README for exact commands.
-Proceed to final target-macOS/release validation; do not publish an isolated-server
-capacity guarantee or treat the unsuccessful M07 grammar as supported.
+M09 subsequently completes original-pin target-macOS and focused release
+validation. Isolated-server capacity remains unverified; the unsuccessful M07
+grammar remains outside the supported release policy.
 
 ## Measurable completion gates
 

@@ -666,12 +666,14 @@ prototype. Independent hardware capacity and long-duration soak behavior remain
 unverified. No isolated-server SLA, distributed consistency, guaranteed remote
 cancellation or general semantic-generalization claim follows from these data.
 
-## 9 — Target macOS and release validation (incomplete)
+## 9 — Target macOS and release validation (complete)
 
 - [x] Correct the embedding-worker completion/cleanup race and verify the locked
   macOS regression baseline.
-- [ ] Validate the pinned Ollama runtime, Gemma artifact and context, then record
-  sequential direct/gateway inference and macOS resource observations.
+- [x] Validate isolated Ollama 0.40.11 with the explicitly approved local Gemma 2
+  2B Mac substitute, context 2048, direct/gateway inference and resource samples.
+- [x] Verify the original pinned Gemma 3 1B artifact on macOS and complete final
+  release validation.
 
 Corrective task verified 2026-11-21 from starting commit `2dc393e`, on macOS 27.0.1
 (26A434), Apple M5 / arm64 / 24 GiB RAM, project-local Python 3.14.7. The existing
@@ -707,8 +709,146 @@ Actual verification commands and results
   **401/422/404/200/200**, using the deterministic mock and cleaning up its servers.
 - Independent code/test review and focused rerun passed **57 tests in 0.43 s**.
 
-M09 remains incomplete. Read-only metadata on 2026-11-21 reports Ollama server
-**0.32.6**, client **0.32.3**; the configured loopback `/api/tags` has no
-`gemma3:1b` entry. `config/ollama.toml` pins server **0.40.11**, context **2048** and
-the existing model digest. Pinned real-model integration and macOS/Metal execution
-remain unverified. M08 measurements retain their historical source and results.
+At the initial inventory checkpoint, M09 was incomplete. Metadata on 2026-11-21
+reported Ollama server **0.32.6** and client **0.32.3**. The configured loopback
+`/api/tags` had no `gemma3:1b` entry. `config/ollama.toml` pins server **0.40.11**,
+context **2048** and the existing model digest. Pinned real-model integration and
+macOS/Metal execution were unverified at that checkpoint. M08 measurements retain
+their historical source and results.
+
+Isolated-runtime prerequisite inventory, 2026-11-21
+
+- Preserved corrective HEAD `62b392ebddf67b984c953c0d914089cb07d30ef3` on
+  `codex/fix-embedding-completion-race`, with a clean initial tracked tree.
+  `2dc393e` is an ancestor. Live origin refs contain `main` at `2dc393e` and no
+  published corrective branch.
+- PATH resolves Ollama to Homebrew **0.32.3** and the application CLI **0.32.6**.
+  The existing app server is PID 30145, owned by `sharvil`, running
+  `/Applications/Ollama.app/Contents/Resources/ollama` on `127.0.0.1:11434`.
+  Its explicit model directory is `/Users/sharvil/.ollama/models`; process,
+  launch-service and relevant configuration checks found no additional model
+  store. Port 11435 had no listener.
+- Hashed all **23** manifests in the active/default store, including alternate
+  tags. None matches the pinned `97558784...e58ba7c`. The canonical
+  `gemma3/1b` manifest and weight blob `sha256-2f8c3d13...cafeeef` are absent.
+  API tags agree; `/api/ps` reports zero loaded models. Existing Gemma 2 2B and
+  Gemma 4 12B manifests have different identities.
+- Applied the task's exact-artifact stop gate. Isolated v0.40.11 provisioning,
+  archive verification, model loading, context/Metal/resource observations and
+  direct/gateway inference remain pending. The prerequisite is an existing store
+  containing the complete pinned Gemma artifact set.
+- Ignored `artifacts/milestone09/inventory.json` records the repository, process,
+  configuration/search scope and every manifest digest. Adjacent
+  `existing-api-{version,tags,ps}.json` files retain the metadata API snapshots.
+  Independent read-only verification agrees with the repository and model-store
+  findings. M09 was incomplete at this inventory checkpoint.
+
+Approved Gemma 2 Mac platform verification, 2026-11-21
+
+- Published `codex/fix-embedding-completion-race` to origin at exact corrective
+  commit `62b392ebddf67b984c953c0d914089cb07d30ef3`; live remote ref confirmed.
+- User explicitly approved existing `gemma-2-2b:latest` for this Mac check.
+  Manifest at `/Users/sharvil/.ollama/models/manifests/registry.ollama.ai/library/gemma-2-2b/latest`
+  hashes to `f650f870a11071282b7f36c2484ed66dc1222c696548a07bdcb30514dfa162ad`.
+  Independently verified all four referenced config/weight/template/parameter
+  blobs, including the 1,708,582,752-byte weight layer `b88e7d96...e8b4a7`.
+  API inspection identifies Gemma 2 instruction-tuned, GGUF Q4_K_M, 2,614,341,888
+  parameters and context capability 8192. Canonical `gemma2:2b` identity is
+  unasserted; the test retains the verified local tag and digest.
+- Official Ollama v0.40.11 macOS archive SHA256 matched
+  `aea7d3f2e32371b7644a6e2ec8d4f26820a0e3965918cce8a46cef3e947f6291`.
+  `file`/`lipo -archs` verified universal x86_64/arm64 server and runner before
+  execution. Runtime, HOME, temp and a separate copied/rehash-verified model store
+  live under ignored `artifacts/milestone09/gemma2-macos/`.
+- Dedicated `127.0.0.1:11435` reported version 0.40.11; one model and one parallel
+  worker, cloud disabled. Empty-prompt load returned 200 in 518.620 ms.
+  `/api/ps` verified the exact digest and effective context **2048**.
+  Logs identify Apple M5/Metal, **27/27 layers offloaded to GPU**, and a 2048-token
+  runner slot. Reported model size/VRAM allocation both equal 1,891,306,044 bytes.
+  No loading, Metal or resource error was observed in the dedicated logs.
+- Temporary ignored `gateway.toml` differs only in backend port and test-model
+  name/digest. Tracked Gemma 3 1B pins, serving code and cache policy are preserved.
+  Both caches disabled. Same city-only France prompt, temperature 0/top_p 1/seed42,
+  max_tokens32/streamfalse, sequential actual loopback HTTP requests.
+  Direct **200, 236.749 ms**, physical model `gemma-2-2b:latest`; gateway **200,
+  88.698 ms**, public alias `gemma`. Both returned `Paris` with surrounding
+  whitespace, stop, provider usage **23 prompt /4 completion /27 total**. Gateway
+  normalized the response and removed provider-only fields. Metrics record one
+  upstream attempt, one BYPASS, zero stores/errors/held permits. Dedicated access
+  logs independently contain exactly **two** chat POSTs.
+- Three native `ps` samples observed runner RSS **1,963.6–1,967.4 MiB** and process
+  CPU **15.3–15.7%**; gateway RSS **59.8 MiB**. CPU percentages are process averages
+  and startup contributes. Memory-pressure free percentage was **80% before /71%
+  after**; system swap counters did not increase. Short samples can miss peaks,
+  shared/mapped/Metal allocations overlap, and host-wide changes have other causes.
+- Second-request logs show provider KV checkpoint reuse, so the latency samples
+  do not establish gateway overhead or a speedup. The existing Linux Gemma 3 1B
+  evidence remains the baseline; these different-model/hardware samples are not
+  directly comparable. GPU utilization, capacity and soak behavior are unmeasured.
+- Owned runtime, runner and gateway processes were stopped and confirmed absent.
+  Original daemon PID30145 remained on port11434 at version0.32.6 with no loaded
+  models. Its source Gemma manifest hash still matches the pre-test value.
+  `summary.json`, `verification.json`, request/response and API snapshots, native
+  samples, dedicated logs, temporary config and the probe driver retain evidence
+  under the ignored directory. Independent artifact/runtime/result review passed.
+  At this substitute checkpoint, M09 was partially verified; original pinned
+  Gemma 3 1B macOS execution and final release validation remained outstanding.
+
+Original-pin Mac verification and final release pass, 2026-11-21
+
+- Retrieved the original Gemma 3 1B manifest from the official Ollama registry
+  `https://registry.ollama.ai/v2/library/gemma3/manifests/1b`. Its SHA256 exactly
+  matches `97558784bdc9175075a72655bf360b15da17df6b3b9e5182af9f8c0c8e58ba7c`.
+  The digest-addressed registry URL returned 404; the tag response was accepted
+  only after that exact hash check. All five referenced blobs passed size/SHA256
+  checks, including the **806,058,400-byte** weight layer
+  `2f8c3d137f2496dcb4019e17a50f2974b89c1be1a742db3c80cc86f91cafeeef`.
+- Used a new isolated HOME, model store and temp directory under
+  `artifacts/milestone09/gemma3-original/`, port **11435**, one model/parallel
+  worker, cloud disabled and the previously checksum/architecture-verified
+  Ollama **0.40.11** runtime. Existing Gemma 2 evidence was retained. API inspection
+  identifies Gemma 3, **999,885,952 parameters**, GGUF **Q4_K_M**, context capability
+  32768; `/api/ps` verifies exact digest and effective context **2048**. Logs show
+  **Apple M5 / Metal**, **27/27 layers offloaded to GPU**, and no loading/resource
+  error. Model/VRAM allocation reported **877,668,597 bytes**.
+- Temporary `gateway.toml` byte-matches tracked `config/ollama.toml` except backend
+  port **11434→11435**. Original model/backend pins remain intact. One direct
+  physical-model request and one authenticated alias `gemma` request both returned
+  **200 `Paris`**, stop, usage **23/2/25**, with identical city-only France prompt,
+  temperature0/top_p1/seed42/max_tokens32/streamfalse. Client samples were
+  **245.109 ms direct /37.945 ms gateway**, after a separate **521.265 ms** load.
+  Two dedicated access-log chat POSTs reconcile with one gateway upstream attempt,
+  BYPASS, zero cache entries/stores and zero retained inference permits. Response
+  schema and provider-field filtering passed. Second-request KV checkpoint reuse
+  prevents causal gateway-overhead or cross-platform performance comparisons.
+- Three native `ps` samples observed runner RSS **927.8–934.1 MiB**, process CPU
+  **13.9–17.6%**, gateway RSS **59.7–59.8 MiB**. These short process-average samples
+  can miss peaks and overlap unified/Metal memory. Host free-memory metric was
+  **80% before /76% after**. Owned servers/runner stopped after verification;
+  original PID30145 on11434 remained version0.32.6 with no loaded models.
+- One final `.venv/bin/pytest -ra` passed **296 tests in 3.10 s**, zero failures
+  and skips. Ruff lint passed; formatting reported **47 files already formatted**.
+  HTTP smoke passed **401/422/404/200/200**. Existing correctness probes passed
+  quota isolation (**19 HTTP429 /24 attempts, 5 calls**), capacity2 rejection
+  (**20 HTTP503, recovery200, zero held permits**), cooperative deadline
+  (**504, 1005.067 ms client /1002.612 ms adapter for1000 ms budget**), and exact
+  cache isolation/replay (**6 successes /3 calls, 3 HIT /2 MISS /1 BYPASS**).
+- Semantic dataset validation and calibration-only threshold recomputation passed
+  with `devtools.semantic_eval --validate-only` and
+  `devtools.semantic_audit --validate-only`. This pass loads no embedding model;
+  actual embedding scores remain the recorded Linux evaluation. Current tests
+  verify reviewed-only serving and compatibility/isolation/failure boundaries.
+  Independent integrity checks passed all16 M08 artifacts (including10 raw gzip
+  payloads), semantic datasets and12 generalization records. M07 remains
+  unpromoted. M08 measurement records retain their historical source and limits.
+- `gemma3-original/verification.json`, model/API snapshots, logs and driver preserve
+  original-pin evidence. `final-release/` preserves the single test/lint/smoke/data
+  validation outputs and HTTP probe JSON. README/SPEC current status reconciled;
+  `git diff --check` passed. No additional application defect was found.
+
+**M09 complete. RELEASE READY for the documented single-worker loopback-only
+local prototype.** Linux Gemma 3 baseline, approved Mac Gemma 2 substitute and
+original-pin Mac Gemma 3 verification remain separate experiments. Existing
+reviewed-phrase semantic restrictions, cooperative cancellation, process-local
+state, bounded observations and unverified isolated-capacity/long-soak/Internet
+deployment limits remain part of the release scope.
