@@ -135,10 +135,11 @@ class FakeEncoder:
     fingerprint = "fake-encoder-v1"
     max_tokens = 256
 
-    def __init__(self):
+    def __init__(self, *, fail_blocked=False):
         self.started = threading.Event()
         self.release = threading.Event()
         self.calls = []
+        self.fail_blocked = fail_blocked
 
     def encode(self, text):
         self.calls.append((text, threading.get_ident()))
@@ -146,9 +147,122 @@ class FakeEncoder:
             self.started.set()
             if not self.release.wait(timeout=3):
                 raise RuntimeError("Synthetic encoder was not released")
+            if self.fail_blocked:
+                raise EmbeddingInputError("Synthetic blocked failure")
         if text == "invalid":
             raise EmbeddingInputError("Synthetic invalid input")
         return [1.0, 0.0]
+
+
+@pytest.fixture
+def completed_executor(monkeypatch):
+    """Return completed worker futures before their callbacks can run."""
+
+    def install(worker):
+        loop = asyncio.get_running_loop()
+        original = loop.run_in_executor
+        futures = []
+
+        def submit(executor, job, *args):
+            if executor is not worker._executor:
+                return original(executor, job, *args)
+            future = loop.create_future()
+            try:
+                future.set_result(job(*args))
+            except Exception as exc:
+                future.set_exception(exc)
+            futures.append(future)
+            return future
+
+        monkeypatch.setattr(loop, "run_in_executor", submit)
+        return futures
+
+    return install
+
+
+@pytest.mark.parametrize("operation", ["encode", "match"])
+@pytest.mark.parametrize("first_fails", [False, True], ids=["success", "failure"])
+async def test_completed_job_releases_capacity_before_caller_resumes(
+    completed_executor, operation, first_fails
+):
+    vector = [1.0] + [0.0] * 383
+
+    def encode(text):
+        if text == "invalid":
+            raise EmbeddingInputError("Synthetic invalid input")
+        return vector
+
+    worker = BoundedEmbedder(SimpleNamespace(fingerprint="fake-v1", max_tokens=256, encode=encode))
+    futures = completed_executor(worker)
+    if operation == "match":
+        np = pytest.importorskip("numpy")
+        expected = (np.asarray(vector, dtype="<f4").tobytes(), None, 0.0)
+    else:
+        expected = vector
+
+    async def request(text):
+        if operation == "match":
+            return await worker.match(text, [], 0.9)
+        return await worker.encode(text)
+
+    try:
+        if first_fails:
+            with pytest.raises(EmbeddingInputError, match="Synthetic invalid input"):
+                await request("invalid")
+        else:
+            assert await request("valid") == expected
+        # No loop yield: the first future's completion callback is still queued.
+        assert await request("next") == expected
+        assert len(futures) == 2 and all(future.done() for future in futures)
+        assert worker._future is None
+    finally:
+        await worker.close()
+
+
+@pytest.mark.parametrize("first_fails", [False, True], ids=["success", "failure"])
+async def test_delayed_old_completion_callback_preserves_new_job(monkeypatch, first_fails):
+    worker = BoundedEmbedder(FakeEncoder())
+    loop = asyncio.get_running_loop()
+    original = loop.run_in_executor
+    old, current, observed = loop.create_future(), loop.create_future(), loop.create_future()
+    if first_fails:
+        old.set_exception(EmbeddingInputError("Synthetic old failure"))
+    else:
+        old.set_result([1.0, 0.0])
+    submissions = iter([old, current])
+
+    def submit(executor, job, *args):
+        if executor is worker._executor:
+            return next(submissions)
+        return original(executor, job, *args)
+
+    monkeypatch.setattr(loop, "run_in_executor", submit)
+
+    async def consecutive_requests():
+        if first_fails:
+            with pytest.raises(EmbeddingInputError, match="Synthetic old failure"):
+                await worker.encode("invalid")
+        else:
+            assert await worker.encode("valid") == [1.0, 0.0]
+        # Observe after the worker's old callback, while the new request awaits.
+        old.add_done_callback(lambda _done: observed.set_result(worker._future))
+        return await worker.encode("new")
+
+    caller = asyncio.create_task(consecutive_requests())
+    try:
+        assert await asyncio.wait_for(observed, 1) is current
+        assert await worker.encode("would-queue") is None
+        assert not caller.done() and not current.done()
+        current.set_result([1.0, 0.0])
+        assert await caller == [1.0, 0.0]
+        assert worker._future is None
+    finally:
+        if not current.done():
+            current.set_result([1.0, 0.0])
+        if not caller.done():
+            caller.cancel()
+        await asyncio.gather(caller, return_exceptions=True)
+        await worker.close()
 
 
 async def test_busy_worker_has_no_waiting_queue_and_runs_outside_event_loop():
@@ -173,9 +287,16 @@ async def test_busy_worker_has_no_waiting_queue_and_runs_outside_event_loop():
         await worker.close()
 
 
-async def test_caller_cancellation_does_not_release_running_worker_capacity():
-    fake = FakeEncoder()
+@pytest.mark.parametrize("fail_blocked", [False, True], ids=["success", "failure"])
+async def test_caller_cancellation_does_not_release_running_worker_capacity(
+    monkeypatch, fail_blocked
+):
+    fake = FakeEncoder(fail_blocked=fail_blocked)
     worker = BoundedEmbedder(fake)
+    loop = asyncio.get_running_loop()
+    previous_handler = loop.get_exception_handler()
+    notifications = []
+    loop.set_exception_handler(lambda _loop, context: notifications.append(context))
     first = asyncio.create_task(worker.encode("blocked"))
     try:
         assert await asyncio.to_thread(fake.started.wait, 1)
@@ -186,12 +307,40 @@ async def test_caller_cancellation_does_not_release_running_worker_capacity():
         assert await worker.match("would-queue", [], 0.9) is None
         assert len(fake.calls) == 1
         pending = worker._future
+        assert not pending.done()
+        consumed = []
+        original_exception = pending.exception
+
+        def exception():
+            result = original_exception()
+            consumed.append(result)
+            return result
+
+        monkeypatch.setattr(pending, "exception", exception)
+        # Observe callback completion without awaiting/consuming the abandoned job.
+        observed = asyncio.get_running_loop().create_future()
+        pending.add_done_callback(lambda _done: observed.set_result(None))
         fake.release.set()
-        await asyncio.wait_for(asyncio.shield(pending), timeout=1)
+        await asyncio.wait_for(observed, timeout=1)
+        assert worker._future is None
+        assert consumed
+        if fail_blocked:
+            assert all(isinstance(error, EmbeddingInputError) for error in consumed)
+        else:
+            assert all(error is None for error in consumed)
+        # Python 3.14 can explicitly report a shielded job's failure even after
+        # consumption. Reject unhandled-future notifications or unrelated errors.
+        for context in notifications:
+            assert fail_blocked
+            assert context["message"] == "EmbeddingInputError exception in shielded future"
+            assert context["future"] is pending and context["exception"] in consumed
         assert await worker.encode("after-completion") == [1.0, 0.0]
     finally:
-        fake.release.set()
-        await worker.close()
+        try:
+            fake.release.set()
+            await worker.close()
+        finally:
+            loop.set_exception_handler(previous_handler)
 
 
 async def test_worker_errors_propagate_and_capacity_recovers():

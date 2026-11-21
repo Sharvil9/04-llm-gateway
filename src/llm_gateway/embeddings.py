@@ -278,7 +278,13 @@ class BoundedEmbedder:
                 done.exception()  # Consume errors even when the caller was cancelled.
 
         future.add_done_callback(finished)
-        return await asyncio.shield(future)
+        try:
+            return await asyncio.shield(future)
+        finally:
+            # An already-done future can resume us before its queued callback.
+            # Caller cancellation must still retain capacity for unfinished work.
+            if future.done():
+                finished(future)
 
     async def encode(self, text: str) -> "np.ndarray | None":
         return await self._run(lambda: self._encoder.encode(text))

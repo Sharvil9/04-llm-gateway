@@ -665,3 +665,50 @@ Proceed to final macOS/Metal and release validation as a single-worker local
 prototype. Independent hardware capacity and long-duration soak behavior remain
 unverified. No isolated-server SLA, distributed consistency, guaranteed remote
 cancellation or general semantic-generalization claim follows from these data.
+
+## 9 — Target macOS and release validation (incomplete)
+
+- [x] Correct the embedding-worker completion/cleanup race and verify the locked
+  macOS regression baseline.
+- [ ] Validate the pinned Ollama runtime, Gemma artifact and context, then record
+  sequential direct/gateway inference and macOS resource observations.
+
+Corrective task verified 2026-11-21 from starting commit `2dc393e`, on macOS 27.0.1
+(26A434), Apple M5 / arm64 / 24 GiB RAM, project-local Python 3.14.7. The existing
+locked semantic environment has NumPy 2.5.4, ONNX Runtime 1.31.1 and Tokenizers
+0.23.3. Dependencies, pins, serving architecture and reviewed cache policy retain
+their existing configuration.
+
+Both reported embedding tests failed independently before the correction. An
+already-completed executor future lets `asyncio.shield()` return or raise before
+the queued completion callback clears `_future`. The awaiting path now calls the
+same identity-guarded callback in `finally` when the future is done. Unfinished
+jobs retain their slot after caller cancellation; their callback releases it on
+completion. Shutdown still waits for outstanding executor work.
+
+Four deterministic success/error cases cover immediate recovery for `encode()`
+and `match()` without a loop yield; two cases cover an old callback running while
+a newer job owns the slot. All six failed against the original source and passed
+after the fix. Real-thread cancellation coverage now checks both successful and
+failed abandoned work, exception retrieval and recovery. Python 3.14.7 explicitly
+reports failed shielded work even after exception retrieval; tests check that
+notification and reject unhandled-future or unrelated notifications. Existing
+capacity, shutdown and semantic-gateway tests remain covered.
+
+Actual verification commands and results
+
+- `.venv/bin/pytest -ra tests/test_embeddings.py` — **28 passed in 0.10 s**.
+- `.venv/bin/pytest -ra tests/test_semantic.py tests/test_semantic_gateway.py tests/test_semantic_eval.py tests/test_semantic_audit.py`
+  — **45 passed in 0.29 s**.
+- `.venv/bin/pytest -ra` — **296 passed in 3.10 s**, zero failures/skips.
+- `.venv/bin/ruff check .` passed; `.venv/bin/ruff format --check .` reported
+  **47 files already formatted**; `git diff --check` passed.
+- `.venv/bin/python -m devtools.smoke` passed actual loopback HTTP checks
+  **401/422/404/200/200**, using the deterministic mock and cleaning up its servers.
+- Independent code/test review and focused rerun passed **57 tests in 0.43 s**.
+
+M09 remains incomplete. Read-only metadata on 2026-11-21 reports Ollama server
+**0.32.6**, client **0.32.3**; the configured loopback `/api/tags` has no
+`gemma3:1b` entry. `config/ollama.toml` pins server **0.40.11**, context **2048** and
+the existing model digest. Pinned real-model integration and macOS/Metal execution
+remain unverified. M08 measurements retain their historical source and results.
